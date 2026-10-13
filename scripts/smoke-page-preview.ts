@@ -145,6 +145,22 @@ async function main(): Promise<void> {
   ok('the editor can edit the page', editorEdits.status === 200, editorEdits.body);
   const editorReviews = await admin(`/content/pages/${pageId}/review`, { method: 'POST', token: editorToken });
   ok('…but cannot sign off its legal review → 403', editorReviews.status === 403, editorReviews.body);
+  section('Publishing is cms.publish, on every route');
+  const editorPublishes = await admin(`/content/pages/${pageId}/publish`, { method: 'POST', token: editorToken, body: {} });
+  ok('the editor cannot POST /publish → 403', editorPublishes.status === 403, editorPublishes.body);
+  const editorPuts = await admin(`/content/pages/${pageId}`, { method: 'PUT', token: editorToken, body: { status: 'published' } });
+  ok('…nor PUT status: published → 403', editorPuts.status === 403, editorPuts.body);
+  const editorCreatesLive = await admin('/content/pages', { method: 'POST', token: editorToken, body: { title: `Live ${run}`, page_type: 'standard', status: 'published' } });
+  ok('…nor create a page already published → 403', editorCreatesLive.status === 403, editorCreatesLive.body);
+  const editorBulk = await admin('/content/pages/bulk-update', { method: 'POST', token: editorToken, body: { ids: [pageId], status: 'published' } });
+  ok('…nor bulk-publish → 403', editorBulk.status === 403, editorBulk.body);
+  const editorDraft = await admin('/content/pages', { method: 'POST', token: editorToken, body: { title: `Draft ${run}`, page_type: 'standard', status: 'in_review' } });
+  ok('the editor can still create a page and send it for review', [200, 201].includes(editorDraft.status), editorDraft.body);
+  const createdLive = await admin('/content/pages', { method: 'POST', body: { title: `Unreviewed ${run}`, page_type: 'policy', status: 'published', requires_legal_review: true } });
+  ok('a page needing legal review cannot be created live → 400', createdLive.status === 400, createdLive.body);
+  const bulk = await admin('/content/pages/bulk-update', { method: 'POST', body: { ids: [pageId], status: 'published' } });
+  ok('bulk publish skips a page whose review is not signed off', bulk.status === 200 && bulk.body?.updatedCount === 0, bulk.body);
+
   const tooEarly = await admin(`/content/pages/${pageId}/publish`, { method: 'POST', body: {} });
   ok('publishing before the review is signed off → 400', tooEarly.status === 400 && /legal review/.test(tooEarly.body?.error?.message ?? ''), tooEarly.body);
   const viaUpdate = await admin(`/content/pages/${pageId}`, { method: 'PUT', body: { status: 'published' } });

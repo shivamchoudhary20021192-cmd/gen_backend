@@ -4,7 +4,7 @@
  * Route definitions for CMS Pages API endpoints.
  */
 
-import { Router } from 'express'
+import { Router, type RequestHandler } from 'express'
 import { asyncHandler } from '../../../core/asyncHandler'
 import { authenticate } from '../../../middleware/authenticate'
 import { requirePermission } from '../../../middleware/requirePermission'
@@ -24,6 +24,20 @@ import {
 } from './pages.schemas'
 
 export const pagesRouter = Router()
+
+/**
+ * Making a page public takes cms.publish wherever it happens. Create, update
+ * and bulk-update all accept a status, and checking only POST /:id/publish
+ * let anyone with cms.edit publish through them instead.
+ */
+const PUBLIC_STATUSES: ReadonlySet<unknown> = new Set(['published', 'scheduled'])
+const publishingNeedsPublish: RequestHandler = (req, res, next) => {
+  if (PUBLIC_STATUSES.has((req.body as { status?: unknown } | undefined)?.status)) {
+    requirePermission('cms.publish')(req, res, next)
+    return
+  }
+  next()
+}
 
 // All routes require authentication
 pagesRouter.use(authenticate)
@@ -72,6 +86,7 @@ pagesRouter.post(
   '/',
   requirePermission('cms.edit'),
   validate({ body: createPageSchema }),
+  publishingNeedsPublish,
   asyncHandler(pagesController.create)
 )
 
@@ -84,6 +99,7 @@ pagesRouter.put(
   '/:id',
   requirePermission('cms.edit'),
   validate({ params: pageIdParamSchema, body: updatePageSchema }),
+  publishingNeedsPublish,
   asyncHandler(pagesController.update)
 )
 
@@ -253,5 +269,6 @@ pagesRouter.post(
   '/bulk-update',
   requirePermission('cms.edit'),
   validate({ body: bulkUpdatePagesSchema }),
+  publishingNeedsPublish,
   asyncHandler(pagesController.bulkUpdate)
 )

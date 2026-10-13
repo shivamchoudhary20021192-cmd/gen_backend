@@ -120,6 +120,12 @@ export const pagesService = {
       data.status = 'scheduled'
     }
 
+    // A page that needs legal review cannot be reviewed before it exists, so
+    // it cannot be created live either.
+    if (data.requires_legal_review && (data.status === 'published' || data.status === 'scheduled')) {
+      throw new ApiError(400, 'INVALID_TRANSITION', 'Page requires legal review before publishing')
+    }
+
     // Create page
     const pageId = await pagesRepository.create(data, adminId)
 
@@ -480,7 +486,9 @@ export const pagesService = {
 
     for (const id of ids) {
       try {
-        await pagesRepository.update(id, { status }, adminId)
+        // Through `update`, so each page gets the same transition and
+        // legal-review checks as a single edit; one that fails is skipped.
+        await this.update(id, { status }, adminId)
         successCount++
       } catch (error) {
         // Continue with other pages even if one fails
