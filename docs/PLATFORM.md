@@ -200,6 +200,19 @@ files live under `shops/{shop public id}/`.
     an address would be offered. For Indian stores, postcodes mapped in
     `pincode_serviceability` still set named zones and can refuse delivery,
     COD or express.
+    **Carrier-calculated rates**: a rate row with `rate_type: "carrier"` and a
+    `carrier_id` matches like any other, but charges the courier's live quote
+    for the parcel (`carrier_markup_percent`, then `carrier_markup_amount`, on
+    top) — the cheapest surface service for standard, air or express for
+    express — and its own `rate` when the courier cannot answer within
+    `SHIPPING_QUOTE_TIMEOUT_MS` (3 s), does not serve the address, or no
+    postcode is known. Quotes are cached ten minutes per basket and address,
+    so the bag and checkout agree; a failing courier is left alone for 30 s.
+    Options say where their price came from (`rateSource`: `table`,
+    `carrier`, `carrier_fallback`). Couriers quote through the optional
+    `CourierProvider.quoteRates`: the stand-in prices from the table it books
+    at; Shiprocket asks its serviceability API (built to its documentation,
+    not yet run against a live account).
   * *Checkout* re-quotes inside its transaction once the customer is known —
     the only point "first order only" and "once per customer" can be decided —
     and counts each discount with a guarded increment on the coupon row, so
@@ -563,8 +576,9 @@ Honest list of what is not done, roughly in priority order:
 * **Legacy timestamps in "mixed" columns** (listed by `db:fix-timestamps`,
   e.g. `products.published_at`, `orders.packed_at`) keep whatever zone they
   were written in on a non-UTC server: a row cannot say which writer set it.
-* **Shipping**: carrier-calculated rates (live quotes from a connected
-  courier) are not wired in.
+* **Shipping**: carrier-calculated rates are quoted for prepaid parcels
+  (a COD surcharge stays the shop's own fee), and the Shiprocket quote has
+  not been run against a live account.
 * **Tax, what is missing**: Avalara is not integrated; there is no
   cross-border tax (EU OSS, import duties — see Markets); registration rates are one combined rate per state, not
   per county or city (the tax service gives that).

@@ -15,6 +15,12 @@ export const createRateSchema = z.object({
   // A rate for one shipping zone; omitted, the rate follows `zone` ('all': everywhere no zone covers).
   zone_id: z.coerce.number().int().positive().nullish(),
   method: z.enum(['standard', 'express', 'pickup']).default('standard'),
+  // 'carrier': priced by the courier's live quote for each parcel, with
+  // `rate` as the fallback when it cannot answer.
+  rate_type: z.enum(['flat', 'carrier']).default('flat'),
+  carrier_id: z.coerce.number().int().positive().nullish(),
+  carrier_markup_percent: z.coerce.number().min(0).max(500).default(0),
+  carrier_markup_amount: z.coerce.number().min(0).default(0),
   min_order_amount: z.coerce.number().min(0).default(0),
   max_order_amount: z.coerce.number().min(0).nullish(),
   min_weight_grams: z.coerce.number().int().min(0).default(0),

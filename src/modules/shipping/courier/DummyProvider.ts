@@ -4,6 +4,8 @@ import type {
   CourierStatus,
   CreateShipmentInput,
   CreateShipmentResult,
+  RateQuote,
+  RateQuoteInput,
   ReversePickupInput,
   TrackingEvent,
   TrackingResult,
@@ -51,6 +53,17 @@ function hoursAgo(from: Date, hours: number): Date {
   return new Date(from.getTime() + hours * 3600_000);
 }
 
+/**
+ * What a parcel costs. Couriers price in 500 g slabs, so the second slab costs
+ * the same as the first plus a bit — worth modelling, because it is what makes
+ * shipping cost look right on the shipments list.
+ */
+function charge(mode: 'surface' | 'air' | 'express', weightGrams: number, cod: boolean): number {
+  const base = mode === 'express' ? 149 : mode === 'air' ? 119 : 79;
+  const slabs = Math.max(1, Math.ceil(weightGrams / 500));
+  return base + (slabs - 1) * 30 + (cod ? 35 : 0);
+}
+
 export class DummyProvider implements CourierProvider {
   readonly code: string;
   readonly isLive = false;
@@ -88,20 +101,38 @@ export class DummyProvider implements CourierProvider {
     }
 
     const days = isMetro(input.delivery.pincode) ? 3 : 6;
-    const base = input.mode === 'express' ? 149 : input.mode === 'air' ? 119 : 79;
-    // Couriers price in 500 g slabs, so the second slab costs the same as the
-    // first plus a bit — worth modelling, because it is what makes shipping
-    // cost look right on the shipments list.
-    const slabs = Math.max(1, Math.ceil(input.parcel.weightGrams / 500));
-    const codSurcharge = input.codAmount > 0 ? 35 : 0;
 
     return {
       awbNumber: this.awb(),
       providerShipmentId: `dummy_${Date.now()}_${digits(4)}`,
       trackingUrl: null, // filled from the carrier's template by the service
       estimatedDeliveryAt: addDays(new Date(), days),
-      shippingCharge: base + (slabs - 1) * 30 + codSurcharge,
+      shippingCharge: charge(input.mode, input.parcel.weightGrams, input.codAmount > 0),
     };
+  }
+
+  /**
+   * Prices from the same table the booking charges, so a rate quoted at
+   * checkout is what the shipment later costs. Refuses what booking would
+   * refuse: a malformed postcode serves nothing.
+   */
+  async quoteRates(input: RateQuoteInput): Promise<RateQuote[]> {
+    if (!isValidPostalCode(input.destination.postalCode, input.destination.country)) return [];
+    if (input.weightGrams <= 0) return [];
+    const metro = isMetro(input.destination.postalCode);
+    const services: { mode: RateQuote['mode']; label: string; eta: [number, number] }[] = [
+      { mode: 'surface', label: 'Surface', eta: metro ? [3, 4] : [5, 7] },
+      { mode: 'air', label: 'Air', eta: metro ? [2, 3] : [3, 5] },
+      { mode: 'express', label: 'Express', eta: metro ? [1, 1] : [2, 3] },
+    ];
+    return services.map((service) => ({
+      mode: service.mode,
+      service: `${this.carrierCode} ${service.label}`,
+      amount: charge(service.mode, input.weightGrams, input.cod),
+      currency: 'INR',
+      etaMinDays: service.eta[0],
+      etaMaxDays: service.eta[1],
+    }));
   }
 
   async cancelShipment(providerShipmentId: string, awbNumber: string): Promise<void> {

@@ -26,6 +26,10 @@ function presentRate(row: ShippingRateRow) {
     zone: row.zone,
     zone_id: row.zone_id === null ? null : Number(row.zone_id),
     method: row.method,
+    rate_type: row.rate_type,
+    carrier_id: row.carrier_id === null ? null : Number(row.carrier_id),
+    carrier_markup_percent: Number(row.carrier_markup_percent),
+    carrier_markup_amount: Number(row.carrier_markup_amount),
     min_order_amount: Number(row.min_order_amount),
     max_order_amount: row.max_order_amount !== null ? Number(row.max_order_amount) : null,
     min_weight_grams: row.min_weight_grams,
@@ -39,6 +43,23 @@ function presentRate(row: ShippingRateRow) {
     created_at: row.created_at,
     updated_at: row.updated_at,
   };
+}
+
+/**
+ * A carrier-calculated rate must name a carrier of this shop; store pickup is
+ * never carrier-priced. The row's `rate` stays required: it is the fallback.
+ */
+async function assertCarrierRate(rate: { rate_type?: unknown; carrier_id?: unknown; method?: unknown }): Promise<void> {
+  if (rate.rate_type !== 'carrier') return;
+  if (rate.method === 'pickup') {
+    throw ApiError.validation({ rate_type: ['Store pickup has no parcel to price; use a flat rate.'] });
+  }
+  if (!rate.carrier_id) {
+    throw ApiError.validation({ carrier_id: ['Choose the carrier whose live rates this charges.'] });
+  }
+  if (!(await shippingRepository.findCarrierById(Number(rate.carrier_id)))) {
+    throw ApiError.validation({ carrier_id: ['That carrier does not exist.'] });
+  }
 }
 
 function presentCarrier(row: ShippingCarrierRow) {
@@ -122,6 +143,7 @@ export const shippingService = {
     meta: ActorMeta,
   ) {
     await shippingZonesService.assertZone(data.zone_id);
+    await assertCarrierRate(data);
     const id = await shippingRepository.createRate(data);
     await auditService.log({
       actorId: admin.id,
@@ -150,6 +172,12 @@ export const shippingService = {
     await shippingZonesService.assertZone(data.zone_id as number | null | undefined);
     const existing = await shippingRepository.findRateById(id);
     if (!existing) throw ApiError.notFound('Shipping rate');
+    // Checked against the row as it will be after the change.
+    await assertCarrierRate({
+      rate_type: data.rate_type ?? existing.rate_type,
+      carrier_id: data.carrier_id !== undefined ? data.carrier_id : existing.carrier_id,
+      method: data.method ?? existing.method,
+    });
 
     await shippingRepository.updateRate(id, data);
     await auditService.log({
@@ -221,6 +249,9 @@ export const shippingService = {
     });
 
     const updated = await shippingRepository.findCarrierById(id);
+    // A carrier switched off, or moved to another provider, prices nothing
+    // it quoted before.
+    shippingQuote.invalidate();
     return { carrier: presentCarrier(updated!) };
   },
 
