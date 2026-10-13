@@ -1,0 +1,53 @@
+{%- unless cart.empty -%}
+  <div class="cart-footer page-width" data-cart-footer>
+    <div class="cart-footer__grid">
+      <div class="cart-footer__start">
+        {%- if section.settings.show_discount -%}
+          <form action="{{ routes.cart_update_url }}" method="post" class="cart-footer__discount">
+            <label class="field__label" for="CartDiscount">{{ 'sections.cart.discount_code' | t }}</label>
+            <div class="field field--inline">
+              <input class="field__input" id="CartDiscount" name="discount" autocomplete="off">
+              <button class="button button--secondary button--small" type="submit">{{ 'sections.cart.apply' | t }}</button>
+            </div>
+          </form>
+        {%- endif -%}
+      </div>
+      <div class="cart-footer__totals">
+        {%- if settings.show_free_shipping_bar and cart.free_shipping_threshold > 0 -%}
+          {%- liquid
+            assign remaining = cart.amount_to_free_shipping
+            assign remaining_money = remaining | money
+            assign progress = cart.free_shipping_threshold | minus: remaining | times: 100 | divided_by: cart.free_shipping_threshold | at_least: 0 | at_most: 100
+          -%}
+          <div class="free-shipping">
+            {%- if remaining > 0 -%}<p>{{ 'sections.cart.free_shipping_remaining_html' | t: amount: remaining_money }}</p>{%- else -%}<p>{% render 'icon', name: 'truck', size: 16 %} {{ 'sections.cart.free_shipping_unlocked' | t }}</p>{%- endif -%}
+            <div class="free-shipping__bar"><span style="width: {{ progress }}%"></span></div>
+          </div>
+        {%- endif -%}
+        {%- for discount in cart.cart_level_discount_applications -%}
+          <div class="cart-footer__line"><span>{% render 'icon', name: 'gift', size: 16 %} {{ discount.title | escape }}</span><span>-{{ discount.total_allocated_amount | money }}</span></div>
+        {%- endfor -%}
+        <div class="cart-footer__line cart-footer__line--total">
+          <span>{{ 'sections.cart.estimated_total' | t }}</span>
+          <strong>{{ cart.total_price | money_with_currency }}</strong>
+        </div>
+        <p class="cart-footer__note">
+          {%- if cart.tax_included_in_prices -%}{{ 'sections.cart.taxes_included_and_shipping_at_checkout' | t }}{%- else -%}{{ 'sections.cart.taxes_and_shipping_at_checkout' | t }}{%- endif -%}
+        </p>
+        <button type="submit" name="checkout" form="cart" class="button button--full button--large">{% render 'icon', name: 'lock', size: 16 %} {{ 'sections.cart.checkout' | t }}</button>
+      </div>
+    </div>
+  </div>
+{%- endunless -%}
+
+{% schema %}
+{
+  "name": "Subtotal",
+  "tag": "section",
+  "class": "section section-main-cart-footer",
+  "enabled_on": { "templates": ["cart"] },
+  "settings": [
+    { "type": "checkbox", "id": "show_discount", "label": "Show discount code field", "default": true }
+  ]
+}
+{% endschema %}

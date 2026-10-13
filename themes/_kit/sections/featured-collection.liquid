@@ -1,0 +1,130 @@
+{%- liquid
+  assign collection = section.settings.collection
+  if collection == blank and collections.all.products_count > 0
+    assign collection = collections.all
+  endif
+  assign columns = section.settings.columns_desktop
+  assign limit = section.settings.products_to_show
+-%}
+{%- style -%}
+  .section-{{ section.id }}-padding { padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px; padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px; }
+  @media screen and (min-width: 750px) { .section-{{ section.id }}-padding { padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px; } }
+{%- endstyle -%}
+<div class="featured-collection scheme-{{ section.settings.color_scheme }} section-{{ section.id }}-padding">
+  <div class="page-width">
+    <div class="section-heading section-heading--{{ section.settings.heading_alignment }}" data-reveal>
+      <div>
+        {%- if section.settings.eyebrow != blank -%}<p class="eyebrow">{{ section.settings.eyebrow | escape }}</p>{%- endif -%}
+        {%- if section.settings.title != blank -%}<h2 class="section-heading__title {{ section.settings.heading_size }}">{{ section.settings.title | escape }}</h2>{%- endif -%}
+        {%- if section.settings.description != blank -%}<div class="section-heading__text rte">{{ section.settings.description }}</div>{%- endif -%}
+      </div>
+      {%- if section.settings.show_view_all and collection != blank -%}
+        <a class="link link--arrow" href="{{ collection.url }}">{{ 'sections.featured_collection.view_all' | t }}{% render 'icon', name: 'arrow-right', size: 16 %}</a>
+      {%- endif -%}
+    </div>
+
+    {%- if section.settings.layout == 'slider' -%}
+      <slider-component class="slider" data-slider>
+        <ul class="slider__track grid grid--slider" role="list" style="--columns: {{ columns }}; --columns-mobile: {{ section.settings.columns_mobile }};" data-slider-track>
+    {%- else -%}
+        <ul class="grid product-grid" role="list" style="--columns: {{ columns }}; --columns-mobile: {{ section.settings.columns_mobile }};">
+    {%- endif -%}
+      {%- if collection != blank and collection.products.size > 0 -%}
+        {%- for product in collection.products limit: limit -%}
+          <li class="grid__item" data-reveal>
+            {% render 'card-product', card_product: product, show_quick_add: section.settings.enable_quick_add, section_id: section.id %}
+          </li>
+        {%- endfor -%}
+      {%- else -%}
+        {%- for i in (1..limit) -%}
+          <li class="grid__item">{% render 'card-product', placeholder_index: i %}</li>
+        {%- endfor -%}
+      {%- endif -%}
+        </ul>
+    {%- if section.settings.layout == 'slider' -%}
+        <div class="slider__buttons">
+          <button type="button" class="slider-button" data-slider-prev aria-label="{{ 'accessibility.previous_slide' | t }}">{% render 'icon', name: 'chevron-left', size: 18 %}</button>
+          <button type="button" class="slider-button" data-slider-next aria-label="{{ 'accessibility.next_slide' | t }}">{% render 'icon', name: 'chevron-right', size: 18 %}</button>
+        </div>
+      </slider-component>
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Featured collection",
+  "tag": "section",
+  "class": "section section-featured-collection",
+  "disabled_on": { "groups": ["header", "footer"] },
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Caption" },
+    { "type": "text", "id": "title", "label": "Heading", "default": "Featured collection" },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "label": "Heading size",
+      "options": [
+        { "value": "h2", "label": "Small" },
+        { "value": "h1", "label": "Medium" },
+        { "value": "h0", "label": "Large" }
+      ],
+      "default": "h1"
+    },
+    {
+      "type": "select",
+      "id": "heading_alignment",
+      "label": "Heading alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" }
+      ],
+      "default": "left"
+    },
+    { "type": "richtext", "id": "description", "label": "Description" },
+    { "type": "collection", "id": "collection", "label": "Collection" },
+    { "type": "range", "id": "products_to_show", "label": "Maximum products to show", "min": 2, "max": 24, "step": 1, "default": 8 },
+    { "type": "range", "id": "columns_desktop", "label": "Number of columns on desktop", "min": 1, "max": 6, "step": 1, "default": 4 },
+    {
+      "type": "select",
+      "id": "columns_mobile",
+      "label": "Number of columns on mobile",
+      "options": [
+        { "value": "1", "label": "1 column" },
+        { "value": "2", "label": "2 columns" }
+      ],
+      "default": "2"
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Layout",
+      "options": [
+        { "value": "grid", "label": "Grid" },
+        { "value": "slider", "label": "Carousel" }
+      ],
+      "default": "grid"
+    },
+    { "type": "checkbox", "id": "show_view_all", "label": "Show \"View all\" link", "default": true },
+    { "type": "checkbox", "id": "enable_quick_add", "label": "Enable quick add button", "default": true },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "options": [
+        { "value": "background", "label": "Background" },
+        { "value": "surface", "label": "Surface" },
+        { "value": "surface-alt", "label": "Surface alternate" },
+        { "value": "accent-surface", "label": "Accent surface" },
+        { "value": "inverse", "label": "Inverse" },
+        { "value": "accent", "label": "Accent" }
+      ],
+      "default": "background"
+    },
+    { "type": "header", "content": "Padding" },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 48 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 48 }
+  ],
+  "presets": [{ "name": "Featured collection", "category": "Collection" }]
+}
+{% endschema %}

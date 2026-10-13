@@ -1,0 +1,26 @@
+{
+  "sections": {
+    "cart-items": {
+      "type": "main-cart-items",
+      "settings": {}
+    },
+    "cart-footer": {
+      "type": "main-cart-footer",
+      "settings": {}
+    },
+    "suggestions": {
+      "type": "featured-collection",
+      "settings": {
+        "title": "You may also like",
+        "heading_size": "h2",
+        "products_to_show": 4,
+        "show_view_all": false
+      }
+    }
+  },
+  "order": [
+    "cart-items",
+    "cart-footer",
+    "suggestions"
+  ]
+}

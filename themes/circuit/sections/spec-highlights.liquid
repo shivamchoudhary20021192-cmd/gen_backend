@@ -1,0 +1,68 @@
+{%- style -%}
+  .section-{{ section.id }}-padding { padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px; padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px; }
+  @media screen and (min-width: 750px) { .section-{{ section.id }}-padding { padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px; } }
+{%- endstyle -%}
+<div class="spec-highlights scheme-{{ section.settings.color_scheme }} section-{{ section.id }}-padding">
+  <div class="page-width">
+    {%- if section.settings.heading != blank -%}<h2 class="h1 spec-highlights__heading">{{ section.settings.heading | escape }}</h2>{%- endif -%}
+    <ul class="spec-highlights__grid" role="list">
+      {%- for block in section.blocks -%}
+        <li class="spec" {{ block.shopify_attributes }} data-reveal>
+          <span class="spec__value">{{ block.settings.value | escape }}<small>{{ block.settings.unit | escape }}</small></span>
+          <span class="spec__label">{{ block.settings.label | escape }}</span>
+        </li>
+      {%- endfor -%}
+    </ul>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Spec highlights",
+  "tag": "section",
+  "class": "section section-spec-highlights",
+  "max_blocks": 6,
+  "disabled_on": { "groups": ["header", "footer"] },
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Built to perform" },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "options": [
+        { "value": "background", "label": "Background" },
+        { "value": "surface", "label": "Surface" },
+        { "value": "inverse", "label": "Inverse" },
+        { "value": "accent", "label": "Accent" }
+      ],
+      "default": "inverse"
+    },
+    { "type": "header", "content": "Padding" },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 56 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 56 }
+  ],
+  "blocks": [
+    {
+      "type": "spec",
+      "name": "Spec",
+      "settings": [
+        { "type": "text", "id": "value", "label": "Value", "default": "48" },
+        { "type": "text", "id": "unit", "label": "Unit", "default": "h" },
+        { "type": "text", "id": "label", "label": "Label", "default": "Battery life" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Spec highlights",
+      "category": "Product",
+      "blocks": [
+        { "type": "spec", "settings": { "value": "48", "unit": "h", "label": "Battery life" } },
+        { "type": "spec", "settings": { "value": "2", "unit": "yr", "label": "Warranty" } },
+        { "type": "spec", "settings": { "value": "24", "unit": "h", "label": "Dispatch" } },
+        { "type": "spec", "settings": { "value": "4.8", "unit": "★", "label": "Average rating" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

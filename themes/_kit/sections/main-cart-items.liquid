@@ -1,0 +1,77 @@
+{%- style -%}
+  .section-{{ section.id }}-padding { padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px; padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px; }
+  @media screen and (min-width: 750px) { .section-{{ section.id }}-padding { padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px; } }
+{%- endstyle -%}
+<cart-items class="cart-page section-{{ section.id }}-padding{% if cart.empty %} is-empty{% endif %}" data-cart-page data-section-id="{{ section.id }}">
+  <div class="page-width">
+    <div class="cart-page__header">
+      <h1 class="h0">{{ 'sections.cart.title' | t }}</h1>
+      {%- unless cart.empty -%}<a class="link" href="{{ routes.all_products_collection_url }}">{{ 'general.continue_shopping' | t }}</a>{%- endunless -%}
+    </div>
+    {%- if cart.empty -%}
+      <div class="cart-page__empty">
+        <p class="h3">{{ 'sections.cart.empty' | t }}</p>
+        <a href="{{ routes.all_products_collection_url }}" class="button">{{ 'general.continue_shopping' | t }}</a>
+      </div>
+    {%- else -%}
+      {%- if request_error != blank -%}<p class="form__message form__message--error">{{ request_error }}</p>{%- endif -%}
+      <form action="{{ routes.cart_url }}" method="post" id="cart" class="cart-page__form">
+        <table class="cart-table">
+          <caption class="visually-hidden">{{ 'sections.cart.caption' | t }}</caption>
+          <thead>
+            <tr>
+              <th scope="col">{{ 'sections.cart.headings.product' | t }}</th>
+              <th scope="col" class="small-hide">{{ 'sections.cart.headings.quantity' | t }}</th>
+              <th scope="col" class="text-right">{{ 'sections.cart.headings.total' | t }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {%- for item in cart.items -%}
+              <tr class="cart-item" data-line="{{ forloop.index }}">
+                <td>
+                  <div class="cart-item__row">
+                    <a href="{{ item.url }}" class="cart-item__media">
+                      {%- if item.image -%}{{ item.image | image_url: width: 300 | image_tag: loading: 'lazy', alt: item.product_title }}{%- else -%}{{ 'product-1' | placeholder_svg_tag }}{%- endif -%}
+                    </a>
+                    <div class="cart-item__details">
+                      <a href="{{ item.url }}" class="cart-item__name">{{ item.product_title | escape }}</a>
+                      {%- if item.variant_title != blank -%}<p class="cart-item__variant">{{ item.variant_title | escape }}</p>{%- endif -%}
+                      <p class="cart-item__unit">{{ item.final_price | money }}</p>
+                      <div class="medium-hide cart-item__actions">
+                        {% render 'quantity-input', name: 'updates[]', value: item.quantity, line: forloop.index, min: 0 %}
+                      </div>
+                    </div>
+                  </div>
+                </td>
+                <td class="small-hide">
+                  <div class="cart-item__actions">
+                    {% render 'quantity-input', name: 'updates[]', value: item.quantity, line: forloop.index, min: 0 %}
+                    <button type="button" class="cart-item__remove link" data-cart-remove="{{ forloop.index }}" aria-label="{{ 'sections.cart.remove' | t }}">{% render 'icon', name: 'trash', size: 18 %}</button>
+                  </div>
+                </td>
+                <td class="text-right">
+                  {%- if item.original_line_price > item.final_line_price -%}<s class="price__compare">{{ item.original_line_price | money }}</s><br>{%- endif -%}
+                  <strong>{{ item.final_line_price | money }}</strong>
+                </td>
+              </tr>
+            {%- endfor -%}
+          </tbody>
+        </table>
+        <noscript><button type="submit" class="button button--secondary">Update</button></noscript>
+      </form>
+    {%- endif -%}
+  </div>
+</cart-items>
+
+{% schema %}
+{
+  "name": "Cart items",
+  "tag": "section",
+  "class": "section section-main-cart-items",
+  "enabled_on": { "templates": ["cart"] },
+  "settings": [
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 36 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 24 }
+  ]
+}
+{% endschema %}

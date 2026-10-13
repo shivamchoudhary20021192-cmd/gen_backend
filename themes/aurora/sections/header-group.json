@@ -1,0 +1,47 @@
+{
+  "type": "header",
+  "name": "Header group",
+  "sections": {
+    "announcement-bar": {
+      "type": "announcement-bar",
+      "settings": {
+        "color_scheme": "inverse"
+      },
+      "blocks": {
+        "a1": {
+          "type": "announcement",
+          "settings": {
+            "text": "Free delivery on orders over ₹999",
+            "link": "/collections/all"
+          }
+        },
+        "a2": {
+          "type": "announcement",
+          "settings": {
+            "text": "Easy 7-day returns",
+            "link": ""
+          }
+        }
+      },
+      "block_order": [
+        "a1",
+        "a2"
+      ]
+    },
+    "header": {
+      "type": "header",
+      "settings": {
+        "logo_position": "left",
+        "menu": "main-menu",
+        "menu_type": "mega",
+        "sticky_header": "on-scroll-up",
+        "color_scheme": "background",
+        "show_line_separator": true
+      }
+    }
+  },
+  "order": [
+    "announcement-bar",
+    "header"
+  ]
+}

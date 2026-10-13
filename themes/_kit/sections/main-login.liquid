@@ -1,0 +1,108 @@
+{%- style -%}
+  .section-{{ section.id }}-padding { padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px; padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px; }
+  @media screen and (min-width: 750px) { .section-{{ section.id }}-padding { padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px; } }
+{%- endstyle -%}
+<div class="customer customer--login scheme-{{ section.settings.color_scheme }} section-{{ section.id }}-padding">
+  <div class="customer__card">
+    {%- form 'customer_login', id: 'CustomerLoginForm', class: 'customer__form', novalidate: 'novalidate' -%}
+      <input type="hidden" name="return_to" value="{{ form.return_to | escape }}">
+      {%- if form.step == 'code' -%}
+        <h1 class="customer__title">{{ 'customer.login.code_title' | t }}</h1>
+        <p class="customer__subtitle">{{ 'customer.login.code_sent' | t: destination: form.sent_to }}</p>
+        {%- if form.errors -%}
+          <div class="form__message form__message--error" role="alert">{{ form.errors | default_errors }}</div>
+        {%- endif -%}
+        <div class="field">
+          <label class="field__label" for="CustomerCode">{{ 'customer.login.code' | t }}</label>
+          <input class="field__input customer__code" type="text" id="CustomerCode" name="customer[code]" inputmode="numeric" pattern="[0-9]*" maxlength="8" autocomplete="one-time-code" required autofocus>
+        </div>
+        <button type="submit" class="button button--full">{{ 'customer.login.verify' | t }}</button>
+      {%- else -%}
+        <h1 class="customer__title">{{ 'customer.login.title' | t }}</h1>
+        <p class="customer__subtitle">{{ 'customer.login.subtitle' | t }}</p>
+        {%- if form.errors -%}
+          <div class="form__message form__message--error" role="alert">{{ form.errors | default_errors }}</div>
+        {%- endif -%}
+        <div class="field">
+          <label class="field__label" for="CustomerPhone">{{ 'customer.login.phone' | t }}</label>
+          <input class="field__input" type="tel" id="CustomerPhone" name="customer[phone]" autocomplete="tel" inputmode="tel" required autofocus>
+        </div>
+        {%- if section.settings.offer_whatsapp -%}
+          <fieldset class="customer__channels">
+            <legend class="field__label">{{ 'customer.login.send_via' | t }}</legend>
+            <label class="customer__choice"><input type="radio" name="customer[channel]" value="sms" checked> {{ 'customer.login.sms' | t }}</label>
+            <label class="customer__choice"><input type="radio" name="customer[channel]" value="whatsapp"> {{ 'customer.login.whatsapp' | t }}</label>
+          </fieldset>
+        {%- endif -%}
+        <button type="submit" class="button button--full">{{ 'customer.login.continue' | t }}</button>
+      {%- endif -%}
+    {%- endform -%}
+
+    {%- if form.step == 'code' -%}
+      <div class="customer__aside">
+        {%- form 'customer_login', class: 'customer__resend' -%}
+          <input type="hidden" name="customer[resend]" value="1">
+          {%- if form.resend_in > 0 -%}
+            <p class="customer__muted" data-resend-timer="{{ form.resend_in }}">{{ 'customer.login.resend_in' | t: seconds: form.resend_in }}</p>
+            <button type="submit" class="link customer__link" hidden data-resend-button>{{ 'customer.login.resend' | t }}</button>
+          {%- else -%}
+            <button type="submit" class="link customer__link">{{ 'customer.login.resend' | t }}</button>
+          {%- endif -%}
+        {%- endform -%}
+        <a class="customer__link" href="{{ routes.account_login_url }}">{{ 'customer.login.change_number' | t }}</a>
+      </div>
+    {%- else -%}
+      <p class="customer__aside customer__muted">
+        {{ 'customer.login.new_customer' | t }} <a class="customer__link" href="{{ routes.account_register_url }}">{{ 'customer.login.create_account' | t }}</a>
+      </p>
+      {%- if section.settings.show_guest_link -%}
+        <p class="customer__aside"><a class="customer__link" href="{{ routes.all_products_collection_url }}">{{ 'customer.login.guest' | t }}</a></p>
+      {%- endif -%}
+    {%- endif -%}
+  </div>
+</div>
+
+<script>
+  (function () {
+    var timer = document.querySelector('[data-resend-timer]');
+    if (!timer) return;
+    var left = Number(timer.getAttribute('data-resend-timer')) || 0;
+    var button = document.querySelector('[data-resend-button]');
+    var text = timer.textContent;
+    var tick = setInterval(function () {
+      left -= 1;
+      if (left <= 0) {
+        clearInterval(tick);
+        timer.hidden = true;
+        if (button) button.hidden = false;
+        return;
+      }
+      timer.textContent = text.replace(/\d+/, left);
+    }, 1000);
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Sign in",
+  "tag": "section",
+  "class": "section section-customer-login",
+  "settings": [
+    { "type": "checkbox", "id": "offer_whatsapp", "label": "Offer codes by WhatsApp", "default": true, "info": "Shoppers can pick WhatsApp instead of a text message." },
+    { "type": "checkbox", "id": "show_guest_link", "label": "Show \"Continue as guest\"", "default": false },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "options": [
+        { "value": "background", "label": "Background" },
+        { "value": "surface", "label": "Surface" },
+        { "value": "surface-alt", "label": "Surface alternate" }
+      ],
+      "default": "background"
+    },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 60 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 80 }
+  ]
+}
+{% endschema %}

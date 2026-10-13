@@ -1,0 +1,35 @@
+{%- comment -%}
+  Results as the shopper types: fetched from /search/suggest?q=…&section_id=predictive-search.
+{%- endcomment -%}
+{%- if predictive_search.performed -%}
+  <div class="predictive-search__results" id="predictive-search-results">
+    {%- if predictive_search.resources.products.size > 0 -%}
+      <p class="predictive-search__heading">{{ 'templates.search.products' | t }}</p>
+      <ul class="predictive-search__list" role="listbox">
+        {%- for product in predictive_search.resources.products -%}
+          <li role="option">
+            <a class="predictive-search__item" href="{{ product.url }}">
+              <span class="predictive-search__image">
+                {%- if product.featured_image -%}{{ product.featured_image | image_url: width: 120 | image_tag: loading: 'lazy', alt: product.title }}{%- else -%}{{ 'product-1' | placeholder_svg_tag }}{%- endif -%}
+              </span>
+              <span class="predictive-search__text">
+                <span class="predictive-search__title">{{ product.title | escape }}</span>
+                {%- if settings.search_show_price -%}{% render 'price', product: product %}{%- endif -%}
+              </span>
+            </a>
+          </li>
+        {%- endfor -%}
+      </ul>
+    {%- else -%}
+      <p class="predictive-search__empty">{{ 'templates.search.no_results' | t: terms: predictive_search.terms }}</p>
+    {%- endif -%}
+    <a class="predictive-search__all link" href="{{ routes.search_url }}?q={{ predictive_search.terms | url_encode }}">{{ 'templates.search.search_for' | t: terms: predictive_search.terms }}{% render 'icon', name: 'arrow-right', size: 14 %}</a>
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Predictive search",
+  "enabled_on": { "templates": [] }
+}
+{% endschema %}

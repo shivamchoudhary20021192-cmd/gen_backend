@@ -1,0 +1,87 @@
+# Bitbucket Pipeline - Veylog Backend API
+# Deploys to EC2 with PM2 at /api path
+
+image: node:20
+
+definitions:
+  caches:
+    npm: ~/.npm
+  
+  steps:
+    - step: &build-and-test
+        name: Build and Test
+        caches:
+          - npm
+        script:
+          - echo "Installing dependencies..."
+          - npm ci
+          - echo "Building TypeScript..."
+          - npm run build
+          - echo "Build complete!"
+        artifacts:
+          - dist/**
+          - package*.json
+    
+    - step: &deploy-to-staging
+        name: Deploy Backend to Staging
+        deployment: staging
+        trigger: manual
+        script:
+          - echo "Deploying backend API to staging EC2..."
+          - pipe: atlassian/ssh-run:0.4.1
+            variables:
+              SSH_USER: $SSH_USER
+              SERVER: $EC2_SERVER
+              COMMAND: |
+                set -e
+                echo "Deploying veylog-backend..."
+                cd /var/www/veylog-backend
+                git fetch origin
+                git checkout develop
+                git pull origin develop
+                npm ci --production
+                npm run build
+                pm2 restart veylog-backend-api || pm2 start dist/index.js --name veylog-backend-api
+                pm2 save
+                echo "✅ Backend API deployed successfully!"
+    
+    - step: &deploy-to-production
+        name: Deploy Backend to Production
+        deployment: production
+        trigger: manual
+        script:
+          - echo "Deploying backend API to production EC2..."
+          - pipe: atlassian/ssh-run:0.4.1
+            variables:
+              SSH_USER: $SSH_USER
+              SERVER: $EC2_SERVER
+              COMMAND: |
+                set -e
+                echo "Deploying veylog-backend to production..."
+                cd /var/www/veylog-backend
+                git fetch origin
+                git checkout main
+                git pull origin main
+                npm ci --production
+                npm run build
+                pm2 restart veylog-backend-api || pm2 start dist/index.js --name veylog-backend-api
+                pm2 save
+                echo "✅ Backend API deployed to production!"
+                echo "API available at: https://$DOMAIN/api"
+
+pipelines:
+  default:
+    - step: *build-and-test
+  
+  branches:
+    develop:
+      - step: *build-and-test
+      - step: *deploy-to-staging
+    
+    main:
+      - step: *build-and-test
+      - step: *deploy-to-production
+  
+  pull-requests:
+    '**':
+      - step: *build-and-test

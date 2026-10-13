@@ -1,0 +1,123 @@
+<article class="main-article" itemscope itemtype="http://schema.org/BlogPosting">
+  {%- for block in section.blocks -%}
+    {%- case block.type -%}
+      {%- when 'featured_image' -%}
+        {%- if article.image -%}
+          <div class="main-article__image main-article__image--{{ block.settings.image_height }}" {{ block.shopify_attributes }}>
+            {{ article.image | image_url: width: 2400 | image_tag: loading: 'eager', fetchpriority: 'high', sizes: '100vw', widths: '375, 750, 1100, 1500, 2000, 2400', alt: article.title }}
+          </div>
+        {%- endif -%}
+      {%- when 'title' -%}
+        <header class="main-article__header page-width page-width--narrow" {{ block.shopify_attributes }}>
+          <a class="link link--back" href="{{ blog.url }}">{% render 'icon', name: 'chevron-left', size: 14 %}{{ 'blogs.article.back_to_blog' | t }}</a>
+          <h1 class="main-article__title h0" itemprop="headline">{{ article.title | escape }}</h1>
+          <p class="main-article__meta">
+            {%- if block.settings.blog_show_date and article.published_at -%}{{ article.published_at | time_tag: format: 'date' }}{%- endif -%}
+            {%- if block.settings.blog_show_author and article.author != blank -%} · {{ 'blogs.article.by_author' | t: author: article.author }}{%- endif -%}
+          </p>
+        </header>
+      {%- when 'content' -%}
+        <div class="main-article__content page-width page-width--narrow rte" itemprop="articleBody" {{ block.shopify_attributes }}>{{ article.content }}</div>
+      {%- when 'share' -%}
+        <div class="page-width page-width--narrow" {{ block.shopify_attributes }}>
+          <share-button class="share-button" data-url="{{ request.origin }}{{ article.url }}" data-title="{{ article.title | escape }}">
+            <button type="button" class="link share-button__button">{% render 'icon', name: 'share', size: 16 %} {{ block.settings.share_label | escape }}</button>
+            <span class="share-button__copied" hidden>{{ 'general.social.link_copied' | t }}</span>
+          </share-button>
+        </div>
+    {%- endcase -%}
+  {%- endfor -%}
+
+  {%- if blog.comments_enabled? -%}
+    <section class="article-comments page-width page-width--narrow" id="comments" aria-labelledby="CommentsHeading">
+      {%- if article.comments_count > 0 -%}
+        <h2 id="CommentsHeading" class="article-comments__title h3">{{ 'blogs.article.comments' | t: count: article.comments_count }}</h2>
+        <ol class="article-comments__list">
+          {%- for comment in article.comments -%}
+            {%- assign comment_date = comment.created_at | date: '%d %B %Y' -%}
+            <li class="article-comment" id="comment-{{ comment.id }}">
+              <div class="article-comment__body rte">{{ comment.content }}</div>
+              <p class="article-comment__meta">{{ comment.author | escape }} · <time datetime="{{ comment.created_at | date: '%Y-%m-%d' }}">{{ comment_date }}</time></p>
+            </li>
+          {%- endfor -%}
+        </ol>
+      {%- endif -%}
+
+      {%- form 'new_comment', article, class: 'article-comments__form' -%}
+        <h2 class="article-comments__title h3"{% if article.comments_count == 0 %} id="CommentsHeading"{% endif %}>{{ 'blogs.article.comment_form_title' | t }}</h2>
+        {%- if form.posted_successfully? -%}
+          <p class="form__message form__message--success" role="status">{% render 'icon', name: 'check', size: 18 %} 
+            {%- if blog.moderated? -%}{{ 'blogs.article.success_moderated' | t }}{%- else -%}{{ 'blogs.article.success' | t }}{%- endif -%}
+          </p>
+        {%- elsif form.errors -%}
+          <div class="form__message form__message--error" role="alert">
+            <ul>{%- for error in form.errors -%}<li>{{ error }}</li>{%- endfor -%}</ul>
+          </div>
+        {%- endif -%}
+        <div class="article-comments__fields">
+          <div class="field">
+            <label class="field__label" for="CommentAuthor">{{ 'blogs.article.name' | t }}</label>
+            <input class="field__input" type="text" id="CommentAuthor" name="comment[author]" autocomplete="name" value="{{ form.author | escape }}" required maxlength="120">
+          </div>
+          <div class="field">
+            <label class="field__label" for="CommentEmail">{{ 'blogs.article.email' | t }}</label>
+            <input class="field__input" type="email" id="CommentEmail" name="comment[email]" autocomplete="email" value="{{ form.email | escape }}" required maxlength="191">
+          </div>
+        </div>
+        <div class="field">
+          <label class="field__label" for="CommentBody">{{ 'blogs.article.message' | t }}</label>
+          <textarea class="field__input" id="CommentBody" name="comment[body]" rows="5" required maxlength="5000">{{ form.body | escape }}</textarea>
+        </div>
+        {%- comment -%} Only bots fill this in. {%- endcomment -%}
+        <div class="visually-hidden" aria-hidden="true"><label for="CommentWebsite">Website</label><input type="text" id="CommentWebsite" name="comment[website]" tabindex="-1" autocomplete="off"></div>
+        {%- if blog.moderated? -%}<p class="article-comments__note">{{ 'blogs.article.moderated' | t }}</p>{%- endif -%}
+        <button type="submit" class="button">{{ 'blogs.article.post' | t }}</button>
+      {%- endform -%}
+    </section>
+  {%- endif -%}
+</article>
+
+{% schema %}
+{
+  "name": "Blog post",
+  "tag": "section",
+  "class": "section section-main-article",
+  "enabled_on": { "templates": ["article"] },
+  "blocks": [
+    {
+      "type": "featured_image",
+      "name": "Featured image",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "select",
+          "id": "image_height",
+          "label": "Image height",
+          "options": [
+            { "value": "adapt", "label": "Adapt to image" },
+            { "value": "medium", "label": "Medium" },
+            { "value": "large", "label": "Large" }
+          ],
+          "default": "adapt"
+        }
+      ]
+    },
+    {
+      "type": "title",
+      "name": "Title",
+      "limit": 1,
+      "settings": [
+        { "type": "checkbox", "id": "blog_show_date", "label": "Show date", "default": true },
+        { "type": "checkbox", "id": "blog_show_author", "label": "Show author", "default": true }
+      ]
+    },
+    { "type": "content", "name": "Content", "limit": 1 },
+    {
+      "type": "share",
+      "name": "Share",
+      "limit": 1,
+      "settings": [{ "type": "text", "id": "share_label", "label": "Label", "default": "Share" }]
+    }
+  ]
+}
+{% endschema %}

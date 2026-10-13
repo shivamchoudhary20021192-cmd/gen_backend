@@ -1,0 +1,31 @@
+{%- comment -%}
+  An app block: the merchant adds it to any section that accepts app blocks
+  (the product page, or an "Apps" section) and sets it up in the theme editor.
+  `block.settings` are this block's settings; `app` is the app that made it.
+{%- endcomment -%}
+<div class="tb" style="--tb-accent: {{ block.settings.accent }}">
+  {%- if block.settings.heading != blank -%}<p class="tb__heading">{{ block.settings.heading | escape }}</p>{%- endif -%}
+  <ul class="tb__list" role="list">
+    {%- if block.settings.show_delivery -%}<li class="tb__item"><span class="tb__icon" aria-hidden="true">🚚</span>{{ block.settings.delivery_text | escape }}</li>{%- endif -%}
+    {%- if block.settings.show_returns -%}<li class="tb__item"><span class="tb__icon" aria-hidden="true">↺</span>{{ block.settings.returns_text | escape }}</li>{%- endif -%}
+    {%- if block.settings.show_secure -%}<li class="tb__item"><span class="tb__icon" aria-hidden="true">🔒</span>{{ block.settings.secure_text | escape }}</li>{%- endif -%}
+  </ul>
+</div>
+
+{% schema %}
+{
+  "name": "Trust badges",
+  "target": "section",
+  "stylesheet": "trust-badges.css",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Why shop with us" },
+    { "type": "color", "id": "accent", "label": "Accent", "default": "#1f8a4c" },
+    { "type": "checkbox", "id": "show_delivery", "label": "Show delivery", "default": true },
+    { "type": "text", "id": "delivery_text", "label": "Delivery text", "default": "Free delivery over ₹799" },
+    { "type": "checkbox", "id": "show_returns", "label": "Show returns", "default": true },
+    { "type": "text", "id": "returns_text", "label": "Returns text", "default": "Easy 7-day returns" },
+    { "type": "checkbox", "id": "show_secure", "label": "Show secure checkout", "default": true },
+    { "type": "text", "id": "secure_text", "label": "Secure checkout text", "default": "Secure checkout" }
+  ]
+}
+{% endschema %}

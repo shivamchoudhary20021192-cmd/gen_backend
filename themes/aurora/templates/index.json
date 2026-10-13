@@ -1,0 +1,210 @@
+{
+  "sections": {
+    "slideshow": {
+      "type": "slideshow",
+      "settings": {
+        "slide_height": "large",
+        "auto_rotate": true
+      },
+      "blocks": {
+        "s1": {
+          "type": "slide",
+          "settings": {
+            "heading": "Everything you need, nothing you don’t",
+            "subheading": "New arrivals every week, delivered fast.",
+            "button_label": "Shop new arrivals",
+            "link": "/collections/all",
+            "content_position": "middle-left",
+            "text_alignment": "left"
+          }
+        },
+        "s2": {
+          "type": "slide",
+          "settings": {
+            "heading": "Gifts they’ll actually use",
+            "subheading": "Thoughtful picks for every budget.",
+            "button_label": "Shop gifts",
+            "link": "/collections/all",
+            "content_position": "middle-center",
+            "text_alignment": "center"
+          }
+        }
+      },
+      "block_order": [
+        "s1",
+        "s2"
+      ]
+    },
+    "categories": {
+      "type": "collection-list",
+      "settings": {
+        "title": "Shop by category",
+        "columns_desktop": 4,
+        "columns_mobile": "2",
+        "card_style": "below",
+        "image_ratio": "square",
+        "show_view_all": true
+      }
+    },
+    "bestsellers": {
+      "type": "featured-collection",
+      "settings": {
+        "title": "Bestsellers",
+        "eyebrow": "Loved by customers",
+        "products_to_show": 8,
+        "columns_desktop": 4,
+        "layout": "grid",
+        "color_scheme": "background",
+        "heading_size": "h1",
+        "show_view_all": true
+      }
+    },
+    "collage": {
+      "type": "collage",
+      "settings": {
+        "heading": "New this week"
+      },
+      "blocks": {
+        "image": {
+          "type": "image",
+          "settings": {
+            "title": "Shop the edit"
+          }
+        },
+        "product": {
+          "type": "product",
+          "settings": {}
+        },
+        "collection": {
+          "type": "collection",
+          "settings": {}
+        }
+      },
+      "block_order": [
+        "image",
+        "product",
+        "collection"
+      ]
+    },
+    "promises": {
+      "type": "multicolumn",
+      "settings": {
+        "title": "",
+        "columns_desktop": 4,
+        "column_style": "card",
+        "color_scheme": "background",
+        "padding_top": 40,
+        "padding_bottom": 40,
+        "columns_mobile": "2"
+      },
+      "blocks": {
+        "c1": {
+          "type": "column",
+          "settings": {
+            "icon": "truck",
+            "title": "Fast delivery",
+            "text": "<p>Dispatched within 24 hours.</p>"
+          }
+        },
+        "c2": {
+          "type": "column",
+          "settings": {
+            "icon": "return",
+            "title": "Easy returns",
+            "text": "<p>7 days, no questions asked.</p>"
+          }
+        },
+        "c3": {
+          "type": "column",
+          "settings": {
+            "icon": "lock",
+            "title": "Secure payments",
+            "text": "<p>UPI, cards and COD.</p>"
+          }
+        },
+        "c4": {
+          "type": "column",
+          "settings": {
+            "icon": "chat",
+            "title": "Real support",
+            "text": "<p>Talk to a person, 7 days a week.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "c1",
+        "c2",
+        "c3",
+        "c4"
+      ]
+    },
+    "testimonials": {
+      "type": "testimonials",
+      "settings": {
+        "title": "What customers are saying",
+        "color_scheme": "surface-alt"
+      },
+      "blocks": {
+        "t1": {
+          "type": "testimonial",
+          "settings": {}
+        },
+        "t2": {
+          "type": "testimonial",
+          "settings": {
+            "quote": "<p>Great quality for the price, and support sorted my exchange in a day.</p>"
+          }
+        },
+        "t3": {
+          "type": "testimonial",
+          "settings": {
+            "quote": "<p>My go-to store now. Everything arrives well packed.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "t1",
+        "t2",
+        "t3"
+      ]
+    },
+    "newsletter": {
+      "type": "newsletter",
+      "settings": {
+        "color_scheme": "accent-surface"
+      },
+      "blocks": {
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "heading": "Get 10% off your first order"
+          }
+        },
+        "text": {
+          "type": "paragraph",
+          "settings": {
+            "text": "<p>Join the list for new arrivals and member-only offers.</p>"
+          }
+        },
+        "form": {
+          "type": "email_form",
+          "settings": {}
+        }
+      },
+      "block_order": [
+        "heading",
+        "text",
+        "form"
+      ]
+    }
+  },
+  "order": [
+    "slideshow",
+    "categories",
+    "bestsellers",
+    "collage",
+    "promises",
+    "testimonials",
+    "newsletter"
+  ]
+}

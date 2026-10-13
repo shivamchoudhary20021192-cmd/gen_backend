@@ -1,0 +1,50 @@
+{
+  "handle": "hearth",
+  "name": "Hearth",
+  "version": "2.4.0",
+  "author": "Veylog",
+  "description": "Spacious and tactile, for furniture and homeware brands that sell with room settings.",
+  "verticals": [
+    "home"
+  ],
+  "industries": [
+    "Furniture",
+    "Home decor",
+    "Kitchen",
+    "Lighting"
+  ],
+  "features": [
+    "Room gallery",
+    "Landscape imagery",
+    "Stacked header",
+    "Testimonials",
+    "Care and dimensions",
+    "Cart drawer"
+  ],
+  "sortOrder": 60,
+  "price": 0,
+  "previewImageUrl": null,
+  "defaults": {
+    "font_heading": "DM Serif Display",
+    "font_body": "Karla",
+    "radius": 4,
+    "button_style": "square",
+    "image_ratio": "landscape",
+    "color_background": "#FCFBF8",
+    "color_ivory": "#F8F6F1",
+    "color_cream": "#F1EDE6",
+    "color_champagne": "#E4DACB",
+    "color_espresso": "#2E241A",
+    "color_accent": "#5A4632",
+    "page_width": 1360
+  },
+  "presets": {
+    "Linen": {},
+    "Terracotta": {
+      "color_accent": "#B5532E",
+      "color_cream": "#F6E9E1",
+      "color_champagne": "#EBCDBE"
+    }
+  },
+  "defaultPreset": "Linen"
+}

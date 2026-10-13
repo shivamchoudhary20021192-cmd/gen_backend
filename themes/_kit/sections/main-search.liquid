@@ -1,0 +1,49 @@
+{%- style -%}
+  .section-{{ section.id }}-padding { padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px; padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px; }
+  @media screen and (min-width: 750px) { .section-{{ section.id }}-padding { padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px; } }
+{%- endstyle -%}
+<div class="main-search section-{{ section.id }}-padding">
+  <div class="page-width">
+    <h1 class="h0 main-search__title text-center">{{ 'templates.search.title' | t }}</h1>
+    <form action="{{ routes.search_url }}" method="get" role="search" class="search-form main-search__form">
+      <div class="field field--search field--large">
+        <input class="field__input" type="search" name="q" value="{{ search.terms | escape }}" placeholder="{{ 'general.search.placeholder' | t }}" aria-label="{{ 'general.search.search' | t }}">
+        <button type="submit" class="field__button" aria-label="{{ 'general.search.submit' | t }}">{% render 'icon', name: 'search', size: 20 %}</button>
+      </div>
+    </form>
+    {%- if search.performed -%}
+      {%- paginate search.results by section.settings.products_per_page -%}
+        <p class="main-search__count text-center">
+          {%- if search.results_count > 0 -%}
+            {{ 'templates.search.results_with_count_and_term' | t: count: search.results_count, terms: search.terms }}
+          {%- else -%}
+            {{ 'templates.search.no_results' | t: terms: search.terms }}
+          {%- endif -%}
+        </p>
+        {%- if search.results_count > 0 -%}
+          <ul class="grid product-grid" role="list" style="--columns: {{ section.settings.columns_desktop }}; --columns-mobile: 2;">
+            {%- for item in search.results -%}
+              <li class="grid__item">{% render 'card-product', card_product: item, show_quick_add: true, section_id: section.id %}</li>
+            {%- endfor -%}
+          </ul>
+          {% render 'pagination', paginate: paginate %}
+        {%- endif -%}
+      {%- endpaginate -%}
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Search results",
+  "tag": "section",
+  "class": "section section-main-search",
+  "enabled_on": { "templates": ["search"] },
+  "settings": [
+    { "type": "range", "id": "products_per_page", "label": "Results per page", "min": 8, "max": 48, "step": 4, "default": 24 },
+    { "type": "range", "id": "columns_desktop", "label": "Columns on desktop", "min": 2, "max": 6, "step": 1, "default": 4 },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 36 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 48 }
+  ]
+}
+{% endschema %}

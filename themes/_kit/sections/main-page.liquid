@@ -1,0 +1,28 @@
+{%- style -%}
+  .section-{{ section.id }}-padding { padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px; padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px; }
+  @media screen and (min-width: 750px) { .section-{{ section.id }}-padding { padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px; } }
+{%- endstyle -%}
+<div class="main-page section-{{ section.id }}-padding">
+  <div class="page-width page-width--narrow">
+    <h1 class="main-page__title h0">{{ page.title | escape }}</h1>
+    {%- if page.image and section.settings.show_image -%}
+      <div class="main-page__image">{{ page.image | image_url: width: 1600 | image_tag: loading: 'eager', sizes: '100vw', widths: '375, 750, 1100, 1600', alt: page.title }}</div>
+    {%- endif -%}
+    <div class="rte">{{ page.content }}</div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Page",
+  "tag": "section",
+  "class": "section section-main-page",
+  "enabled_on": { "templates": ["page"] },
+  "settings": [
+    { "type": "paragraph", "content": "A page's content is edited in Online Store → Pages." },
+    { "type": "checkbox", "id": "show_image", "label": "Show page image", "default": true },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 36 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 48 }
+  ]
+}
+{% endschema %}

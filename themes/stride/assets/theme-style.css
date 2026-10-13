@@ -1,0 +1,18 @@
+/* Stride — bold and energetic. */
+h1, h2, .h0, .h1, .hxl { font-weight: 800; letter-spacing: -0.02em; font-style: italic; }
+.button { text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; }
+.card__title { font-weight: 600; }
+.badge--sale { background: var(--color-accent); color: var(--color-accent-contrast); }
+.banner__heading { max-width: 12ch; }
+.countdown__inner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 2rem; }
+.countdown__heading { margin: 0; }
+.countdown__copy { color: var(--fg-muted); margin: 0.5rem 0 0; }
+.countdown__timer { display: flex; gap: 0.75rem; }
+.countdown__unit { display: flex; flex-direction: column; align-items: center; min-width: 76px; padding: 0.9rem 0.6rem; border: 1px solid var(--line); }
+.countdown__number { font-family: var(--font-heading-family); font-size: 2.4rem; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
+.countdown__label { font-size: 0.7rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--fg-muted); margin-top: 0.35rem; }
+.stats-bar__list { display: grid; gap: 2rem; grid-template-columns: 1fr; text-align: center; }
+@media (min-width: 750px) { .stats-bar__list { grid-template-columns: repeat(3, 1fr); } }
+.stat { display: flex; flex-direction: column; gap: 0.25rem; }
+.stat__value { margin: 0; }
+.stat__label { color: var(--fg-muted); text-transform: uppercase; letter-spacing: 0.12em; font-size: 0.8rem; }

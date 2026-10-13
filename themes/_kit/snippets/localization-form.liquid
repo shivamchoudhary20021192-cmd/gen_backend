@@ -1,0 +1,40 @@
+{%- comment -%}
+  The country/currency and language pickers. Each shows when there is more
+  than one to choose from: countries the store sells to, languages it is
+  published in. Accepts: id
+{%- endcomment -%}
+{%- assign show_countries = false -%}
+{%- assign show_languages = false -%}
+{%- if localization.available_countries.size > 1 -%}{%- assign show_countries = true -%}{%- endif -%}
+{%- if localization.available_languages.size > 1 -%}{%- assign show_languages = true -%}{%- endif -%}
+{%- if show_countries or show_languages -%}
+  {%- form 'localization', class: 'localization-form', data-localization-form: '' -%}
+    {%- if show_countries -%}
+      <label class="visually-hidden" for="Country-{{ id | default: 'default' }}">{{ 'localization.country_label' | t }}</label>
+      <div class="select">
+        <select id="Country-{{ id | default: 'default' }}" name="country_code" class="select__select" data-autosubmit>
+          {%- for country in localization.available_countries -%}
+            <option value="{{ country.iso_code }}"{% if country.iso_code == localization.country.iso_code %} selected{% endif %}>
+              {{ country.name }} ({{ country.currency.iso_code }} {{ country.currency.symbol }})
+            </option>
+          {%- endfor -%}
+        </select>
+        {% render 'icon', name: 'chevron-down', size: 14 %}
+      </div>
+    {%- endif -%}
+    {%- if show_languages -%}
+      <label class="visually-hidden" for="Language-{{ id | default: 'default' }}">{{ 'localization.language_label' | t }}</label>
+      <div class="select">
+        <select id="Language-{{ id | default: 'default' }}" name="language_code" class="select__select" data-autosubmit>
+          {%- for language in localization.available_languages -%}
+            <option value="{{ language.iso_code }}" lang="{{ language.iso_code }}"{% if language.iso_code == localization.language.iso_code %} selected{% endif %}>{{ language.endonym_name }}</option>
+          {%- endfor -%}
+        </select>
+        {% render 'icon', name: 'chevron-down', size: 14 %}
+      </div>
+    {%- else -%}
+      <input type="hidden" name="language_code" value="{{ localization.language.iso_code }}">
+    {%- endif -%}
+    <noscript><button class="button button--small">{{ 'localization.update_country' | t }}</button></noscript>
+  {%- endform -%}
+{%- endif -%}

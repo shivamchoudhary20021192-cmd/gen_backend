@@ -1,0 +1,63 @@
+{%- layout 'gift_card' -%}
+{%- comment -%}
+  A gift card's own page — /gift_cards/<token>, the link in the gift card
+  email. Shows the balance and the code to use at checkout, and prints
+  cleanly. The gift_card object is Shopify's: balance, initial_value, code,
+  last_four_characters, enabled, expired, expires_on, message, currency, url.
+{%- endcomment -%}
+{%- assign balance = gift_card.balance | money -%}
+{%- assign initial = gift_card.initial_value | money -%}
+{%- assign expires = gift_card.expires_on | date: '%d %B %Y' -%}
+<div class="gift-card page-width">
+  <header class="gift-card__header">
+    <a class="gift-card__shop" href="{{ routes.root_url }}">{{ shop.name }}</a>
+  </header>
+
+  <section class="gift-card__card{% unless gift_card.enabled %} gift-card__card--inactive{% endunless %}{% if gift_card.expired %} gift-card__card--inactive{% endif %}" aria-labelledby="GiftCardHeading">
+    <p class="gift-card__eyebrow">{{ 'gift_cards.issued.subtext' | t }}</p>
+    <h1 id="GiftCardHeading" class="gift-card__balance">{{ balance }}</h1>
+    {%- if gift_card.balance != gift_card.initial_value -%}
+      <p class="gift-card__initial">{{ 'gift_cards.issued.initial_value' | t: value: initial }}</p>
+    {%- endif -%}
+
+    {%- if gift_card.enabled == false -%}
+      <p class="gift-card__state">{{ 'gift_cards.issued.disabled' | t }}</p>
+    {%- elsif gift_card.expired -%}
+      <p class="gift-card__state">{{ 'gift_cards.issued.expired' | t: expiry: expires }}</p>
+    {%- elsif gift_card.expires_on -%}
+      <p class="gift-card__expiry">{{ 'gift_cards.issued.expiration_date' | t: expires_on: expires }}</p>
+    {%- endif -%}
+
+    {%- if gift_card.code -%}
+      <div class="gift-card__code">
+        <label class="gift-card__code-label" for="GiftCardCode">{{ 'gift_cards.issued.code_label' | t }}</label>
+        <div class="gift-card__code-row">
+          <input class="gift-card__code-input" id="GiftCardCode" value="{{ gift_card.code }}" readonly>
+          <button type="button" class="button button--secondary gift-card__copy" data-copy="GiftCardCode" data-copied="{{ 'gift_cards.issued.copy_success' | t }}">{{ 'gift_cards.issued.copy_code' | t }}</button>
+        </div>
+      </div>
+    {%- endif -%}
+
+    {%- if gift_card.message != blank -%}
+      <blockquote class="gift-card__message">{{ gift_card.message | escape }}</blockquote>
+    {%- endif -%}
+  </section>
+
+  <p class="gift-card__how">{{ 'gift_cards.issued.how_to_use_gift_card' | t }}</p>
+  <div class="gift-card__actions">
+    <a href="{{ routes.root_url }}" class="button">{{ 'gift_cards.issued.shop_link' | t }}</a>
+    <button type="button" class="button button--secondary" data-print>{{ 'gift_cards.issued.print_gift_card' | t }}</button>
+  </div>
+</div>
+<script>
+  document.addEventListener('click', function (event) {
+    var copy = event.target.closest('[data-copy]');
+    if (copy) {
+      var input = document.getElementById(copy.getAttribute('data-copy'));
+      var done = function () { copy.textContent = copy.getAttribute('data-copied'); };
+      if (navigator.clipboard) navigator.clipboard.writeText(input.value).then(done);
+      else { input.select(); document.execCommand('copy'); done(); }
+    }
+    if (event.target.closest('[data-print]')) window.print();
+  });
+</script>

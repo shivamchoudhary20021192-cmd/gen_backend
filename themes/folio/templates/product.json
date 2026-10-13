@@ -1,0 +1,93 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-product",
+      "settings": {
+        "gallery_layout": "thumbnails"
+      },
+      "blocks": {
+        "vendor": {
+          "type": "vendor",
+          "settings": {}
+        },
+        "title": {
+          "type": "title",
+          "settings": {}
+        },
+        "rating": {
+          "type": "rating",
+          "settings": {}
+        },
+        "price": {
+          "type": "price",
+          "settings": {
+            "show_tax_note": true
+          }
+        },
+        "variant_picker": {
+          "type": "variant_picker",
+          "settings": {
+            "picker_type": "button"
+          }
+        },
+        "buy_buttons": {
+          "type": "buy_buttons",
+          "settings": {
+            "show_dynamic_checkout": true
+          }
+        },
+        "description": {
+          "type": "description",
+          "settings": {}
+        },
+        "specs": {
+          "type": "specifications",
+          "settings": {
+            "heading": "Details"
+          }
+        },
+        "custom_fields": {
+          "type": "custom_fields",
+          "settings": {
+            "heading": "Product details",
+            "open": true
+          }
+        },
+        "shipping": {
+          "type": "collapsible_tab",
+          "settings": {
+            "heading": "Shipping & returns",
+            "icon": "truck"
+          }
+        },
+        "share": {
+          "type": "share",
+          "settings": {}
+        }
+      },
+      "block_order": [
+        "vendor",
+        "title",
+        "rating",
+        "price",
+        "variant_picker",
+        "buy_buttons",
+        "description",
+        "specs",
+        "custom_fields",
+        "shipping",
+        "share"
+      ]
+    },
+    "related": {
+      "type": "related-products",
+      "settings": {
+        "heading": "Readers also enjoyed"
+      }
+    }
+  },
+  "order": [
+    "main",
+    "related"
+  ]
+}

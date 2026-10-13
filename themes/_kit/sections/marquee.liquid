@@ -1,0 +1,79 @@
+{%- style -%}
+  .section-{{ section.id }}-padding { padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px; }
+{%- endstyle -%}
+<div class="marquee scheme-{{ section.settings.color_scheme }} section-{{ section.id }}-padding" style="--marquee-speed: {{ section.settings.speed }}s;">
+  <div class="marquee__track{% if section.settings.direction == 'right' %} marquee__track--reverse{% endif %}" aria-hidden="false">
+    {%- for i in (1..2) -%}
+      <ul class="marquee__group {{ section.settings.text_size }}" role="list"{% if forloop.last %} aria-hidden="true"{% endif %}>
+        {%- for block in section.blocks -%}
+          <li class="marquee__item" {% if forloop.parentloop.first %}{{ block.shopify_attributes }}{% endif %}>
+            {%- if block.settings.link != blank -%}<a href="{{ block.settings.link }}">{{ block.settings.text | escape }}</a>{%- else -%}{{ block.settings.text | escape }}{%- endif -%}
+            <span class="marquee__separator">{{ section.settings.separator }}</span>
+          </li>
+        {%- endfor -%}
+      </ul>
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Scrolling text",
+  "tag": "section",
+  "class": "section section-marquee",
+  "max_blocks": 10,
+  "settings": [
+    {
+      "type": "select",
+      "id": "text_size",
+      "label": "Text size",
+      "options": [
+        { "value": "h3", "label": "Small" },
+        { "value": "h1", "label": "Medium" },
+        { "value": "hxl", "label": "Large" }
+      ],
+      "default": "h1"
+    },
+    { "type": "text", "id": "separator", "label": "Separator", "default": "✦" },
+    { "type": "range", "id": "speed", "label": "Speed (seconds per loop)", "min": 10, "max": 80, "step": 5, "unit": "s", "default": 35 },
+    {
+      "type": "select",
+      "id": "direction",
+      "label": "Direction",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "options": [
+        { "value": "background", "label": "Background" },
+        { "value": "surface", "label": "Surface" },
+        { "value": "accent-surface", "label": "Accent surface" },
+        { "value": "inverse", "label": "Inverse" },
+        { "value": "accent", "label": "Accent" }
+      ],
+      "default": "accent"
+    },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 60, "step": 4, "unit": "px", "default": 16 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 60, "step": 4, "unit": "px", "default": 16 }
+  ],
+  "blocks": [
+    {
+      "type": "text",
+      "name": "Text",
+      "settings": [
+        { "type": "text", "id": "text", "label": "Text", "default": "Free delivery on orders over ₹999" },
+        { "type": "url", "id": "link", "label": "Link" }
+      ]
+    }
+  ],
+  "presets": [
+    { "name": "Scrolling text", "category": "Text", "blocks": [{ "type": "text" }, { "type": "text", "settings": { "text": "New arrivals every week" } }, { "type": "text", "settings": { "text": "Easy 7-day returns" } }] }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,153 @@
+[
+  {
+    "name": "Logo",
+    "settings": [
+      { "type": "image_picker", "id": "logo", "label": "Logo", "info": "Leave empty to use the logo from Settings → Brand." },
+      { "type": "range", "id": "logo_width", "label": "Desktop logo width", "min": 50, "max": 300, "step": 10, "unit": "px", "default": 120 },
+      { "type": "image_picker", "id": "favicon", "label": "Favicon", "info": "Shown at 32 × 32 px." }
+    ]
+  },
+  {
+    "name": "Colors",
+    "settings": [
+      { "type": "header", "content": "Surfaces" },
+      { "type": "color", "id": "color_background", "label": "Page background", "default": "#FFFFFF" },
+      { "type": "color", "id": "color_ivory", "label": "Surface", "info": "Sections with the \"Surface\" color scheme.", "default": "#FAFAF7" },
+      { "type": "color", "id": "color_cream", "label": "Surface, alternate", "info": "Sections with the \"Surface alternate\" color scheme.", "default": "#F3EFE7" },
+      { "type": "color", "id": "color_champagne", "label": "Accent surface", "info": "Sections with the \"Accent surface\" color scheme.", "default": "#EADFCB" },
+      { "type": "color", "id": "color_espresso", "label": "Inverse surface", "info": "Dark sections: footer, banners, the \"Inverse\" color scheme.", "default": "#1F1B16" },
+      { "type": "header", "content": "Text and accents" },
+      { "type": "color", "id": "color_text", "label": "Text", "default": "#1A1A1A" },
+      { "type": "color", "id": "color_text_muted", "label": "Secondary text", "default": "#6B6B6B" },
+      { "type": "color", "id": "color_accent", "label": "Buttons and links", "default": "#1A1A1A" },
+      { "type": "color", "id": "color_accent_contrast", "label": "Text on buttons", "default": "#FFFFFF" },
+      { "type": "color", "id": "color_border", "label": "Borders", "default": "#E5E5E5" },
+      { "type": "color", "id": "color_sale", "label": "Sale price and badges", "default": "#B42318" }
+    ]
+  },
+  {
+    "name": "Typography",
+    "settings": [
+      { "type": "font_picker", "id": "font_heading", "label": "Headings", "default": "Inter" },
+      { "type": "font_picker", "id": "font_body", "label": "Body", "default": "Inter" },
+      { "type": "range", "id": "font_base_size", "label": "Body size", "min": 14, "max": 20, "step": 1, "unit": "px", "default": 16 },
+      { "type": "range", "id": "heading_scale", "label": "Heading scale", "min": 90, "max": 160, "step": 5, "unit": "%", "default": 120 },
+      {
+        "type": "select",
+        "id": "heading_case",
+        "label": "Heading case",
+        "options": [
+          { "value": "none", "label": "As written" },
+          { "value": "uppercase", "label": "Uppercase" }
+        ],
+        "default": "none"
+      }
+    ]
+  },
+  {
+    "name": "Layout",
+    "settings": [
+      { "type": "range", "id": "page_width", "label": "Page width", "min": 1000, "max": 1600, "step": 20, "unit": "px", "default": 1280 },
+      { "type": "range", "id": "spacing_sections", "label": "Space between sections", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 0 },
+      { "type": "range", "id": "radius", "label": "Corner radius", "min": 0, "max": 24, "step": 2, "unit": "px", "default": 8 },
+      {
+        "type": "select",
+        "id": "button_style",
+        "label": "Buttons",
+        "options": [
+          { "value": "square", "label": "Square" },
+          { "value": "rounded", "label": "Rounded" },
+          { "value": "pill", "label": "Pill" }
+        ],
+        "default": "rounded"
+      }
+    ]
+  },
+  {
+    "name": "Product cards",
+    "settings": [
+      {
+        "type": "select",
+        "id": "image_ratio",
+        "label": "Image shape",
+        "options": [
+          { "value": "square", "label": "Square" },
+          { "value": "portrait", "label": "Portrait (4:5)" },
+          { "value": "landscape", "label": "Landscape (4:3)" },
+          { "value": "natural", "label": "As uploaded" }
+        ],
+        "default": "portrait"
+      },
+      {
+        "type": "select",
+        "id": "card_style",
+        "label": "Style",
+        "options": [
+          { "value": "minimal", "label": "Minimal" },
+          { "value": "bordered", "label": "Bordered" },
+          { "value": "elevated", "label": "Shadowed" },
+          { "value": "overlay", "label": "Text over image" }
+        ],
+        "default": "minimal"
+      },
+      { "type": "checkbox", "id": "show_secondary_image", "label": "Show second image on hover", "default": true },
+      { "type": "checkbox", "id": "quick_add", "label": "Quick add to cart", "default": true },
+      { "type": "checkbox", "id": "show_vendor", "label": "Show vendor", "default": false },
+      { "type": "checkbox", "id": "show_ratings", "label": "Show star ratings", "default": true },
+      { "type": "checkbox", "id": "show_sale_badge", "label": "Show sale badge", "default": true }
+    ]
+  },
+  {
+    "name": "Cart",
+    "settings": [
+      {
+        "type": "select",
+        "id": "cart_type",
+        "label": "Cart type",
+        "options": [
+          { "value": "drawer", "label": "Drawer" },
+          { "value": "page", "label": "Page" }
+        ],
+        "default": "drawer"
+      },
+      { "type": "checkbox", "id": "show_free_shipping_bar", "label": "Show progress to free delivery", "default": true },
+      { "type": "collection", "id": "cart_drawer_collection", "label": "Collection to suggest in an empty cart" }
+    ]
+  },
+  {
+    "name": "Search",
+    "settings": [
+      { "type": "checkbox", "id": "predictive_search_enabled", "label": "Show results as shoppers type", "default": true },
+      { "type": "checkbox", "id": "search_show_price", "label": "Show prices in results", "default": true }
+    ]
+  },
+  {
+    "name": "Social media",
+    "settings": [
+      { "type": "paragraph", "content": "Leave empty to use the profiles from Settings → Brand." },
+      { "type": "url", "id": "social_instagram", "label": "Instagram" },
+      { "type": "url", "id": "social_facebook", "label": "Facebook" },
+      { "type": "url", "id": "social_x", "label": "X (Twitter)" },
+      { "type": "url", "id": "social_youtube", "label": "YouTube" },
+      { "type": "url", "id": "social_tiktok", "label": "TikTok" },
+      { "type": "url", "id": "social_pinterest", "label": "Pinterest" }
+    ]
+  },
+  {
+    "name": "Animations",
+    "settings": [
+      { "type": "checkbox", "id": "animations_reveal", "label": "Reveal sections on scroll", "default": true },
+      {
+        "type": "select",
+        "id": "animations_hover",
+        "label": "Hover effect",
+        "options": [
+          { "value": "none", "label": "None" },
+          { "value": "lift", "label": "Lift" },
+          { "value": "zoom", "label": "Zoom image" }
+        ],
+        "default": "zoom"
+      }
+    ]
+  }
+]

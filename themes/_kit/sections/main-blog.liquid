@@ -1,0 +1,46 @@
+{%- style -%}
+  .section-{{ section.id }}-padding { padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px; padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px; }
+  @media screen and (min-width: 750px) { .section-{{ section.id }}-padding { padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px; } }
+{%- endstyle -%}
+<div class="main-blog section-{{ section.id }}-padding">
+  <div class="page-width">
+    <h1 class="main-blog__title h0">{{ blog.title | escape }}</h1>
+    {%- paginate blog.articles by section.settings.articles_per_page -%}
+      <ul class="grid blog-grid blog-grid--{{ section.settings.layout }}" role="list" style="--columns: {{ section.settings.columns_desktop }}; --columns-mobile: 1;">
+        {%- for article in blog.articles -%}
+          <li class="grid__item" data-reveal>{% render 'card-article', article: article, show_excerpt: section.settings.show_excerpt, show_date: section.settings.show_date %}</li>
+        {%- else -%}
+          <li class="grid__item"><p>No articles yet.</p></li>
+        {%- endfor -%}
+      </ul>
+      {% render 'pagination', paginate: paginate %}
+    {%- endpaginate -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Blog posts",
+  "tag": "section",
+  "class": "section section-main-blog",
+  "enabled_on": { "templates": ["blog"] },
+  "settings": [
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Layout",
+      "options": [
+        { "value": "grid", "label": "Grid" },
+        { "value": "collage", "label": "Collage" }
+      ],
+      "default": "grid"
+    },
+    { "type": "range", "id": "articles_per_page", "label": "Articles per page", "min": 3, "max": 24, "step": 3, "default": 9 },
+    { "type": "range", "id": "columns_desktop", "label": "Columns on desktop", "min": 1, "max": 4, "step": 1, "default": 3 },
+    { "type": "checkbox", "id": "show_date", "label": "Show date", "default": true },
+    { "type": "checkbox", "id": "show_excerpt", "label": "Show excerpt", "default": true },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 36 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 48 }
+  ]
+}
+{% endschema %}

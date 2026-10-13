@@ -1,0 +1,264 @@
+{
+  "sections": {
+    "hero": {
+      "type": "image-banner",
+      "settings": {
+        "image_height": "large",
+        "desktop_content_position": "middle-left",
+        "desktop_content_alignment": "left",
+        "color_scheme": "inverse",
+        "show_text_box": false,
+        "image_overlay_opacity": 30
+      },
+      "blocks": {
+        "eyebrow": {
+          "type": "eyebrow",
+          "settings": {
+            "text": "Dermatologist tested"
+          }
+        },
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "heading": "Skincare that explains itself",
+            "heading_size": "h0"
+          }
+        },
+        "text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Clinically proven actives at honest concentrations. Nothing you don’t need.</p>",
+            "text_style": "subtitle"
+          }
+        },
+        "buttons": {
+          "type": "buttons",
+          "settings": {
+            "button_label_1": "Find your routine",
+            "button_link_1": "/collections/all",
+            "button_label_2": "Take the quiz",
+            "button_link_2": "/pages/skin-quiz"
+          }
+        }
+      },
+      "block_order": [
+        "eyebrow",
+        "heading",
+        "text",
+        "buttons"
+      ]
+    },
+    "promises": {
+      "type": "multicolumn",
+      "settings": {
+        "title": "",
+        "columns_desktop": 4,
+        "column_style": "plain",
+        "color_scheme": "surface-alt",
+        "padding_top": 40,
+        "padding_bottom": 40,
+        "columns_mobile": "2"
+      },
+      "blocks": {
+        "c1": {
+          "type": "column",
+          "settings": {
+            "icon": "leaf",
+            "title": "Clean formulas",
+            "text": "<p>No parabens, sulphates or synthetic fragrance.</p>"
+          }
+        },
+        "c2": {
+          "type": "column",
+          "settings": {
+            "icon": "shield",
+            "title": "Dermatologist tested",
+            "text": "<p>Safe for sensitive skin.</p>"
+          }
+        },
+        "c3": {
+          "type": "column",
+          "settings": {
+            "icon": "heart",
+            "title": "Cruelty free",
+            "text": "<p>Never tested on animals.</p>"
+          }
+        },
+        "c4": {
+          "type": "column",
+          "settings": {
+            "icon": "box",
+            "title": "Recyclable packaging",
+            "text": "<p>Glass and aluminium, wherever we can.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "c1",
+        "c2",
+        "c3",
+        "c4"
+      ]
+    },
+    "bestsellers": {
+      "type": "featured-collection",
+      "settings": {
+        "title": "Bestsellers",
+        "eyebrow": "Most loved",
+        "products_to_show": 8,
+        "columns_desktop": 4,
+        "layout": "grid",
+        "color_scheme": "background",
+        "heading_size": "h1",
+        "show_view_all": true
+      }
+    },
+    "ingredients": {
+      "type": "ingredients-spotlight",
+      "settings": {},
+      "blocks": {
+        "i1": {
+          "type": "ingredient",
+          "settings": {
+            "name": "Niacinamide",
+            "percentage": "10%",
+            "benefit": "Refines pores and evens tone."
+          }
+        },
+        "i2": {
+          "type": "ingredient",
+          "settings": {
+            "name": "Hyaluronic acid",
+            "percentage": "2%",
+            "benefit": "Draws in and holds moisture."
+          }
+        },
+        "i3": {
+          "type": "ingredient",
+          "settings": {
+            "name": "Ceramides",
+            "percentage": "3%",
+            "benefit": "Repairs the skin barrier."
+          }
+        }
+      },
+      "block_order": [
+        "i1",
+        "i2",
+        "i3"
+      ]
+    },
+    "routine": {
+      "type": "routine-steps",
+      "settings": {},
+      "blocks": {
+        "s1": {
+          "type": "step",
+          "settings": {
+            "title": "Cleanse",
+            "text": "Start with a gentle, low-foam cleanser."
+          }
+        },
+        "s2": {
+          "type": "step",
+          "settings": {
+            "title": "Treat",
+            "text": "Target concerns with a concentrated serum."
+          }
+        },
+        "s3": {
+          "type": "step",
+          "settings": {
+            "title": "Protect",
+            "text": "Seal it in with moisturiser and SPF."
+          }
+        }
+      },
+      "block_order": [
+        "s1",
+        "s2",
+        "s3"
+      ]
+    },
+    "reviews": {
+      "type": "testimonials",
+      "settings": {
+        "title": "Real skin, real results",
+        "color_scheme": "surface-alt"
+      },
+      "blocks": {
+        "t1": {
+          "type": "testimonial",
+          "settings": {
+            "quote": "<p>My skin has never been calmer. The serum is a game-changer.</p>",
+            "detail": "Combination skin"
+          }
+        },
+        "t2": {
+          "type": "testimonial",
+          "settings": {
+            "quote": "<p>Finally, products that tell you exactly what’s in them.</p>",
+            "detail": "Sensitive skin"
+          }
+        },
+        "t3": {
+          "type": "testimonial",
+          "settings": {
+            "quote": "<p>Six weeks in and my dark spots have faded visibly.</p>",
+            "detail": "Oily skin"
+          }
+        }
+      },
+      "block_order": [
+        "t1",
+        "t2",
+        "t3"
+      ]
+    },
+    "journal": {
+      "type": "blog-posts",
+      "settings": {
+        "heading": "Skin school"
+      }
+    },
+    "newsletter": {
+      "type": "newsletter",
+      "settings": {
+        "color_scheme": "accent-surface"
+      },
+      "blocks": {
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "heading": "Skin notes, monthly"
+          }
+        },
+        "text": {
+          "type": "paragraph",
+          "settings": {
+            "text": "<p>Formulas, routines and first access to launches.</p>"
+          }
+        },
+        "form": {
+          "type": "email_form",
+          "settings": {}
+        }
+      },
+      "block_order": [
+        "heading",
+        "text",
+        "form"
+      ]
+    }
+  },
+  "order": [
+    "hero",
+    "promises",
+    "bestsellers",
+    "ingredients",
+    "routine",
+    "reviews",
+    "journal",
+    "newsletter"
+  ]
+}

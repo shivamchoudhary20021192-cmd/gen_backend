@@ -1,0 +1,51 @@
+{
+  "handle": "harvest",
+  "name": "Harvest",
+  "version": "2.4.0",
+  "author": "Veylog",
+  "description": "Friendly and quick to shop, for grocery and food stores where people buy many things at once.",
+  "verticals": [
+    "grocery"
+  ],
+  "industries": [
+    "Grocery",
+    "Food & drink",
+    "Organic",
+    "Bakery"
+  ],
+  "features": [
+    "Shop by aisle",
+    "Quick add everywhere",
+    "Sticky header",
+    "Free-delivery progress",
+    "Cart drawer",
+    "Predictive search"
+  ],
+  "sortOrder": 50,
+  "price": 0,
+  "previewImageUrl": null,
+  "defaults": {
+    "font_heading": "Outfit",
+    "font_body": "Nunito Sans",
+    "radius": 14,
+    "button_style": "pill",
+    "image_ratio": "square",
+    "card_style": "elevated",
+    "color_accent": "#1F8A4C",
+    "color_cream": "#F4F8EE",
+    "color_champagne": "#FFF3D6",
+    "color_espresso": "#12301E",
+    "quick_add": true,
+    "show_secondary_image": false
+  },
+  "presets": {
+    "Fresh": {},
+    "Market": {
+      "color_accent": "#D9480F",
+      "color_cream": "#FFF4E6",
+      "color_champagne": "#FFE8CC",
+      "color_espresso": "#3B1D0E"
+    }
+  },
+  "defaultPreset": "Fresh"
+}

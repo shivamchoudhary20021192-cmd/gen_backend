@@ -1,0 +1,70 @@
+{%- assign product = section.settings.product -%}
+{%- style -%}
+  .section-{{ section.id }}-padding { padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px; padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px; }
+  @media screen and (min-width: 750px) { .section-{{ section.id }}-padding { padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px; } }
+{%- endstyle -%}
+<div class="featured-product scheme-{{ section.settings.color_scheme }} section-{{ section.id }}-padding">
+  <div class="page-width">
+    <div class="product product--featured" data-product-section data-section-id="{{ section.id }}">
+      <div class="product__media-wrapper">
+        {%- if product != blank and product.featured_image -%}
+          <div class="product__media">{{ product.featured_image | image_url: width: 1500 | image_tag: loading: 'lazy', sizes: '(min-width: 990px) 50vw, 100vw', widths: '375, 550, 750, 1100, 1500', alt: product.title }}</div>
+        {%- else -%}
+          <div class="product__media">{{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}</div>
+        {%- endif -%}
+      </div>
+      <div class="product__info">
+        {%- if product != blank -%}
+          {%- if product.vendor != blank -%}<p class="product__vendor eyebrow">{{ product.vendor }}</p>{%- endif -%}
+          <h2 class="product__title h1"><a href="{{ product.url }}">{{ product.title | escape }}</a></h2>
+          {% render 'price', product: product, use_variant: true, show_badges: true, class: 'price--large' %}
+          {%- if product.excerpt != blank -%}<div class="product__description rte">{{ product.excerpt }}</div>{%- endif -%}
+          {%- assign current_variant = product.selected_or_first_available_variant -%}
+          {%- form 'product', product, class: 'product-form', data-product-form: '' -%}
+            <input type="hidden" name="id" value="{{ current_variant.id }}" data-variant-id>
+            <div class="product-form__buttons">
+              {% render 'quantity-input', id: 'Quantity-featured' %}
+              <button type="submit" class="button button--full" data-add-button{% unless current_variant.available %} disabled{% endunless %}>
+                {%- if current_variant.available -%}{{ 'products.product.add_to_cart' | t }}{%- else -%}{{ 'products.product.sold_out' | t }}{%- endif -%}
+              </button>
+            </div>
+          {%- endform -%}
+          <a class="link link--arrow" href="{{ product.url }}">{{ 'products.product.view_full_details' | t }}{% render 'icon', name: 'arrow-right', size: 14 %}</a>
+        {%- else -%}
+          <h2 class="product__title h1">Your product's name</h2>
+          <div class="price price--large"><span class="price__current">{{ 4999 | money }}</span></div>
+          <p class="rte">Choose a product in the theme editor to feature it here.</p>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Featured product",
+  "tag": "section",
+  "class": "section section-featured-product",
+  "disabled_on": { "groups": ["header", "footer"] },
+  "settings": [
+    { "type": "product", "id": "product", "label": "Product" },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "options": [
+        { "value": "background", "label": "Background" },
+        { "value": "surface", "label": "Surface" },
+        { "value": "surface-alt", "label": "Surface alternate" },
+        { "value": "accent-surface", "label": "Accent surface" },
+        { "value": "inverse", "label": "Inverse" }
+      ],
+      "default": "surface"
+    },
+    { "type": "header", "content": "Padding" },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 48 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 48 }
+  ],
+  "presets": [{ "name": "Featured product", "category": "Product" }]
+}
+{% endschema %}

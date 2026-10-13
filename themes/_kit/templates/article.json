@@ -1,0 +1,31 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-article",
+      "blocks": {
+        "image": {
+          "type": "featured_image"
+        },
+        "title": {
+          "type": "title"
+        },
+        "content": {
+          "type": "content"
+        },
+        "share": {
+          "type": "share"
+        }
+      },
+      "block_order": [
+        "image",
+        "title",
+        "content",
+        "share"
+      ],
+      "settings": {}
+    }
+  },
+  "order": [
+    "main"
+  ]
+}

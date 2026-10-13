@@ -1,0 +1,146 @@
+{%- style -%}
+  .section-{{ section.id }}-padding { padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px; padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px; }
+  @media screen and (min-width: 750px) { .section-{{ section.id }}-padding { padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px; } }
+{%- endstyle -%}
+<div class="customer customer--order scheme-{{ section.settings.color_scheme }} section-{{ section.id }}-padding">
+  <div class="page-width">
+    <a class="link--back" href="{{ routes.account_url }}">{% render 'icon', name: 'chevron-left', size: 16 %} {{ 'customer.order.back' | t }}</a>
+    <div class="customer__header">
+      <div>
+        <h1 class="customer__title">{{ 'customer.order.title' | t: name: order.name }}</h1>
+        {%- assign placed_on = order.created_at | date: '%B %d, %Y at %H:%M' -%}
+        <p class="customer__subtitle">{{ 'customer.order.date_html' | t: date: placed_on }}</p>
+      </div>
+      <span class="badge badge--{{ order.status | handle }}">{{ order.status_label }}</span>
+    </div>
+
+    {%- if order.cancelled -%}
+      <div class="form__message form__message--error" role="status">
+        {%- assign cancelled_on = order.cancelled_at | date: '%B %d, %Y' -%}
+        {{ 'customer.order.cancelled_html' | t: date: cancelled_on }}
+        {%- if order.cancel_reason != blank %} · {{ 'customer.order.cancelled_reason' | t: reason: order.cancel_reason }}{% endif -%}
+      </div>
+    {%- endif -%}
+
+    <div class="customer__grid">
+      <div class="customer__panel">
+        {%- if section.settings.show_progress and order.timeline.size > 0 -%}
+          <h2 class="customer__heading">{{ 'customer.order.progress' | t }}</h2>
+          <ol class="order-timeline" role="list">
+            {%- for event in order.timeline -%}
+              <li class="order-timeline__step{% if forloop.last %} is-current{% endif %}">
+                <span class="order-timeline__dot" aria-hidden="true"></span>
+                <div>
+                  <p class="order-timeline__label">{{ event.label }}</p>
+                  <p class="customer__muted">{{ event.created_at | date: '%b %d, %H:%M' }}{% if event.note != blank %} · {{ event.note | escape }}{% endif %}</p>
+                </div>
+              </li>
+            {%- endfor -%}
+          </ol>
+          {%- if order.estimated_delivery -%}
+            {%- assign eta_from = order.estimated_delivery.from | date: '%b %d' -%}
+            {%- assign eta_to = order.estimated_delivery.to | date: '%b %d' -%}
+            <p class="order-eta">{{ 'customer.order.estimated_delivery' | t: from: eta_from, to: eta_to }}</p>
+          {%- endif -%}
+        {%- endif -%}
+
+        {%- for fulfillment in order.fulfillments -%}
+          {%- if fulfillment.tracking_url != blank or fulfillment.tracking_number != blank -%}
+            <div class="order-tracking">
+              <p>
+                {%- if fulfillment.tracking_company != blank %}<strong>{{ fulfillment.tracking_company }}</strong> · {% endif -%}
+                {%- if fulfillment.tracking_number != blank %}{{ 'customer.order.tracking_number' | t: number: fulfillment.tracking_number }}{% endif -%}
+              </p>
+              {%- if fulfillment.tracking_url != blank -%}
+                <a class="button button--secondary button--small" href="{{ fulfillment.tracking_url }}" target="_blank" rel="noopener">{{ 'customer.order.track' | t }}</a>
+              {%- endif -%}
+            </div>
+          {%- endif -%}
+        {%- endfor -%}
+
+        <table class="order-table">
+          <thead>
+            <tr>
+              <th scope="col">{{ 'customer.order.product' | t }}</th>
+              <th scope="col" class="order-table__num">{{ 'customer.order.quantity' | t }}</th>
+              <th scope="col" class="order-table__num">{{ 'customer.order.total' | t }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {%- for item in order.line_items -%}
+              <tr>
+                <td>
+                  <div class="order-table__product">
+                    <span class="order-card__thumb">
+                      {%- if item.image -%}<img src="{{ item.image | image_url: width: 120 }}" alt="" width="60" height="60" loading="lazy">{%- else -%}{% render 'icon', name: 'cart', size: 20 %}{%- endif -%}
+                    </span>
+                    <div>
+                      {%- if item.url -%}<a href="{{ item.url }}">{{ item.product_title | escape }}</a>{%- else -%}{{ item.product_title | escape }}{%- endif -%}
+                      {%- if item.variant_title != blank -%}<p class="customer__muted">{{ item.variant_title | escape }}</p>{%- endif -%}
+                      <p class="customer__muted">{{ item.final_price | money }}{% if item.sku != blank %} · {{ 'customer.order.sku' | t }} {{ item.sku }}{% endif %}</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="order-table__num">{{ item.quantity }}</td>
+                <td class="order-table__num">{{ item.final_line_price | money }}</td>
+              </tr>
+            {%- endfor -%}
+          </tbody>
+        </table>
+
+        <dl class="order-totals">
+          <div><dt>{{ 'customer.order.subtotal' | t }}</dt><dd>{{ order.line_items_subtotal_price | money }}</dd></div>
+          {%- for discount in order.discount_applications -%}
+            <div><dt>{{ 'customer.order.discount' | t }} ({{ discount.title | escape }})</dt><dd>-{{ discount.total_allocated_amount | money }}</dd></div>
+          {%- endfor -%}
+          {%- for method in order.shipping_methods -%}
+            <div><dt>{{ 'customer.order.shipping' | t }}</dt><dd>{{ method.price | money }}</dd></div>
+          {%- endfor -%}
+          {%- for tax in order.tax_lines -%}
+            <div><dt>{% if order.taxes_included %}{{ 'customer.order.tax_included' | t }}{% else %}{{ 'customer.order.tax' | t }}{% endif %}</dt><dd>{{ tax.price | money }}</dd></div>
+          {%- endfor -%}
+          <div class="order-totals__total"><dt>{{ 'customer.order.total_price' | t }}</dt><dd>{{ order.total_price | money_with_currency }}</dd></div>
+        </dl>
+      </div>
+
+      <aside class="customer__panel customer__details">
+        <h2 class="customer__heading">{{ 'customer.order.payment' | t }}</h2>
+        <p>{{ order.financial_status_label }}{% if order.payment_method %} · {{ order.payment_method }}{% endif %}</p>
+        {%- if order.shipping_address -%}
+          <h2 class="customer__heading">{{ 'customer.order.shipping_address' | t }}</h2>
+          <address class="customer__address">
+            {{- order.shipping_address.name }}<br>
+            {{ order.shipping_address.address1 }}{% if order.shipping_address.address2 != blank %}, {{ order.shipping_address.address2 }}{% endif %}<br>
+            {{ order.shipping_address.city }}, {{ order.shipping_address.province }} {{ order.shipping_address.zip }}<br>
+            {{ order.shipping_address.country }}<br>
+            {{ order.shipping_address.phone -}}
+          </address>
+        {%- endif -%}
+      </aside>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Order",
+  "tag": "section",
+  "class": "section section-customer-order",
+  "settings": [
+    { "type": "checkbox", "id": "show_progress", "label": "Show order progress", "default": true },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "options": [
+        { "value": "background", "label": "Background" },
+        { "value": "surface", "label": "Surface" },
+        { "value": "surface-alt", "label": "Surface alternate" }
+      ],
+      "default": "background"
+    },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 40 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 60 }
+  ]
+}
+{% endschema %}

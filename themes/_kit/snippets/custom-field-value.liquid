@@ -1,0 +1,47 @@
+{%- comment -%}
+  One custom field (Products (new) › Custom fields), drawn for its type.
+
+  Accepts:
+  - field: {Object} a field from product.custom_fields, or product.metafields.<namespace>.<key>
+{%- endcomment -%}
+{%- assign base = field.type | remove: 'list.' -%}
+{%- case base -%}
+  {%- when 'rich_text_field' -%}
+    <div class="rte">{{ field }}</div>
+  {%- when 'multi_line_text_field' -%}
+    {{ field | escape | newline_to_br }}
+  {%- when 'file_reference' -%}
+    <span class="custom-field__files">
+      {%- for file in field.values -%}
+        {%- if file.media_type == 'image' -%}
+          {{ file | image_url: width: 480 | image_tag: loading: 'lazy', widths: '160, 320, 480', class: 'custom-field__image', alt: file.alt }}
+        {%- else -%}
+          <a href="{{ file.url | escape }}" target="_blank" rel="noopener">{{ file.alt | default: field.name | escape }}</a>
+        {%- endif -%}
+      {%- endfor -%}
+    </span>
+  {%- when 'product_reference', 'variant_reference', 'collection_reference', 'page_reference' -%}
+    {%- for item in field.values -%}
+      <a href="{{ item.url | escape }}">{{ item.title | escape }}</a>{%- unless forloop.last -%}, {% endunless -%}
+    {%- endfor -%}
+  {%- when 'metaobject_reference' -%}
+    {%- for entry in field.values -%}
+      {{- entry.display_name | escape -}}{%- unless forloop.last -%}, {% endunless -%}
+    {%- endfor -%}
+  {%- when 'color' -%}
+    {%- for colour in field.values -%}
+      <span class="custom-field__swatch" style="background-color: {{ colour | escape }}" title="{{ colour | escape }}"></span>
+    {%- endfor -%}
+  {%- when 'url' -%}
+    {%- for link in field.values -%}
+      <a href="{{ link | escape }}" target="_blank" rel="noopener nofollow">{{ link | remove_first: 'https://' | remove_first: 'http://' | escape }}</a>{%- unless forloop.last -%}, {% endunless -%}
+    {%- endfor -%}
+  {%- when 'link' -%}
+    {%- for link in field.values -%}
+      <a href="{{ link.url | escape }}">{{ link.text | default: link.url | escape }}</a>{%- unless forloop.last -%}, {% endunless -%}
+    {%- endfor -%}
+  {%- when 'boolean' -%}
+    {%- if field.value -%}✓{%- else -%}—{%- endif -%}
+  {%- else -%}
+    {{ field | escape }}
+{%- endcase -%}

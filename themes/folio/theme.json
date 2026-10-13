@@ -1,0 +1,56 @@
+{
+  "handle": "folio",
+  "name": "Folio",
+  "version": "2.4.0",
+  "author": "Veylog",
+  "description": "Literary and calm, for bookshops and stationers.",
+  "verticals": [
+    "books"
+  ],
+  "industries": [
+    "Books",
+    "Stationery",
+    "Art prints"
+  ],
+  "features": [
+    "Staff picks",
+    "Book quotes",
+    "Blog",
+    "Portrait covers",
+    "Stacked header",
+    "Cart drawer"
+  ],
+  "sortOrder": 90,
+  "price": 0,
+  "previewImageUrl": null,
+  "defaults": {
+    "font_heading": "Libre Baskerville",
+    "font_body": "Lora",
+    "radius": 2,
+    "button_style": "square",
+    "image_ratio": "portrait",
+    "color_background": "#FFFDF8",
+    "color_ivory": "#FBF8F0",
+    "color_cream": "#F5EFE3",
+    "color_champagne": "#EAE0CB",
+    "color_espresso": "#1F1A15",
+    "color_accent": "#7A2E2E",
+    "font_base_size": 17
+  },
+  "presets": {
+    "Paper": {},
+    "Library": {
+      "color_background": "#1C1A17",
+      "color_ivory": "#23201C",
+      "color_cream": "#2B2823",
+      "color_champagne": "#332E26",
+      "color_espresso": "#0F0E0C",
+      "color_text": "#F3EDE2",
+      "color_text_muted": "#B8AE9D",
+      "color_border": "#3A352D",
+      "color_accent": "#E0B15C",
+      "color_accent_contrast": "#1C1A17"
+    }
+  },
+  "defaultPreset": "Paper"
+}

@@ -1,0 +1,250 @@
+{
+  "sections": {
+    "hero": {
+      "type": "image-banner",
+      "settings": {
+        "image_height": "medium",
+        "desktop_content_position": "middle-left",
+        "desktop_content_alignment": "left",
+        "color_scheme": "inverse",
+        "show_text_box": false,
+        "image_overlay_opacity": 30
+      },
+      "blocks": {
+        "eyebrow": {
+          "type": "eyebrow",
+          "settings": {
+            "text": "New launches"
+          }
+        },
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "heading": "Performance, delivered tomorrow",
+            "heading_size": "h0"
+          }
+        },
+        "text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>The latest devices, genuine warranty, and experts to help you choose.</p>",
+            "text_style": "subtitle"
+          }
+        },
+        "buttons": {
+          "type": "buttons",
+          "settings": {
+            "button_label_1": "Shop new launches",
+            "button_link_1": "/collections/all",
+            "button_label_2": "Compare models",
+            "button_link_2": "#compare"
+          }
+        }
+      },
+      "block_order": [
+        "eyebrow",
+        "heading",
+        "text",
+        "buttons"
+      ]
+    },
+    "categories": {
+      "type": "collection-list",
+      "settings": {
+        "title": "Shop by category",
+        "columns_desktop": 6,
+        "columns_mobile": "2",
+        "image_ratio": "square",
+        "card_style": "below",
+        "heading_size": "h2",
+        "show_view_all": true
+      }
+    },
+    "deals": {
+      "type": "featured-collection",
+      "settings": {
+        "title": "Deals of the day",
+        "eyebrow": "Limited stock",
+        "products_to_show": 10,
+        "columns_desktop": 5,
+        "layout": "grid",
+        "color_scheme": "background",
+        "heading_size": "h2",
+        "show_view_all": true
+      }
+    },
+    "specs": {
+      "type": "spec-highlights",
+      "settings": {},
+      "blocks": {
+        "s1": {
+          "type": "spec",
+          "settings": {
+            "value": "48",
+            "unit": "h",
+            "label": "Battery life"
+          }
+        },
+        "s2": {
+          "type": "spec",
+          "settings": {
+            "value": "2",
+            "unit": "yr",
+            "label": "Warranty"
+          }
+        },
+        "s3": {
+          "type": "spec",
+          "settings": {
+            "value": "24",
+            "unit": "h",
+            "label": "Dispatch"
+          }
+        },
+        "s4": {
+          "type": "spec",
+          "settings": {
+            "value": "4.8",
+            "unit": "★",
+            "label": "Average rating"
+          }
+        }
+      },
+      "block_order": [
+        "s1",
+        "s2",
+        "s3",
+        "s4"
+      ]
+    },
+    "compare": {
+      "type": "comparison-table",
+      "settings": {},
+      "blocks": {
+        "r1": {
+          "type": "row",
+          "settings": {
+            "label": "Battery life",
+            "values": "20 h | 30 h | 40 h"
+          }
+        },
+        "r2": {
+          "type": "row",
+          "settings": {
+            "label": "Noise cancelling",
+            "values": "no | yes | yes"
+          }
+        },
+        "r3": {
+          "type": "row",
+          "settings": {
+            "label": "Warranty",
+            "values": "1 year | 1 year | 2 years"
+          }
+        }
+      },
+      "block_order": [
+        "r1",
+        "r2",
+        "r3"
+      ]
+    },
+    "launches": {
+      "type": "featured-collection",
+      "settings": {
+        "title": "New launches",
+        "eyebrow": "",
+        "products_to_show": 8,
+        "columns_desktop": 4,
+        "layout": "slider",
+        "color_scheme": "background",
+        "heading_size": "h2",
+        "show_view_all": true
+      }
+    },
+    "brands": {
+      "type": "logo-list",
+      "settings": {
+        "title": "Brands we carry"
+      },
+      "blocks": {
+        "l0": {
+          "type": "logo",
+          "settings": {
+            "name": "Sonic"
+          }
+        },
+        "l1": {
+          "type": "logo",
+          "settings": {
+            "name": "Voltra"
+          }
+        },
+        "l2": {
+          "type": "logo",
+          "settings": {
+            "name": "Nimbus"
+          }
+        },
+        "l3": {
+          "type": "logo",
+          "settings": {
+            "name": "Quark"
+          }
+        },
+        "l4": {
+          "type": "logo",
+          "settings": {
+            "name": "Helix"
+          }
+        }
+      },
+      "block_order": [
+        "l0",
+        "l1",
+        "l2",
+        "l3",
+        "l4"
+      ]
+    },
+    "newsletter": {
+      "type": "newsletter",
+      "settings": {
+        "color_scheme": "surface"
+      },
+      "blocks": {
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "heading": "Deals in your inbox"
+          }
+        },
+        "text": {
+          "type": "paragraph",
+          "settings": {
+            "text": "<p>Launches, price drops and restocks — first.</p>"
+          }
+        },
+        "form": {
+          "type": "email_form",
+          "settings": {}
+        }
+      },
+      "block_order": [
+        "heading",
+        "text",
+        "form"
+      ]
+    }
+  },
+  "order": [
+    "hero",
+    "categories",
+    "deals",
+    "specs",
+    "compare",
+    "launches",
+    "brands",
+    "newsletter"
+  ]
+}

@@ -1,0 +1,107 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-product",
+      "blocks": {
+        "vendor": {
+          "type": "vendor"
+        },
+        "title": {
+          "type": "title"
+        },
+        "rating": {
+          "type": "rating"
+        },
+        "price": {
+          "type": "price",
+          "settings": {
+            "show_tax_note": true
+          }
+        },
+        "variant_picker": {
+          "type": "variant_picker",
+          "settings": {
+            "picker_type": "button"
+          }
+        },
+        "quantity": {
+          "type": "quantity_selector"
+        },
+        "buy_buttons": {
+          "type": "buy_buttons",
+          "settings": {
+            "show_dynamic_checkout": true
+          }
+        },
+        "trust": {
+          "type": "icon_with_text"
+        },
+        "description": {
+          "type": "description"
+        },
+        "features": {
+          "type": "key_features",
+          "settings": {
+            "heading": "Highlights"
+          }
+        },
+        "benefits": {
+          "type": "benefits"
+        },
+        "specs": {
+          "type": "specifications",
+          "settings": {
+            "heading": "Details"
+          }
+        },
+        "custom_fields": {
+          "type": "custom_fields",
+          "settings": {
+            "heading": "Product details",
+            "open": true
+          }
+        },
+        "how_to_use": {
+          "type": "how_to_use"
+        },
+        "shipping": {
+          "type": "collapsible_tab",
+          "settings": {
+            "heading": "Shipping & returns",
+            "icon": "truck"
+          }
+        },
+        "share": {
+          "type": "share"
+        }
+      },
+      "block_order": [
+        "vendor",
+        "title",
+        "rating",
+        "price",
+        "variant_picker",
+        "quantity",
+        "buy_buttons",
+        "trust",
+        "description",
+        "features",
+        "benefits",
+        "specs",
+        "custom_fields",
+        "how_to_use",
+        "shipping",
+        "share"
+      ],
+      "settings": {}
+    },
+    "related": {
+      "type": "related-products",
+      "settings": {}
+    }
+  },
+  "order": [
+    "main",
+    "related"
+  ]
+}

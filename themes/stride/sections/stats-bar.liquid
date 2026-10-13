@@ -1,0 +1,60 @@
+{%- style -%}
+  .section-{{ section.id }}-padding { padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px; }
+{%- endstyle -%}
+<div class="stats-bar scheme-{{ section.settings.color_scheme }} section-{{ section.id }}-padding">
+  <ul class="page-width stats-bar__list" role="list">
+    {%- for block in section.blocks -%}
+      <li class="stat" {{ block.shopify_attributes }} data-reveal>
+        <span class="stat__value hxl">{{ block.settings.value | escape }}</span>
+        <span class="stat__label">{{ block.settings.label | escape }}</span>
+      </li>
+    {%- endfor -%}
+  </ul>
+</div>
+
+{% schema %}
+{
+  "name": "Stats bar",
+  "tag": "section",
+  "class": "section section-stats-bar",
+  "max_blocks": 5,
+  "disabled_on": { "groups": ["header", "footer"] },
+  "settings": [
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "options": [
+        { "value": "background", "label": "Background" },
+        { "value": "surface", "label": "Surface" },
+        { "value": "inverse", "label": "Inverse" },
+        { "value": "accent", "label": "Accent" }
+      ],
+      "default": "inverse"
+    },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 48 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 48 }
+  ],
+  "blocks": [
+    {
+      "type": "stat",
+      "name": "Stat",
+      "settings": [
+        { "type": "text", "id": "value", "label": "Number", "default": "50K+" },
+        { "type": "text", "id": "label", "label": "Label", "default": "Athletes kitted out" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Stats bar",
+      "category": "Social proof",
+      "blocks": [
+        { "type": "stat", "settings": { "value": "50K+", "label": "Athletes kitted out" } },
+        { "type": "stat", "settings": { "value": "4.8★", "label": "Average rating" } },
+        { "type": "stat", "settings": { "value": "30", "label": "Day trial on shoes" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

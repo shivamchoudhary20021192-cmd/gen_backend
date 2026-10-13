@@ -1,0 +1,41 @@
+{%- style -%}
+  .section-{{ section.id }}-padding { padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px; padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px; }
+  @media screen and (min-width: 750px) { .section-{{ section.id }}-padding { padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px; } }
+{%- endstyle -%}
+<div class="apps-section scheme-{{ section.settings.color_scheme }} section-{{ section.id }}-padding">
+  <div class="{% if section.settings.include_margins %}page-width{% endif %}">
+    {%- for block in section.blocks -%}
+      {% render block %}
+    {%- else -%}
+      {%- if request.design_mode -%}
+        <p class="apps-section__empty">Add app blocks here from the apps installed on your store.</p>
+      {%- endif -%}
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Apps",
+  "tag": "section",
+  "class": "section section-apps",
+  "settings": [
+    { "type": "checkbox", "id": "include_margins", "label": "Make section margins the same as theme", "default": true },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "options": [
+        { "value": "background", "label": "Background" },
+        { "value": "surface", "label": "Surface" },
+        { "value": "surface-alt", "label": "Surface alternate" }
+      ],
+      "default": "background"
+    },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 24 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 24 }
+  ],
+  "blocks": [{ "type": "@app" }],
+  "presets": [{ "name": "Apps", "category": "Apps" }]
+}
+{% endschema %}

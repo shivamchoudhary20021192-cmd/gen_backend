@@ -1,0 +1,112 @@
+{%- style -%}
+  .section-{{ section.id }}-padding { padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px; padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px; }
+  @media screen and (min-width: 750px) { .section-{{ section.id }}-padding { padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px; } }
+{%- endstyle -%}
+{%- liquid
+  assign sort_by = collection.sort_by | default: collection.default_sort_by
+-%}
+<div class="collection section-{{ section.id }}-padding" id="ProductGridContainer" data-section-id="{{ section.id }}">
+  <div class="page-width">
+    {%- paginate collection.products by section.settings.products_per_page -%}
+      <facet-filters class="facets facets--{{ section.settings.filter_type }}">
+        <form class="facets__form" action="{{ collection.url }}" method="get" data-facets-form>
+          <div class="facets__bar">
+            {%- if section.settings.enable_filtering -%}
+              <details class="facets__disclosure" data-facet>
+                <summary class="facets__summary button button--secondary button--small">{% render 'icon', name: 'filter', size: 16 %} {{ 'products.facets.filter_button' | t }}</summary>
+                <div class="facets__panel">
+                  <fieldset class="facets__group">
+                    <legend>{{ 'products.facets.price' | t }}</legend>
+                    <div class="facets__price">
+                      <label class="field"><span class="field__label">{{ 'products.facets.from' | t }} ({{ localization.country.currency.symbol }})</span><input class="field__input" type="number" min="0" name="filter.v.price.gte" inputmode="decimal" placeholder="0"></label>
+                      <label class="field"><span class="field__label">{{ 'products.facets.to' | t }} ({{ localization.country.currency.symbol }})</span><input class="field__input" type="number" min="0" name="filter.v.price.lte" inputmode="decimal"></label>
+                    </div>
+                  </fieldset>
+                  <fieldset class="facets__group">
+                    <legend>{{ 'products.facets.availability' | t }}</legend>
+                    <label class="checkbox"><input type="checkbox" name="filter.v.availability" value="1"> {{ 'products.facets.in_stock_only' | t }}</label>
+                  </fieldset>
+                  <div class="facets__actions">
+                    <a class="link" href="{{ collection.url }}">{{ 'products.facets.clear_all' | t }}</a>
+                    <button type="submit" class="button button--small">{{ 'products.facets.apply' | t }}</button>
+                  </div>
+                </div>
+              </details>
+            {%- endif -%}
+            <p class="facets__count">{{ 'products.facets.product_count' | t: count: paginate.items }}</p>
+            {%- if section.settings.enable_sorting -%}
+              <div class="facets__sort">
+                <label for="SortBy-{{ section.id }}" class="facets__sort-label">{{ 'products.facets.sort_by_label' | t }}</label>
+                <div class="select">
+                  <select name="sort_by" id="SortBy-{{ section.id }}" class="select__select" data-autosubmit>
+                    {%- for option in collection.sort_options -%}
+                      <option value="{{ option.value | escape }}"{% if option.value == sort_by %} selected{% endif %}>{{ option.name | escape }}</option>
+                    {%- endfor -%}
+                  </select>
+                  {% render 'icon', name: 'chevron-down', size: 14 %}
+                </div>
+              </div>
+            {%- endif -%}
+          </div>
+        </form>
+      </facet-filters>
+
+      {%- if collection.products.size == 0 -%}
+        <div class="collection__empty">
+          <h2 class="h3">{{ 'sections.collection_template.empty' | t }}</h2>
+          <p>{{ 'sections.collection_template.use_fewer_filters_html' | t: link: collection.url }}</p>
+        </div>
+      {%- else -%}
+        <ul class="grid product-grid" role="list" style="--columns: {{ section.settings.columns_desktop }}; --columns-mobile: {{ section.settings.columns_mobile }};">
+          {%- for product in collection.products -%}
+            <li class="grid__item" data-reveal>
+              {%- assign eager = false -%}{%- if forloop.index <= section.settings.columns_desktop -%}{%- assign eager = true -%}{%- endif -%}
+              {% render 'card-product', card_product: product, show_quick_add: section.settings.enable_quick_add, section_id: section.id, eager: eager %}
+            </li>
+          {%- endfor -%}
+        </ul>
+        {% render 'pagination', paginate: paginate %}
+      {%- endif -%}
+    {%- endpaginate -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Product grid",
+  "tag": "section",
+  "class": "section section-product-grid",
+  "enabled_on": { "templates": ["collection"] },
+  "settings": [
+    { "type": "range", "id": "products_per_page", "label": "Products per page", "min": 8, "max": 48, "step": 4, "default": 24 },
+    { "type": "range", "id": "columns_desktop", "label": "Number of columns on desktop", "min": 1, "max": 6, "step": 1, "default": 4 },
+    {
+      "type": "select",
+      "id": "columns_mobile",
+      "label": "Number of columns on mobile",
+      "options": [
+        { "value": "1", "label": "1 column" },
+        { "value": "2", "label": "2 columns" }
+      ],
+      "default": "2"
+    },
+    { "type": "checkbox", "id": "enable_quick_add", "label": "Enable quick add button", "default": true },
+    { "type": "header", "content": "Filtering and sorting" },
+    { "type": "checkbox", "id": "enable_filtering", "label": "Enable filtering", "default": true },
+    {
+      "type": "select",
+      "id": "filter_type",
+      "label": "Filter layout",
+      "options": [
+        { "value": "horizontal", "label": "Horizontal" },
+        { "value": "drawer", "label": "Drawer" }
+      ],
+      "default": "horizontal"
+    },
+    { "type": "checkbox", "id": "enable_sorting", "label": "Enable sorting", "default": true },
+    { "type": "header", "content": "Padding" },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 24 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 48 }
+  ]
+}
+{% endschema %}

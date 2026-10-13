@@ -1,0 +1,151 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-product",
+      "settings": {
+        "gallery_layout": "carousel"
+      },
+      "blocks": {
+        "vendor": {
+          "type": "vendor",
+          "settings": {}
+        },
+        "title": {
+          "type": "title",
+          "settings": {}
+        },
+        "rating": {
+          "type": "rating",
+          "settings": {}
+        },
+        "price": {
+          "type": "price",
+          "settings": {
+            "show_tax_note": true
+          }
+        },
+        "variant_picker": {
+          "type": "variant_picker",
+          "settings": {
+            "picker_type": "button"
+          }
+        },
+        "quantity": {
+          "type": "quantity_selector",
+          "settings": {}
+        },
+        "buy_buttons": {
+          "type": "buy_buttons",
+          "settings": {
+            "show_dynamic_checkout": true
+          }
+        },
+        "benefits": {
+          "type": "benefits",
+          "settings": {}
+        },
+        "ingredients": {
+          "type": "key_features",
+          "settings": {
+            "heading": "Key ingredients"
+          }
+        },
+        "description": {
+          "type": "description",
+          "settings": {}
+        },
+        "how_to_use": {
+          "type": "how_to_use",
+          "settings": {}
+        },
+        "specs": {
+          "type": "specifications",
+          "settings": {
+            "heading": "Details"
+          }
+        },
+        "custom_fields": {
+          "type": "custom_fields",
+          "settings": {
+            "heading": "Product details",
+            "open": true
+          }
+        },
+        "shipping": {
+          "type": "collapsible_tab",
+          "settings": {
+            "heading": "Shipping & returns",
+            "icon": "truck"
+          }
+        },
+        "share": {
+          "type": "share",
+          "settings": {}
+        }
+      },
+      "block_order": [
+        "vendor",
+        "title",
+        "rating",
+        "price",
+        "variant_picker",
+        "quantity",
+        "buy_buttons",
+        "benefits",
+        "ingredients",
+        "description",
+        "how_to_use",
+        "specs",
+        "custom_fields",
+        "shipping",
+        "share"
+      ]
+    },
+    "related": {
+      "type": "related-products",
+      "settings": {
+        "heading": "Complete your routine"
+      }
+    },
+    "routine": {
+      "type": "routine-steps",
+      "settings": {
+        "heading": "Build your routine",
+        "color_scheme": "surface-alt"
+      },
+      "blocks": {
+        "s1": {
+          "type": "step",
+          "settings": {
+            "title": "Cleanse",
+            "text": "Start with a gentle cleanser."
+          }
+        },
+        "s2": {
+          "type": "step",
+          "settings": {
+            "title": "Treat",
+            "text": "Apply two drops of serum."
+          }
+        },
+        "s3": {
+          "type": "step",
+          "settings": {
+            "title": "Protect",
+            "text": "Finish with SPF in the morning."
+          }
+        }
+      },
+      "block_order": [
+        "s1",
+        "s2",
+        "s3"
+      ]
+    }
+  },
+  "order": [
+    "main",
+    "related",
+    "routine"
+  ]
+}

@@ -1,0 +1,5 @@
+.chat-button { position: fixed; bottom: 20px; z-index: 60; display: inline-flex; align-items: center; gap: 8px; padding: 12px 16px; border-radius: 999px; background: var(--chat-bg); color: #fff; text-decoration: none; font: 600 14px/1 system-ui, sans-serif; box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.45); transition: transform 0.2s; }
+.chat-button:hover { transform: translateY(-2px); }
+.chat-button--right { right: 20px; }
+.chat-button--left { left: 20px; }
+@media (max-width: 600px) { .chat-button__label { display: none; } .chat-button { padding: 14px; } }

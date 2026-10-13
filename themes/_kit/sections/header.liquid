@@ -1,0 +1,200 @@
+{%- liquid
+  assign menu = section.settings.menu
+  assign logo = settings.logo | default: shop.brand.logo
+-%}
+<sticky-header class="header-wrapper scheme-{{ section.settings.color_scheme }}{% if section.settings.show_line_separator %} header-wrapper--border{% endif %}" data-sticky="{{ section.settings.sticky_header }}">
+  <header class="header header--{{ section.settings.logo_position }} page-width">
+    <details class="header__drawer" data-menu-drawer>
+      <summary class="header__icon header__icon--menu" aria-label="{{ 'general.menu' | t }}">
+        <span class="header__icon-open">{% render 'icon', name: 'menu', size: 22 %}</span>
+        <span class="header__icon-close">{% render 'icon', name: 'close', size: 22 %}</span>
+      </summary>
+      <div class="menu-drawer scheme-{{ section.settings.color_scheme }}">
+        <nav class="menu-drawer__nav" aria-label="{{ 'general.menu' | t }}">
+          <ul class="menu-drawer__list" role="list">
+            {%- for link in menu.links -%}
+              <li>
+                {%- if link.links.size > 0 -%}
+                  <details class="menu-drawer__details">
+                    <summary class="menu-drawer__item{% if link.child_active %} is-active{% endif %}">{{ link.title | escape }}{% render 'icon', name: 'chevron-down', size: 16 %}</summary>
+                    <ul class="menu-drawer__sublist" role="list">
+                      <li><a class="menu-drawer__subitem" href="{{ link.url }}">{{ 'general.view_all' | t }}</a></li>
+                      {%- for child in link.links -%}
+                        <li><a class="menu-drawer__subitem{% if child.current %} is-active{% endif %}" href="{{ child.url }}">{{ child.title | escape }}</a></li>
+                        {%- for grandchild in child.links -%}
+                          <li><a class="menu-drawer__subitem menu-drawer__subitem--nested" href="{{ grandchild.url }}">{{ grandchild.title | escape }}</a></li>
+                        {%- endfor -%}
+                      {%- endfor -%}
+                    </ul>
+                  </details>
+                {%- else -%}
+                  <a class="menu-drawer__item{% if link.current %} is-active{% endif %}" href="{{ link.url }}"{% if link.current %} aria-current="page"{% endif %}>{{ link.title | escape }}</a>
+                {%- endif -%}
+              </li>
+            {%- endfor -%}
+          </ul>
+        </nav>
+        <div class="menu-drawer__footer">
+          {% render 'localization-form', id: 'drawer' %}
+          {% render 'social-icons' %}
+        </div>
+      </div>
+    </details>
+
+    {%- capture logo_markup -%}
+      <a href="{{ routes.root_url }}" class="header__heading-link">
+        {%- if logo != blank -%}
+          {%- assign logo_height = settings.logo_width | divided_by: logo.aspect_ratio -%}
+          {{ logo | image_url: width: 600 | image_tag: class: 'header__logo', widths: '120, 240, 360, 480, 600', height: logo_height, width: settings.logo_width, alt: shop.name, loading: 'eager', sizes: '(min-width: 750px) 240px, 160px' }}
+        {%- else -%}
+          <span class="header__wordmark">{{ shop.name }}</span>
+        {%- endif -%}
+      </a>
+    {%- endcapture -%}
+
+    {%- if request.page_type == 'index' -%}
+      <h1 class="header__heading">{{ logo_markup }}</h1>
+    {%- else -%}
+      <div class="header__heading">{{ logo_markup }}</div>
+    {%- endif -%}
+
+    <nav class="header__inline-menu" aria-label="{{ 'general.menu' | t }}">
+      <ul class="list-menu" role="list">
+        {%- for link in menu.links -%}
+          <li class="list-menu__item">
+            {%- if link.links.size > 0 -%}
+              {%- assign has_grandchildren = false -%}
+              {%- for child in link.links -%}{%- if child.links.size > 0 -%}{%- assign has_grandchildren = true -%}{%- endif -%}{%- endfor -%}
+              <details class="menu-dropdown{% if section.settings.menu_type == 'mega' or has_grandchildren %} menu-dropdown--mega{% endif %}" data-hover-menu>
+                <summary class="list-menu__link{% if link.child_active %} is-active{% endif %}">
+                  <span>{{ link.title | escape }}</span>{% render 'icon', name: 'chevron-down', size: 14 %}
+                </summary>
+                <div class="menu-dropdown__panel scheme-{{ section.settings.color_scheme }}">
+                  {%- if section.settings.menu_type == 'mega' or has_grandchildren -%}
+                    <div class="mega-menu page-width">
+                      {%- for child in link.links -%}
+                        <div class="mega-menu__column">
+                          {%- if child.image and section.settings.mega_menu_images -%}
+                            <a class="mega-menu__image" href="{{ child.url }}">{{ child.image | image_url: width: 480 | image_tag: loading: 'lazy', alt: child.title }}</a>
+                          {%- endif -%}
+                          <a class="mega-menu__heading" href="{{ child.url }}">{{ child.title | escape }}</a>
+                          {%- if child.links.size > 0 -%}
+                            <ul role="list">
+                              {%- for grandchild in child.links -%}
+                                <li><a class="mega-menu__link" href="{{ grandchild.url }}">{{ grandchild.title | escape }}</a></li>
+                              {%- endfor -%}
+                            </ul>
+                          {%- endif -%}
+                        </div>
+                      {%- endfor -%}
+                    </div>
+                  {%- else -%}
+                    <ul class="menu-dropdown__list" role="list">
+                      {%- for child in link.links -%}
+                        <li><a class="menu-dropdown__link{% if child.current %} is-active{% endif %}" href="{{ child.url }}">{{ child.title | escape }}</a></li>
+                      {%- endfor -%}
+                    </ul>
+                  {%- endif -%}
+                </div>
+              </details>
+            {%- else -%}
+              <a class="list-menu__link{% if link.current %} is-active{% endif %}" href="{{ link.url }}"{% if link.current %} aria-current="page"{% endif %}>{{ link.title | escape }}</a>
+            {%- endif -%}
+          </li>
+        {%- endfor -%}
+      </ul>
+    </nav>
+
+    <div class="header__icons">
+      {%- if section.settings.show_localization -%}
+        <div class="header__localization small-hide">{% render 'localization-form', id: 'header' %}</div>
+      {%- endif -%}
+      <details class="header__search" data-search-modal>
+        <summary class="header__icon" aria-label="{{ 'general.search.search' | t }}">{% render 'icon', name: 'search', size: 22 %}</summary>
+        <div class="search-modal scheme-{{ section.settings.color_scheme }}">
+          <div class="search-modal__content page-width">
+            <form action="{{ routes.search_url }}" method="get" role="search" class="search-form">
+              <div class="field field--search">
+                <input class="field__input" id="Search-{{ section.id }}" type="search" name="q" value="{{ search.terms | escape }}" placeholder="{{ 'general.search.placeholder' | t }}" autocomplete="off"{% if settings.predictive_search_enabled %} data-predictive-search{% endif %} aria-label="{{ 'general.search.search' | t }}">
+                <button type="submit" class="field__button" aria-label="{{ 'general.search.submit' | t }}">{% render 'icon', name: 'search', size: 20 %}</button>
+              </div>
+              <div class="predictive-search" data-predictive-results hidden></div>
+            </form>
+            <button type="button" class="search-modal__close" data-close-details aria-label="{{ 'general.close' | t }}">{% render 'icon', name: 'close', size: 22 %}</button>
+          </div>
+        </div>
+      </details>
+      {%- if shop.customer_accounts_enabled -%}
+        <a href="{{ routes.account_url }}" class="header__icon small-hide" aria-label="{{ 'sections.header.account' | t }}">{% render 'icon', name: 'account', size: 22 %}</a>
+      {%- endif -%}
+      <a href="{{ routes.cart_url }}" class="header__icon header__icon--cart" id="cart-icon-bubble" data-cart-toggle aria-label="{{ 'sections.header.cart' | t }}">
+        {%- render 'icon', name: 'cart', size: 22 -%}
+        {%- if cart.item_count > 0 -%}
+          <span class="cart-count-bubble" aria-hidden="true">{{ cart.item_count | at_most: 99 }}</span>
+          <span class="visually-hidden">{{ 'sections.header.cart_count' | t: count: cart.item_count }}</span>
+        {%- endif -%}
+      </a>
+    </div>
+  </header>
+</sticky-header>
+
+{% schema %}
+{
+  "name": "Header",
+  "class": "section-header",
+  "tag": "div",
+  "enabled_on": { "groups": ["header"] },
+  "settings": [
+    {
+      "type": "select",
+      "id": "logo_position",
+      "label": "Desktop logo position",
+      "options": [
+        { "value": "left", "label": "Left, menu beside" },
+        { "value": "center", "label": "Centered, menu left" },
+        { "value": "stacked", "label": "Centered, menu below" }
+      ],
+      "default": "left"
+    },
+    { "type": "link_list", "id": "menu", "label": "Menu", "default": "main-menu" },
+    {
+      "type": "select",
+      "id": "menu_type",
+      "label": "Menu type",
+      "options": [
+        { "value": "dropdown", "label": "Dropdown" },
+        { "value": "mega", "label": "Mega menu" }
+      ],
+      "default": "dropdown"
+    },
+    { "type": "checkbox", "id": "mega_menu_images", "label": "Show menu item images in mega menus", "default": true },
+    {
+      "type": "select",
+      "id": "sticky_header",
+      "label": "Sticky header",
+      "options": [
+        { "value": "none", "label": "None" },
+        { "value": "on-scroll-up", "label": "When scrolling up" },
+        { "value": "always", "label": "Always" }
+      ],
+      "default": "on-scroll-up"
+    },
+    { "type": "checkbox", "id": "show_line_separator", "label": "Show separator line", "default": true },
+    { "type": "checkbox", "id": "show_localization", "label": "Show country/language selector", "info": "Shown when the store sells to more than one country or is published in more than one language.", "default": true },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "options": [
+        { "value": "background", "label": "Background" },
+        { "value": "surface", "label": "Surface" },
+        { "value": "surface-alt", "label": "Surface alternate" },
+        { "value": "accent-surface", "label": "Accent surface" },
+        { "value": "inverse", "label": "Inverse" },
+        { "value": "accent", "label": "Accent" }
+      ],
+      "default": "background"
+    }
+  ]
+}
+{% endschema %}

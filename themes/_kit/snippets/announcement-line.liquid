@@ -1,0 +1,58 @@
+{%- comment -%}
+  One line of the announcement bar.
+
+  id              the line's id in Content → Announcement bar (blank for a theme block)
+  message         the sentence; a free-shipping line has {amount} where the remaining amount goes
+  href, cta       where it goes, and the words that say so (the whole line is the link without cta)
+  code            a discount code to copy
+  countdown       an ISO date to count down to
+  bg, fg          the line's own colours
+  visibility      all | desktop | mobile
+  kind            message | free_shipping
+  threshold_cents free shipping from this subtotal, in the shopper's currency
+  success         what a free-shipping line says once it is reached
+  index, total    for "2 of 3"
+  active          the line shown first
+  link_arrow      the class that shows the link's arrow on some devices (or hides it)
+  attributes      the theme editor's block attributes
+{%- endcomment -%}
+{%- liquid
+  assign line_class = ''
+  if visibility == 'desktop'
+    assign line_class = ' small-hide'
+  elsif visibility == 'mobile'
+    assign line_class = ' medium-hide'
+  endif
+  assign text = message
+  if kind == 'free_shipping'
+    assign threshold_money = threshold_cents | money
+    assign text = message | replace: '{amount}', threshold_money
+  endif
+-%}
+<div class="vl-ab__line{{ line_class }}{% if active %} is-active{% endif %}"
+  role="group" aria-roledescription="slide" aria-label="{{ 'sections.announcement.slide_of' | t: index: index, count: total }}"
+  {% unless active %}aria-hidden="true"{% endunless %}
+  {% if id != blank %}data-line-id="{{ id }}"{% endif %}
+  {% if bg != blank %}data-bg="{{ bg }}"{% endif %}
+  {% if fg != blank %}data-fg="{{ fg }}"{% endif %}
+  {% if bg != blank or fg != blank %}style="{% if bg != blank %}--line-bg: {{ bg }};{% endif %}{% if fg != blank %}--line-fg: {{ fg }};{% endif %}"{% endif %}
+  {% if kind == 'free_shipping' %}data-free-shipping="{{ threshold_cents }}" data-template="{{ message | escape }}" data-success="{{ success | escape }}"{% endif %}
+  {{ attributes }}>
+  {%- if href != blank and cta == blank -%}
+    <a href="{{ href }}" class="vl-ab__link" data-ab-click><span class="vl-ab__text">{{ text | escape }}</span><span class="vl-ab__link-arrow{{ link_arrow }}" aria-hidden="true">{% render 'icon', name: 'arrow-right', size: 14 %}</span></a>
+  {%- else -%}
+    <span class="vl-ab__text">{{ text | escape }}</span>
+    {%- if href != blank -%}
+      <a href="{{ href }}" class="vl-ab__cta" data-ab-click>{{ cta | escape }}<span class="vl-ab__link-arrow{{ link_arrow }}" aria-hidden="true">{% render 'icon', name: 'arrow-right', size: 14 %}</span></a>
+    {%- endif -%}
+  {%- endif -%}
+  {%- if code != blank -%}
+    <button type="button" class="vl-ab__code" data-ab-copy="{{ code | escape }}" aria-label="{{ 'sections.announcement.copy_code' | t: code: code }}">{{ code | escape }}</button>
+  {%- endif -%}
+  {%- if countdown != blank -%}
+    <span class="vl-ab__countdown" data-ab-countdown="{{ countdown }}" aria-live="off"></span>
+  {%- endif -%}
+  {%- if kind == 'free_shipping' -%}
+    <span class="vl-ab__progress" aria-hidden="true"><span class="vl-ab__progress-bar"></span></span>
+  {%- endif -%}
+</div>

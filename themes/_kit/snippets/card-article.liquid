@@ -1,0 +1,20 @@
+{%- comment -%} An article card. Accepts: article, show_excerpt, show_date {%- endcomment -%}
+<article class="article-card">
+  <a class="article-card__media" href="{{ article.url }}" aria-label="{{ article.title | escape }}">
+    {%- if article.image -%}
+      {{ article.image | image_url: width: 900 | image_tag: loading: 'lazy', sizes: '(min-width: 990px) 33vw, 100vw', widths: '360, 540, 720, 900', alt: article.title }}
+    {%- else -%}
+      {{ 'lifestyle-1' | placeholder_svg_tag: 'article-card__placeholder' }}
+    {%- endif -%}
+  </a>
+  <div class="article-card__info">
+    {%- if show_date and article.published_at -%}
+      <p class="article-card__meta">{{ article.published_at | time_tag: format: 'date' }}{% if article.author != blank %} · {{ article.author }}{% endif %}</p>
+    {%- endif -%}
+    <h3 class="article-card__title"><a href="{{ article.url }}">{{ article.title | escape }}</a></h3>
+    {%- if show_excerpt and article.excerpt != blank -%}
+      <p class="article-card__excerpt">{{ article.excerpt | strip_html | truncatewords: 26 }}</p>
+    {%- endif -%}
+    <a class="link article-card__more" href="{{ article.url }}">{{ 'blogs.article.read_more' | t }}</a>
+  </div>
+</article>

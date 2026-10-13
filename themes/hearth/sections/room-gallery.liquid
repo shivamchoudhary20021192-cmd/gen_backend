@@ -1,0 +1,97 @@
+{%- style -%}
+  .section-{{ section.id }}-padding { padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px; padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px; }
+  @media screen and (min-width: 750px) { .section-{{ section.id }}-padding { padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px; } }
+{%- endstyle -%}
+<room-gallery class="rooms scheme-{{ section.settings.color_scheme }} section-{{ section.id }}-padding" data-tabs>
+  <div class="page-width">
+    <div class="section-heading section-heading--left" data-reveal>
+      <h2 class="section-heading__title h1">{{ section.settings.heading | escape }}</h2>
+    </div>
+    <div class="rooms__tabs" role="tablist">
+      {%- for block in section.blocks -%}
+        <button type="button" class="rooms__tab{% if forloop.first %} is-active{% endif %}" role="tab" aria-selected="{% if forloop.first %}true{% else %}false{% endif %}" aria-controls="Room-{{ section.id }}-{{ forloop.index }}" data-tab="{{ forloop.index }}" {{ block.shopify_attributes }}>{{ block.settings.title | escape }}</button>
+      {%- endfor -%}
+    </div>
+    {%- for block in section.blocks -%}
+      {%- assign room = block.settings.collection -%}
+      <div class="rooms__panel" id="Room-{{ section.id }}-{{ forloop.index }}" role="tabpanel" data-panel="{{ forloop.index }}"{% unless forloop.first %} hidden{% endunless %}>
+        <div class="rooms__image">
+          {%- if block.settings.image != blank -%}
+            {{ block.settings.image | image_url: width: 1800 | image_tag: loading: 'lazy', sizes: '(min-width: 990px) 60vw, 100vw', widths: '550, 750, 1100, 1500, 1800', alt: block.settings.title }}
+          {%- else -%}
+            {{ 'lifestyle-1' | placeholder_svg_tag: 'placeholder-svg' }}
+          {%- endif -%}
+        </div>
+        <div class="rooms__products">
+          <p class="rooms__intro">{{ block.settings.text | escape }}</p>
+          <ul class="rooms__list" role="list">
+            {%- if room != blank and room.products.size > 0 -%}
+              {%- for product in room.products limit: 4 -%}
+                <li>
+                  <a class="rooms__item" href="{{ product.url }}">
+                    <span class="rooms__thumb">{%- if product.featured_image -%}{{ product.featured_image | image_url: width: 200 | image_tag: loading: 'lazy', alt: product.title }}{%- else -%}{{ 'product-4' | placeholder_svg_tag }}{%- endif -%}</span>
+                    <span><strong>{{ product.title | escape }}</strong>{% render 'price', product: product %}</span>
+                  </a>
+                </li>
+              {%- endfor -%}
+            {%- else -%}
+              {%- for i in (1..3) -%}<li><span class="rooms__item"><span class="rooms__thumb">{{ 'product-4' | placeholder_svg_tag }}</span><span><strong>Product name</strong><span class="price">{{ 14999 | money }}</span></span></span></li>{%- endfor -%}
+            {%- endif -%}
+          </ul>
+          {%- if room != blank -%}<a class="button button--secondary" href="{{ room.url }}">{{ block.settings.button_label | escape }}</a>{%- endif -%}
+        </div>
+      </div>
+    {%- endfor -%}
+  </div>
+</room-gallery>
+
+{% schema %}
+{
+  "name": "Room gallery",
+  "tag": "section",
+  "class": "section section-rooms",
+  "max_blocks": 6,
+  "disabled_on": { "groups": ["header", "footer"] },
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Shop by room" },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "options": [
+        { "value": "background", "label": "Background" },
+        { "value": "surface", "label": "Surface" },
+        { "value": "surface-alt", "label": "Surface alternate" }
+      ],
+      "default": "surface"
+    },
+    { "type": "header", "content": "Padding" },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 64 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 64 }
+  ],
+  "blocks": [
+    {
+      "type": "room",
+      "name": "Room",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Room", "default": "Living room" },
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "text", "id": "text", "label": "Text", "default": "Soft textures and warm wood for everyday living." },
+        { "type": "collection", "id": "collection", "label": "Products from" },
+        { "type": "text", "id": "button_label", "label": "Button label", "default": "Shop the room" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Room gallery",
+      "category": "Home",
+      "blocks": [
+        { "type": "room", "settings": { "title": "Living room" } },
+        { "type": "room", "settings": { "title": "Bedroom", "text": "Calm, layered and made for rest." } },
+        { "type": "room", "settings": { "title": "Dining", "text": "Tables and pieces for long dinners." } }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,21 @@
+<div class="main-404 page-width text-center">
+  <p class="eyebrow">404</p>
+  <h1 class="h0">{{ 'templates.404.title' | t }}</h1>
+  <p class="main-404__text">{{ 'templates.404.subtext' | t }}</p>
+  <form action="{{ routes.search_url }}" method="get" role="search" class="search-form main-404__search">
+    <div class="field field--search">
+      <input class="field__input" type="search" name="q" placeholder="{{ 'general.search.placeholder' | t }}" aria-label="{{ 'general.search.search' | t }}">
+      <button type="submit" class="field__button" aria-label="{{ 'general.search.submit' | t }}">{% render 'icon', name: 'search', size: 20 %}</button>
+    </div>
+  </form>
+  <a href="{{ routes.all_products_collection_url }}" class="button">{{ 'general.continue_shopping' | t }}</a>
+</div>
+
+{% schema %}
+{
+  "name": "404 page",
+  "tag": "section",
+  "class": "section section-main-404",
+  "enabled_on": { "templates": ["404"] }
+}
+{% endschema %}

@@ -1,0 +1,21 @@
+/* Atelier — editorial fashion. */
+h1, h2, h3, .h0, .h1, .h2, .hxl { font-weight: 500; letter-spacing: 0.06em; }
+.list-menu__link, .menu-drawer__item, .button, .eyebrow, .footer__heading { text-transform: uppercase; letter-spacing: 0.14em; font-size: 0.78rem; }
+.button { font-weight: 500; }
+.card__title { text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.82rem; }
+.card__info { align-items: center; text-align: center; }
+.marquee__item { letter-spacing: 0.12em; }
+.lookbook__layout { display: grid; gap: clamp(2rem, 5vw, 5rem); align-items: center; }
+@media (min-width: 990px) { .lookbook__layout { grid-template-columns: 1fr 1.4fr; } .lookbook__layout--image-left .lookbook__media { order: -1; } }
+.lookbook__copy { color: var(--fg-muted); margin-bottom: 1.5rem; }
+.lookbook__products { border-top: 1px solid var(--line); }
+.lookbook__product { display: grid; grid-template-columns: 2rem 1fr auto; gap: 1rem; padding: 1rem 0; border-bottom: 1px solid var(--line); align-items: center; }
+.lookbook__product:hover .lookbook__product-title { text-decoration: underline; }
+.lookbook__index { font-family: var(--font-heading-family); font-size: 1.3rem; }
+.lookbook__media { position: relative; aspect-ratio: 4 / 5; overflow: hidden; }
+.lookbook__media > img, .lookbook__media > svg { width: 100%; height: 100%; object-fit: cover; }
+.hotspot { position: absolute; left: var(--x); top: var(--y); transform: translate(-50%, -50%); }
+.hotspot__dot { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 999px; background: #fff; color: #111; font-size: 0.8rem; font-weight: 600; box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.35); animation: pulse 2.2s infinite; }
+.hotspot__card { position: absolute; left: 50%; bottom: calc(100% + 10px); transform: translateX(-50%); min-width: 180px; padding: 0.75rem 1rem; background: #fff; color: #111; font-size: 0.85rem; display: none; flex-direction: column; box-shadow: 0 12px 30px -12px rgba(0, 0, 0, 0.4); }
+.hotspot:hover .hotspot__card, .hotspot:focus .hotspot__card { display: flex; }
+@keyframes pulse { 50% { box-shadow: 0 0 0 12px rgba(255, 255, 255, 0); } }

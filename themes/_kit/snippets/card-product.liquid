@@ -1,0 +1,86 @@
+{%- comment -%}
+  A product card. Accepts:
+  - card_product: {Object} product (a placeholder card when blank)
+  - placeholder_index: {Number} which placeholder illustration to show
+  - show_quick_add: {Boolean}
+  - section_id: {String}
+  - eager: {Boolean} load the image eagerly (first row above the fold)
+{%- endcomment -%}
+{%- liquid
+  assign hover_class = ''
+  if settings.animations_hover == 'lift'
+    assign hover_class = ' card--lift'
+  elsif settings.animations_hover == 'zoom'
+    assign hover_class = ' card--zoom'
+  endif
+  assign loading = 'lazy'
+  if eager
+    assign loading = 'eager'
+  endif
+-%}
+{%- if card_product != blank -%}
+  {%- liquid
+    assign first_image = card_product.featured_image
+    assign second_image = card_product.images[1]
+    assign variant = card_product.selected_or_first_available_variant
+  -%}
+  <div class="card card--product card--{{ settings.card_style }}{{ hover_class }}" data-product-card>
+    <div class="card__media-wrap">
+    <a href="{{ card_product.url }}" class="card__media{% if second_image and settings.show_secondary_image %} card__media--has-hover{% endif %}" aria-label="{{ card_product.title | escape }}">
+      {%- if first_image -%}
+        {{ first_image | image_url: width: 900 | image_tag: loading: loading, sizes: '(min-width: 990px) 25vw, 50vw', widths: '240, 360, 540, 720, 900', class: 'card__image', alt: card_product.title }}
+        {%- if second_image and settings.show_secondary_image -%}
+          {{ second_image | image_url: width: 900 | image_tag: loading: 'lazy', sizes: '(min-width: 990px) 25vw, 50vw', widths: '240, 360, 540, 720, 900', class: 'card__image card__image--hover', alt: '' }}
+        {%- endif -%}
+      {%- else -%}
+        {{ 'product-1' | placeholder_svg_tag: 'card__placeholder' }}
+      {%- endif -%}
+      <div class="card__badges">
+        {%- if card_product.available == false -%}
+          <span class="badge badge--muted">{{ 'products.product.sold_out' | t }}</span>
+        {%- elsif card_product.on_sale and settings.show_sale_badge -%}
+          <span class="badge badge--sale">{{ 'products.product.on_sale' | t }}</span>
+        {%- elsif card_product.tags contains 'new' -%}
+          <span class="badge">{{ 'products.product.new' | t }}</span>
+        {%- elsif card_product.tags contains 'bestseller' -%}
+          <span class="badge">{{ 'products.product.bestseller' | t }}</span>
+        {%- endif -%}
+      </div>
+    </a>
+      {%- if show_quick_add and settings.quick_add and card_product.available -%}
+        <div class="card__quick-add">
+          {%- if card_product.has_only_default_variant or card_product.variants.size == 1 -%}
+            {%- form 'product', card_product, class: 'quick-add', data-product-form: '' -%}
+              <input type="hidden" name="id" value="{{ variant.id }}">
+              <input type="hidden" name="quantity" value="1">
+              <button type="submit" class="button button--secondary button--small button--full" data-add-button>
+                <span>{{ 'products.product.add_to_cart' | t }}</span>
+              </button>
+            {%- endform -%}
+          {%- else -%}
+            <a class="button button--secondary button--small button--full" href="{{ card_product.url }}">{{ 'products.product.choose_options' | t }}</a>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+    </div>
+    <div class="card__info">
+      {%- if settings.show_vendor and card_product.vendor != blank -%}
+        <p class="card__vendor">{{ card_product.vendor }}</p>
+      {%- endif -%}
+      <h3 class="card__title"><a href="{{ card_product.url }}">{{ card_product.title | escape }}</a></h3>
+      {%- if settings.show_ratings -%}
+        {% render 'rating', rating: card_product.rating, count: card_product.review_count %}
+      {%- endif -%}
+      {% render 'price', product: card_product %}
+    </div>
+  </div>
+{%- else -%}
+  {%- assign placeholder = placeholder_index | default: 1 | modulo: 6 | plus: 1 -%}
+  <div class="card card--product card--{{ settings.card_style }} card--placeholder">
+    <div class="card__media">{{ 'product-' | append: placeholder | placeholder_svg_tag: 'card__placeholder' }}</div>
+    <div class="card__info">
+      <h3 class="card__title">Example product title</h3>
+      <div class="price"><span class="price__current">{{ 1999 | times: placeholder | money }}</span></div>
+    </div>
+  </div>
+{%- endif -%}

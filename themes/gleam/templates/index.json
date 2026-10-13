@@ -1,0 +1,176 @@
+{
+  "sections": {
+    "hero": {
+      "type": "image-banner",
+      "settings": {
+        "image_height": "full",
+        "desktop_content_position": "middle-center",
+        "desktop_content_alignment": "center",
+        "color_scheme": "inverse",
+        "show_text_box": false,
+        "image_overlay_opacity": 30
+      },
+      "blocks": {
+        "eyebrow": {
+          "type": "eyebrow",
+          "settings": {
+            "text": "Fine jewellery"
+          }
+        },
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "heading": "Made to be kept",
+            "heading_size": "h0"
+          }
+        },
+        "text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Fine jewellery in recycled gold and ethically sourced stones.</p>",
+            "text_style": "subtitle"
+          }
+        },
+        "buttons": {
+          "type": "buttons",
+          "settings": {
+            "button_label_1": "Discover the collection",
+            "button_link_1": "/collections/all"
+          }
+        }
+      },
+      "block_order": [
+        "eyebrow",
+        "heading",
+        "text",
+        "buttons"
+      ]
+    },
+    "signatures": {
+      "type": "featured-collection",
+      "settings": {
+        "title": "The signatures",
+        "eyebrow": "Icons",
+        "products_to_show": 6,
+        "columns_desktop": 3,
+        "layout": "grid",
+        "color_scheme": "background",
+        "heading_size": "h1",
+        "show_view_all": true
+      }
+    },
+    "craft": {
+      "type": "craftsmanship",
+      "settings": {},
+      "blocks": {
+        "s1": {
+          "type": "step",
+          "settings": {
+            "title": "Designed",
+            "text": "<p>Every piece starts as a drawing in our studio.</p>"
+          }
+        },
+        "s2": {
+          "type": "step",
+          "settings": {
+            "title": "Cast and set",
+            "text": "<p>Recycled gold, cast in small batches and set by hand.</p>"
+          }
+        },
+        "s3": {
+          "type": "step",
+          "settings": {
+            "title": "Finished",
+            "text": "<p>Polished, hallmarked and checked twice before it ships.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "s1",
+        "s2",
+        "s3"
+      ]
+    },
+    "collections": {
+      "type": "collection-list",
+      "settings": {
+        "title": "Shop by category",
+        "heading_alignment": "center",
+        "columns_desktop": 4,
+        "image_ratio": "portrait"
+      }
+    },
+    "story": {
+      "type": "image-with-text",
+      "settings": {
+        "layout": "text-first",
+        "color_scheme": "surface-alt",
+        "height": "medium"
+      },
+      "blocks": {
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "heading": "A promise, in gold"
+          }
+        },
+        "text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Every piece carries a lifetime guarantee and free cleaning, forever.</p>"
+          }
+        },
+        "button": {
+          "type": "button",
+          "settings": {
+            "button_label": "Our promise",
+            "button_link": "/pages/about",
+            "button_style_secondary": true
+          }
+        }
+      },
+      "block_order": [
+        "heading",
+        "text",
+        "button"
+      ]
+    },
+    "newsletter": {
+      "type": "newsletter",
+      "settings": {
+        "color_scheme": "background"
+      },
+      "blocks": {
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "heading": "The private list"
+          }
+        },
+        "text": {
+          "type": "paragraph",
+          "settings": {
+            "text": "<p>New collections and invitations, before anyone else.</p>"
+          }
+        },
+        "form": {
+          "type": "email_form",
+          "settings": {}
+        }
+      },
+      "block_order": [
+        "heading",
+        "text",
+        "form"
+      ]
+    }
+  },
+  "order": [
+    "hero",
+    "signatures",
+    "craft",
+    "collections",
+    "story",
+    "newsletter"
+  ]
+}

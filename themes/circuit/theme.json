@@ -1,0 +1,59 @@
+{
+  "handle": "circuit",
+  "name": "Circuit",
+  "version": "2.4.0",
+  "author": "Veylog",
+  "description": "Dense, fast and spec-forward, for electronics stores with big catalogues and comparison shoppers.",
+  "verticals": [
+    "electronics"
+  ],
+  "industries": [
+    "Electronics",
+    "Computers",
+    "Mobile accessories",
+    "Appliances"
+  ],
+  "features": [
+    "Comparison table",
+    "Spec highlights",
+    "Mega menu",
+    "Specifications on product pages",
+    "Large catalogues",
+    "Filtering",
+    "Quick add"
+  ],
+  "sortOrder": 40,
+  "price": 0,
+  "previewImageUrl": null,
+  "defaults": {
+    "font_heading": "Space Grotesk",
+    "font_body": "IBM Plex Sans",
+    "radius": 8,
+    "button_style": "rounded",
+    "image_ratio": "square",
+    "card_style": "bordered",
+    "color_accent": "#0A66FF",
+    "color_cream": "#F4F6FA",
+    "color_ivory": "#F8F9FC",
+    "color_champagne": "#E6EEFF",
+    "color_espresso": "#0B1220",
+    "page_width": 1440,
+    "show_vendor": true
+  },
+  "presets": {
+    "Electric": {},
+    "Graphite": {
+      "color_background": "#0E1116",
+      "color_ivory": "#141922",
+      "color_cream": "#1A202B",
+      "color_champagne": "#1F2A3A",
+      "color_espresso": "#05070A",
+      "color_text": "#E8ECF2",
+      "color_text_muted": "#94A0B4",
+      "color_border": "#263042",
+      "color_accent": "#3DDC97",
+      "color_accent_contrast": "#0E1116"
+    }
+  },
+  "defaultPreset": "Electric"
+}

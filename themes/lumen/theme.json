@@ -1,0 +1,61 @@
+{
+  "handle": "lumen",
+  "name": "Lumen",
+  "version": "2.4.0",
+  "author": "Veylog",
+  "description": "Warm, calm and precise — built for beauty, skincare and wellness brands that explain their formulas.",
+  "verticals": [
+    "beauty",
+    "health"
+  ],
+  "industries": [
+    "Beauty",
+    "Skincare",
+    "Wellness",
+    "Cosmetics"
+  ],
+  "features": [
+    "Ingredients spotlight",
+    "Routine builder",
+    "Key ingredients on product pages",
+    "How to use",
+    "Reviews",
+    "Blog",
+    "Cart drawer"
+  ],
+  "sortOrder": 30,
+  "price": 0,
+  "previewImageUrl": null,
+  "defaults": {
+    "font_heading": "Fraunces",
+    "font_body": "DM Sans",
+    "color_background": "#FBF8F3",
+    "color_ivory": "#FBF8F3",
+    "color_cream": "#F3ECE1",
+    "color_champagne": "#E8D9C0",
+    "color_espresso": "#2B2118",
+    "color_text": "#2B2118",
+    "color_text_muted": "#7A6A5A",
+    "color_accent": "#2B2118",
+    "color_border": "#E6DDCF",
+    "radius": 12,
+    "button_style": "pill",
+    "image_ratio": "portrait"
+  },
+  "presets": {
+    "Porcelain": {},
+    "Blush": {
+      "color_cream": "#F8E8E4",
+      "color_champagne": "#F0D0C8",
+      "color_accent": "#9C4A4A"
+    },
+    "Botanical": {
+      "color_cream": "#EEF1E6",
+      "color_champagne": "#D8E0C8",
+      "color_accent": "#3E5B3A",
+      "color_espresso": "#1E2A1C",
+      "color_text": "#1E2A1C"
+    }
+  },
+  "defaultPreset": "Porcelain"
+}

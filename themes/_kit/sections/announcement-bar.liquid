@@ -1,0 +1,214 @@
+{%- comment -%}
+  The announcement bar.
+
+  Its lines come from Content → Announcement bar in the admin (scheduled,
+  targeted, with codes and countdowns), or — with "Lines: blocks in this
+  section" — from the blocks below. How it moves, how big it is and what it
+  looks like are set in the admin for both, so a store has one place for it.
+{%- endcomment -%}
+{%- liquid
+  assign bar = announcement_bar
+  assign s = bar.settings
+  assign blocks_list = section.blocks | where: 'type', 'announcement'
+  assign use_admin = false
+  assign show = true
+  if section.settings.source == 'admin'
+    if s.is_enabled == false
+      assign show = false
+    elsif bar.lines.size > 0
+      assign use_admin = true
+    endif
+  endif
+  if use_admin
+    assign count = bar.lines.size
+  else
+    assign count = blocks_list.size
+  endif
+  if count == 0
+    assign show = false
+  endif
+
+  assign mode = s.display_mode | default: 'rotate'
+  assign transition = s.transition | default: 'fade'
+  assign height_mode = s.height_mode | default: 'uniform'
+  assign rotating = false
+  if mode == 'rotate' and count > 1 and s.autoplay != false
+    assign rotating = true
+  endif
+  assign moving = rotating
+  if mode == 'marquee'
+    assign moving = true
+  endif
+
+  assign bar_class = ''
+  if s.bar_visibility == 'desktop'
+    assign bar_class = ' small-hide'
+  elsif s.bar_visibility == 'mobile'
+    assign bar_class = ' medium-hide'
+  endif
+  assign arrows_class = ''
+  case s.arrows_visibility
+    when 'desktop'
+      assign arrows_class = ' small-hide'
+    when 'mobile'
+      assign arrows_class = ' medium-hide'
+    when 'none'
+      assign arrows_class = ' vl-ab__hidden'
+  endcase
+  assign link_arrow = ''
+  case s.link_arrow_visibility
+    when 'desktop'
+      assign link_arrow = ' small-hide'
+    when 'mobile'
+      assign link_arrow = ' medium-hide'
+    when 'none'
+      assign link_arrow = ' vl-ab__hidden'
+  endcase
+  assign separator = s.marquee_separator | default: '•'
+-%}
+{%- if show -%}
+  <div class="vl-ab{{ bar_class }} scheme-{{ section.settings.color_scheme }} vl-ab--{{ mode }} vl-ab--h-{{ height_mode }} vl-ab--t-{{ transition }} vl-ab--w-{{ s.font_weight | default: 'medium' }} vl-ab--a-{{ s.text_align | default: 'center' }}{% if s.text_transform == 'uppercase' %} vl-ab--upper{% endif %}{% if s.pause_on_hover != false %} vl-ab--hover-pause{% endif %}"
+    style="{% if s.background_hex %}--ab-bg: {{ s.background_hex }};{% endif %}{% if s.background_hex and s.background_gradient_hex %}--ab-bg-image: linear-gradient(90deg, {{ s.background_hex }}, {{ s.background_gradient_hex }});{% endif %}{% if s.text_hex %}--ab-fg: {{ s.text_hex }};{% endif %}--ab-h: {{ s.fixed_height_desktop | default: 40 }}px; --ab-h-m: {{ s.fixed_height_mobile | default: 44 }}px; --ab-lines: {{ s.max_lines | default: 1 }}; --ab-fs: {{ s.font_size_desktop | default: 13 }}px; --ab-fs-m: {{ s.font_size_mobile | default: 12 }}px; --ab-sep: &quot;{{ separator | escape }}&quot;;"
+    data-announcement-bar
+    data-mode="{{ mode }}"
+    data-transition="{{ transition }}"
+    data-autoplay="{{ rotating }}"
+    data-interval="{{ s.rotation_seconds | default: 5 }}"
+    data-speed="{{ s.marquee_speed | default: 60 }}"
+    data-direction="{{ s.marquee_direction | default: 'left' }}"
+    data-height="{{ height_mode }}"
+    {% if s.is_dismissible %}data-dismiss-days="{{ s.dismiss_days }}"{% endif %}
+    data-version="{% if use_admin %}{{ bar.version }}{% else %}{{ section.id }}-{{ count }}{% endif %}"
+    {% if use_admin %}data-track{% endif %}
+    data-strings="{{ 'sections.announcement.ends_in' | t | escape }}|{{ 'sections.announcement.copied' | t | escape }}|{{ 'sections.announcement.pause' | t | escape }}|{{ 'sections.announcement.play' | t | escape }}"
+    role="region"
+    aria-roledescription="carousel"
+    aria-label="{{ 'sections.announcement.label' | t }}">
+    <div class="page-width vl-ab__inner">
+      {%- if section.settings.show_social -%}
+        <div class="vl-ab__side small-hide">{% render 'social-icons' %}</div>
+      {%- endif -%}
+      {%- if mode == 'rotate' and count > 1 -%}
+        <button type="button" class="vl-ab__arrow vl-ab__arrow--prev{{ arrows_class }}" data-ab-prev aria-label="{{ 'sections.announcement.previous' | t }}">{% render 'icon', name: 'chevron-left', size: 16 %}</button>
+      {%- endif -%}
+      <div class="vl-ab__viewport">
+        <div class="vl-ab__track" aria-live="{% if rotating %}off{% else %}polite{% endif %}">
+          {%- if use_admin -%}
+            {%- for line in bar.lines -%}
+              {%- render 'announcement-line',
+                id: line.id,
+                message: line.message,
+                href: line.href,
+                cta: line.cta_label,
+                code: line.code,
+                countdown: line.countdown_ends_at,
+                bg: line.background,
+                fg: line.text_color,
+                visibility: line.visibility,
+                kind: line.kind,
+                threshold_cents: line.threshold_cents,
+                success: line.success_message,
+                index: forloop.index,
+                total: count,
+                active: forloop.first,
+                link_arrow: link_arrow
+              -%}
+            {%- endfor -%}
+          {%- else -%}
+            {%- for block in blocks_list -%}
+              {%- render 'announcement-line',
+                message: block.settings.text,
+                href: block.settings.link,
+                index: forloop.index,
+                total: count,
+                active: forloop.first,
+                link_arrow: link_arrow,
+                attributes: block.shopify_attributes
+              -%}
+            {%- endfor -%}
+          {%- endif -%}
+        </div>
+      </div>
+      {%- if mode == 'rotate' and count > 1 -%}
+        <button type="button" class="vl-ab__arrow vl-ab__arrow--next{{ arrows_class }}" data-ab-next aria-label="{{ 'sections.announcement.next' | t }}">{% render 'icon', name: 'chevron-right', size: 16 %}</button>
+      {%- endif -%}
+      {%- if moving -%}
+        <button type="button" class="vl-ab__control" data-ab-pause aria-pressed="false" aria-label="{{ 'sections.announcement.pause' | t }}">
+          <svg class="vl-ab__icon-pause" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><rect x="2" y="1.5" width="2.6" height="9" rx="0.6" fill="currentColor"/><rect x="7.4" y="1.5" width="2.6" height="9" rx="0.6" fill="currentColor"/></svg>
+          <svg class="vl-ab__icon-play" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 1.8v8.4a.6.6 0 0 0 .9.5l6.6-4.2a.6.6 0 0 0 0-1L3.9 1.3a.6.6 0 0 0-.9.5Z" fill="currentColor"/></svg>
+        </button>
+      {%- endif -%}
+      {%- if s.is_dismissible -%}
+        <button type="button" class="vl-ab__control vl-ab__close" data-ab-close aria-label="{{ 'sections.announcement.close' | t }}">{% render 'icon', name: 'close', size: 14 %}</button>
+      {%- endif -%}
+      {%- if section.settings.show_localization -%}
+        <div class="vl-ab__side vl-ab__side--end small-hide">{% render 'localization-form', id: 'announcement' %}</div>
+      {%- endif -%}
+    </div>
+  </div>
+  {%- if s.is_dismissible -%}
+    {%- comment -%} Closed before, and still within the days it stays closed: hidden before it is painted. {%- endcomment -%}
+    <script>
+      (function () {
+        var bar = document.currentScript.previousElementSibling;
+        try {
+          var key = 'vl-ab:' + bar.getAttribute('data-version');
+          var until = Number(localStorage.getItem(key) || sessionStorage.getItem(key) || 0);
+          if (until && (until === 1 || until > Date.now())) bar.hidden = true;
+        } catch (e) {}
+      })();
+    </script>
+  {%- endif -%}
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Announcement bar",
+  "class": "announcement-bar-section",
+  "max_blocks": 12,
+  "enabled_on": { "groups": ["header"] },
+  "settings": [
+    {
+      "type": "select",
+      "id": "source",
+      "label": "Lines",
+      "options": [
+        { "value": "admin", "label": "From Content → Announcement bar" },
+        { "value": "blocks", "label": "Blocks in this section" }
+      ],
+      "default": "admin",
+      "info": "Style, motion, size, arrows and scheduling are set in the admin under Content → Announcement bar. Without lines there, the blocks below are shown."
+    },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "info": "Used unless colours are set in Content → Announcement bar.",
+      "options": [
+        { "value": "background", "label": "Background" },
+        { "value": "surface", "label": "Surface" },
+        { "value": "surface-alt", "label": "Surface alternate" },
+        { "value": "accent-surface", "label": "Accent surface" },
+        { "value": "inverse", "label": "Inverse" },
+        { "value": "accent", "label": "Accent" }
+      ],
+      "default": "inverse"
+    },
+    { "type": "checkbox", "id": "show_social", "label": "Show social icons on desktop", "default": false },
+    { "type": "checkbox", "id": "show_localization", "label": "Show country selector on desktop", "default": false }
+  ],
+  "blocks": [
+    {
+      "type": "announcement",
+      "name": "Announcement",
+      "settings": [
+        { "type": "text", "id": "text", "label": "Text", "default": "Welcome to our store" },
+        { "type": "url", "id": "link", "label": "Link" }
+      ]
+    }
+  ],
+  "presets": [
+    { "name": "Announcement bar", "blocks": [{ "type": "announcement" }] }
+  ]
+}
+{% endschema %}

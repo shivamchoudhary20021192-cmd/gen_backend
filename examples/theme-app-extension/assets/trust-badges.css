@@ -1,0 +1,5 @@
+.tb { border: 1px solid color-mix(in srgb, var(--tb-accent) 30%, transparent); border-radius: 12px; padding: 14px 16px; margin: 12px 0; background: color-mix(in srgb, var(--tb-accent) 6%, transparent); }
+.tb__heading { margin: 0 0 8px; font-weight: 600; font-size: 0.9rem; }
+.tb__list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.tb__item { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; }
+.tb__icon { width: 26px; height: 26px; display: grid; place-items: center; border-radius: 50%; background: color-mix(in srgb, var(--tb-accent) 16%, transparent); color: var(--tb-accent); font-size: 14px; }

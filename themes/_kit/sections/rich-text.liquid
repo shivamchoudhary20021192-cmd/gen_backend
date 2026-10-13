@@ -1,0 +1,114 @@
+{%- style -%}
+  .section-{{ section.id }}-padding { padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px; padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px; }
+  @media screen and (min-width: 750px) { .section-{{ section.id }}-padding { padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px; } }
+{%- endstyle -%}
+<div class="rich-text scheme-{{ section.settings.color_scheme }} section-{{ section.id }}-padding{% if section.settings.full_width %} rich-text--full{% endif %}">
+  <div class="page-width">
+    <div class="rich-text__inner text-{{ section.settings.content_alignment }}" data-reveal>
+      {%- for block in section.blocks -%}
+        {%- case block.type -%}
+          {%- when 'heading' -%}
+            <h2 class="rich-text__heading {{ block.settings.heading_size }}" {{ block.shopify_attributes }}>{{ block.settings.heading | escape }}</h2>
+          {%- when 'caption' -%}
+            <p class="eyebrow" {{ block.shopify_attributes }}>{{ block.settings.caption | escape }}</p>
+          {%- when 'text' -%}
+            <div class="rich-text__text rte" {{ block.shopify_attributes }}>{{ block.settings.text }}</div>
+          {%- when 'button' -%}
+            <div class="rich-text__buttons" {{ block.shopify_attributes }}>
+              {%- if block.settings.button_label != blank -%}
+                <a {% if block.settings.button_link == blank %}role="link" aria-disabled="true"{% else %}href="{{ block.settings.button_link }}"{% endif %} class="button{% if block.settings.button_style_secondary %} button--secondary{% endif %}">{{ block.settings.button_label | escape }}</a>
+              {%- endif -%}
+            </div>
+        {%- endcase -%}
+      {%- endfor -%}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Rich text",
+  "tag": "section",
+  "class": "section section-rich-text",
+  "disabled_on": { "groups": ["header"] },
+  "settings": [
+    {
+      "type": "select",
+      "id": "content_alignment",
+      "label": "Content alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center"
+    },
+    { "type": "checkbox", "id": "full_width", "label": "Make text full width", "default": false },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "options": [
+        { "value": "background", "label": "Background" },
+        { "value": "surface", "label": "Surface" },
+        { "value": "surface-alt", "label": "Surface alternate" },
+        { "value": "accent-surface", "label": "Accent surface" },
+        { "value": "inverse", "label": "Inverse" },
+        { "value": "accent", "label": "Accent" }
+      ],
+      "default": "background"
+    },
+    { "type": "header", "content": "Padding" },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 56 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 56 }
+  ],
+  "blocks": [
+    {
+      "type": "caption",
+      "name": "Caption",
+      "limit": 2,
+      "settings": [{ "type": "text", "id": "caption", "label": "Text", "default": "Add a tagline" }]
+    },
+    {
+      "type": "heading",
+      "name": "Heading",
+      "limit": 3,
+      "settings": [
+        { "type": "text", "id": "heading", "label": "Heading", "default": "Talk about your brand" },
+        {
+          "type": "select",
+          "id": "heading_size",
+          "label": "Heading size",
+          "options": [
+            { "value": "h2", "label": "Small" },
+            { "value": "h1", "label": "Medium" },
+            { "value": "h0", "label": "Large" }
+          ],
+          "default": "h1"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "name": "Text",
+      "limit": 3,
+      "settings": [
+        { "type": "richtext", "id": "text", "label": "Text", "default": "<p>Share information about your brand with your customers. Describe a product, make announcements, or welcome customers to your store.</p>" }
+      ]
+    },
+    {
+      "type": "button",
+      "name": "Button",
+      "limit": 2,
+      "settings": [
+        { "type": "text", "id": "button_label", "label": "Button label", "default": "Button label" },
+        { "type": "url", "id": "button_link", "label": "Button link" },
+        { "type": "checkbox", "id": "button_style_secondary", "label": "Use outline button style", "default": false }
+      ]
+    }
+  ],
+  "presets": [
+    { "name": "Rich text", "category": "Text", "blocks": [{ "type": "heading" }, { "type": "text" }, { "type": "button" }] }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,93 @@
+{%- style -%}
+  .section-{{ section.id }}-padding { padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px; padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px; }
+  @media screen and (min-width: 750px) { .section-{{ section.id }}-padding { padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px; } }
+{%- endstyle -%}
+<div class="collapsible-content scheme-{{ section.settings.color_scheme }} section-{{ section.id }}-padding">
+  <div class="page-width page-width--narrow">
+    {%- if section.settings.caption != blank -%}<p class="eyebrow text-{{ section.settings.heading_alignment }}">{{ section.settings.caption | escape }}</p>{%- endif -%}
+    {%- if section.settings.heading != blank -%}<h2 class="collapsible-content__heading h1 text-{{ section.settings.heading_alignment }}">{{ section.settings.heading | escape }}</h2>{%- endif -%}
+    <div class="accordion-group">
+      {%- for block in section.blocks -%}
+        <details class="accordion" {{ block.shopify_attributes }}{% if section.settings.open_first_collapsible_row and forloop.first %} open{% endif %}>
+          <summary class="accordion__summary">
+            {%- if block.settings.icon != 'none' -%}{% render 'icon', name: block.settings.icon, size: 20 %}{%- endif -%}
+            <span class="accordion__title">{{ block.settings.heading | escape }}</span>
+            {% render 'icon', name: 'plus', size: 18, class: 'accordion__toggle' %}
+          </summary>
+          <div class="accordion__content rte">
+            {{ block.settings.row_content }}
+            {%- if block.settings.page != blank -%}{{ block.settings.page.content }}{%- endif -%}
+          </div>
+        </details>
+      {%- endfor -%}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Collapsible content",
+  "tag": "section",
+  "class": "section section-collapsible-content",
+  "disabled_on": { "groups": ["header", "footer"] },
+  "settings": [
+    { "type": "text", "id": "caption", "label": "Caption" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Frequently asked questions" },
+    {
+      "type": "select",
+      "id": "heading_alignment",
+      "label": "Heading alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" }
+      ],
+      "default": "center"
+    },
+    { "type": "checkbox", "id": "open_first_collapsible_row", "label": "Open first row", "default": false },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "options": [
+        { "value": "background", "label": "Background" },
+        { "value": "surface", "label": "Surface" },
+        { "value": "surface-alt", "label": "Surface alternate" },
+        { "value": "inverse", "label": "Inverse" }
+      ],
+      "default": "background"
+    },
+    { "type": "header", "content": "Padding" },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 48 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 48 }
+  ],
+  "blocks": [
+    {
+      "type": "collapsible_row",
+      "name": "Collapsible row",
+      "settings": [
+        { "type": "text", "id": "heading", "label": "Heading", "default": "Collapsible row" },
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+            { "value": "none", "label": "None" },
+            { "value": "truck", "label": "Delivery" },
+            { "value": "return", "label": "Returns" },
+            { "value": "lock", "label": "Secure" },
+            { "value": "leaf", "label": "Natural" },
+            { "value": "chat", "label": "Question" },
+            { "value": "box", "label": "Packaging" }
+          ],
+          "default": "none"
+        },
+        { "type": "richtext", "id": "row_content", "label": "Row content", "default": "<p>Use this text to answer questions in as much detail as possible for your customers.</p>" },
+        { "type": "page", "id": "page", "label": "Row content from page" }
+      ]
+    }
+  ],
+  "presets": [
+    { "name": "Collapsible content", "category": "Text", "blocks": [{ "type": "collapsible_row" }, { "type": "collapsible_row" }, { "type": "collapsible_row" }] }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,227 @@
+{
+  "sections": {
+    "hero": {
+      "type": "image-banner",
+      "settings": {
+        "image_height": "full",
+        "desktop_content_position": "bottom-left",
+        "desktop_content_alignment": "left",
+        "color_scheme": "inverse",
+        "show_text_box": false,
+        "image_overlay_opacity": 30
+      },
+      "blocks": {
+        "eyebrow": {
+          "type": "eyebrow",
+          "settings": {
+            "text": "New season"
+          }
+        },
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "heading": "Built for the next mile",
+            "heading_size": "h0"
+          }
+        },
+        "text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Performance gear tested by athletes, made for everyone.</p>",
+            "text_style": "subtitle"
+          }
+        },
+        "buttons": {
+          "type": "buttons",
+          "settings": {
+            "button_label_1": "Shop running",
+            "button_link_1": "/collections/all",
+            "button_label_2": "Shop training",
+            "button_link_2": "/collections/all"
+          }
+        }
+      },
+      "block_order": [
+        "eyebrow",
+        "heading",
+        "text",
+        "buttons"
+      ]
+    },
+    "marquee": {
+      "type": "marquee",
+      "settings": {
+        "text_size": "hxl",
+        "color_scheme": "accent",
+        "separator": "✦",
+        "speed": 30
+      },
+      "blocks": {
+        "m1": {
+          "type": "text",
+          "settings": {
+            "text": "Run further"
+          }
+        },
+        "m2": {
+          "type": "text",
+          "settings": {
+            "text": "Train harder"
+          }
+        },
+        "m3": {
+          "type": "text",
+          "settings": {
+            "text": "Recover better"
+          }
+        }
+      },
+      "block_order": [
+        "m1",
+        "m2",
+        "m3"
+      ]
+    },
+    "countdown": {
+      "type": "countdown",
+      "settings": {
+        "color_scheme": "inverse"
+      }
+    },
+    "sports": {
+      "type": "collection-list",
+      "settings": {
+        "title": "Shop by sport",
+        "columns_desktop": 4,
+        "card_style": "overlay",
+        "image_ratio": "portrait"
+      }
+    },
+    "new": {
+      "type": "featured-collection",
+      "settings": {
+        "title": "New drops",
+        "eyebrow": "",
+        "products_to_show": 8,
+        "columns_desktop": 4,
+        "layout": "slider",
+        "color_scheme": "background",
+        "heading_size": "h1",
+        "show_view_all": true
+      }
+    },
+    "stats": {
+      "type": "stats-bar",
+      "settings": {},
+      "blocks": {
+        "s1": {
+          "type": "stat",
+          "settings": {
+            "value": "50K+",
+            "label": "Athletes kitted out"
+          }
+        },
+        "s2": {
+          "type": "stat",
+          "settings": {
+            "value": "4.8★",
+            "label": "Average rating"
+          }
+        },
+        "s3": {
+          "type": "stat",
+          "settings": {
+            "value": "30",
+            "label": "Day trial on shoes"
+          }
+        }
+      },
+      "block_order": [
+        "s1",
+        "s2",
+        "s3"
+      ]
+    },
+    "story": {
+      "type": "image-with-text",
+      "settings": {
+        "layout": "image-first",
+        "color_scheme": "background",
+        "height": "medium"
+      },
+      "blocks": {
+        "caption": {
+          "type": "caption",
+          "settings": {
+            "caption": "Our lab"
+          }
+        },
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "heading": "Tested in the real world"
+          }
+        },
+        "text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Every product is worn for 500 km by our athlete team before it reaches you.</p>"
+          }
+        },
+        "button": {
+          "type": "button",
+          "settings": {
+            "button_label": "Meet the team",
+            "button_link": "/pages/about",
+            "button_style_secondary": true
+          }
+        }
+      },
+      "block_order": [
+        "caption",
+        "heading",
+        "text",
+        "button"
+      ]
+    },
+    "newsletter": {
+      "type": "newsletter",
+      "settings": {
+        "color_scheme": "surface-alt"
+      },
+      "blocks": {
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "heading": "Join the club"
+          }
+        },
+        "text": {
+          "type": "paragraph",
+          "settings": {
+            "text": "<p>Drops, training plans and members-only offers.</p>"
+          }
+        },
+        "form": {
+          "type": "email_form",
+          "settings": {}
+        }
+      },
+      "block_order": [
+        "heading",
+        "text",
+        "form"
+      ]
+    }
+  },
+  "order": [
+    "hero",
+    "marquee",
+    "countdown",
+    "sports",
+    "new",
+    "stats",
+    "story",
+    "newsletter"
+  ]
+}

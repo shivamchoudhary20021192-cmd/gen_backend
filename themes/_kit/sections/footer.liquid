@@ -1,0 +1,172 @@
+{%- style -%}
+  .footer__policies { display: flex; flex-wrap: wrap; gap: 4px 16px; margin-top: 6px; font-size: 0.8125rem; }
+  .footer__policies a { color: inherit; opacity: 0.85; text-decoration: none; }
+  .footer__policies a:hover, .footer__policies a:focus-visible { opacity: 1; text-decoration: underline; }
+  .footer__policies a[hidden] { display: none; }
+{%- endstyle -%}
+{%- style -%}
+  .section-{{ section.id }}-padding { padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px; padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px; }
+  @media screen and (min-width: 750px) { .section-{{ section.id }}-padding { padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px; } }
+{%- endstyle -%}
+<footer class="footer scheme-{{ section.settings.color_scheme }} section-{{ section.id }}-padding">
+  <div class="page-width">
+    {%- if section.blocks.size > 0 -%}
+      <div class="footer__blocks footer__blocks--{{ section.blocks.size | at_most: 5 }}">
+        {%- for block in section.blocks -%}
+          <div class="footer__block footer__block--{{ block.type }}" {{ block.shopify_attributes }}>
+            {%- case block.type -%}
+              {%- when 'link_list' -%}
+                {%- if block.settings.heading != blank -%}<h2 class="footer__heading">{{ block.settings.heading | escape }}</h2>{%- endif -%}
+                <ul class="footer__links" role="list">
+                  {%- for link in block.settings.menu.links -%}
+                    <li><a href="{{ link.url }}" class="footer__link{% if link.current %} is-active{% endif %}">{{ link.title | escape }}</a></li>
+                  {%- endfor -%}
+                </ul>
+              {%- when 'brand_information' -%}
+                {%- assign logo = settings.logo | default: shop.brand.logo -%}
+                {%- if block.settings.show_logo and logo != blank -%}
+                  <div class="footer__logo" style="max-width: {{ block.settings.logo_width }}px">{{ logo | image_url: width: 480 | image_tag: loading: 'lazy', alt: shop.name }}</div>
+                {%- else -%}
+                  <h2 class="footer__heading footer__heading--brand">{{ shop.name }}</h2>
+                {%- endif -%}
+                {%- assign about = block.settings.text | default: shop.brand.short_description -%}
+                {%- if about != blank -%}<div class="footer__text rte">{{ about }}</div>{%- endif -%}
+                {%- if block.settings.show_social -%}{% render 'social-icons' %}{%- endif -%}
+              {%- when 'text' -%}
+                {%- if block.settings.heading != blank -%}<h2 class="footer__heading">{{ block.settings.heading | escape }}</h2>{%- endif -%}
+                <div class="footer__text rte">{{ block.settings.subtext }}</div>
+              {%- when 'image' -%}
+                {%- if block.settings.image != blank -%}
+                  <div class="footer__image" style="max-width: {{ block.settings.image_width }}px">{{ block.settings.image | image_url: width: 600 | image_tag: loading: 'lazy' }}</div>
+                {%- endif -%}
+            {%- endcase -%}
+          </div>
+        {%- endfor -%}
+        {%- if section.settings.newsletter_enable -%}
+          <div class="footer__block footer__block--newsletter">
+            {%- if section.settings.newsletter_heading != blank -%}<h2 class="footer__heading">{{ section.settings.newsletter_heading | escape }}</h2>{%- endif -%}
+            {%- if section.settings.newsletter_text != blank -%}<p class="footer__text">{{ section.settings.newsletter_text | escape }}</p>{%- endif -%}
+            {%- form 'customer', id: 'ContactFooter', class: 'newsletter-form' -%}
+              <input type="hidden" name="contact[tags]" value="newsletter">
+              <input type="hidden" name="return_to" value="{{ request.path }}">
+              {%- if form.posted_successfully -%}
+                <p class="form__message form__message--success" role="status">{% render 'icon', name: 'check', size: 16 %} {{ 'general.newsletter.success' | t }}</p>
+              {%- else -%}
+                <div class="field field--inline">
+                  <input id="NewsletterForm--{{ section.id }}" type="email" name="contact[email]" class="field__input" autocomplete="email" required placeholder="{{ 'general.newsletter.label' | t }}" aria-label="{{ 'general.newsletter.label' | t }}">
+                  <button type="submit" class="field__button" aria-label="{{ 'general.newsletter.button' | t }}">{% render 'icon', name: 'arrow-right', size: 18 %}</button>
+                </div>
+                {%- if form.errors -%}<p class="form__message form__message--error">{{ form.errors | first }}</p>{%- endif -%}
+              {%- endif -%}
+            {%- endform -%}
+          </div>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    <div class="footer__bottom">
+      <div class="footer__bottom-start">
+        {%- if section.settings.enable_country_selector -%}{% render 'localization-form', id: 'footer' %}{%- endif -%}
+        <small class="footer__copyright">&copy; {{ 'now' | date: '%Y' }} {{ shop.name | link_to: routes.root_url }}{% if section.settings.show_powered_by %} · {{ 'general.powered_by' | t }}{% endif %}</small>
+        <nav class="footer__policies" aria-label="{{ 'general.privacy.policies' | t }}">
+          {%- if section.settings.show_policy -%}
+            {%- for policy in shop.policies -%}<a href="{{ policy.url }}">{{ policy.title }}</a>{%- endfor -%}
+          {%- endif -%}
+          {%- comment -%} Shown by the platform's privacy script where they apply (Settings → Customer privacy). {%- endcomment -%}
+          <a href="#" data-privacy-preferences hidden>{{ 'general.privacy.cookie_preferences' | t }}</a>
+          <a href="/pages/data-sharing-opt-out" data-privacy-choices hidden>{{ 'general.privacy.choices' | t }}</a>
+        </nav>
+      </div>
+      {%- if section.settings.show_payment_icons -%}
+        <ul class="footer__payment" role="list" aria-label="Payment methods">
+          {%- for method in section.settings.payment_methods | split: ',' -%}
+            <li class="payment-pill">{{ method | strip }}</li>
+          {%- endfor -%}
+        </ul>
+      {%- endif -%}
+    </div>
+  </div>
+</footer>
+
+{% schema %}
+{
+  "name": "Footer",
+  "class": "section-footer",
+  "max_blocks": 6,
+  "enabled_on": { "groups": ["footer"] },
+  "settings": [
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "options": [
+        { "value": "background", "label": "Background" },
+        { "value": "surface", "label": "Surface" },
+        { "value": "surface-alt", "label": "Surface alternate" },
+        { "value": "accent-surface", "label": "Accent surface" },
+        { "value": "inverse", "label": "Inverse" },
+        { "value": "accent", "label": "Accent" }
+      ],
+      "default": "inverse"
+    },
+    { "type": "header", "content": "Email signup" },
+    { "type": "checkbox", "id": "newsletter_enable", "label": "Show email signup", "default": true },
+    { "type": "text", "id": "newsletter_heading", "label": "Heading", "default": "Subscribe to our emails" },
+    { "type": "text", "id": "newsletter_text", "label": "Text", "default": "Be the first to know about new collections and exclusive offers." },
+    { "type": "header", "content": "Bottom bar" },
+    { "type": "checkbox", "id": "enable_country_selector", "label": "Show country selector", "default": true },
+    { "type": "checkbox", "id": "show_payment_icons", "label": "Show payment methods", "default": true },
+    { "type": "text", "id": "payment_methods", "label": "Payment methods", "info": "Separate with commas.", "default": "UPI, Visa, Mastercard, RuPay, COD" },
+    { "type": "checkbox", "id": "show_policy", "label": "Show policy links", "info": "Write policies in Settings → Policies.", "default": true },
+    { "type": "checkbox", "id": "show_powered_by", "label": "Show \"Powered by Veylog\"", "default": false },
+    { "type": "header", "content": "Padding" },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 56 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 28 }
+  ],
+  "blocks": [
+    {
+      "type": "brand_information",
+      "name": "Brand information",
+      "limit": 1,
+      "settings": [
+        { "type": "paragraph", "content": "Uses your logo, description and social profiles from Settings → Brand." },
+        { "type": "checkbox", "id": "show_logo", "label": "Show logo", "default": false },
+        { "type": "range", "id": "logo_width", "label": "Logo width", "min": 60, "max": 300, "step": 10, "unit": "px", "default": 140 },
+        { "type": "richtext", "id": "text", "label": "Text", "info": "Leave empty to use your brand's short description." },
+        { "type": "checkbox", "id": "show_social", "label": "Show social icons", "default": true }
+      ]
+    },
+    {
+      "type": "link_list",
+      "name": "Menu",
+      "settings": [
+        { "type": "text", "id": "heading", "label": "Heading", "default": "Quick links" },
+        { "type": "link_list", "id": "menu", "label": "Menu", "default": "footer" }
+      ]
+    },
+    {
+      "type": "text",
+      "name": "Text",
+      "settings": [
+        { "type": "text", "id": "heading", "label": "Heading", "default": "About us" },
+        { "type": "richtext", "id": "subtext", "label": "Text", "default": "<p>Share contact information, store details, and brand content with your customers.</p>" }
+      ]
+    },
+    {
+      "type": "image",
+      "name": "Image",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "range", "id": "image_width", "label": "Width", "min": 50, "max": 400, "step": 10, "unit": "px", "default": 160 }
+      ]
+    }
+  ],
+  "default": {
+    "blocks": [
+      { "type": "brand_information" },
+      { "type": "link_list" },
+      { "type": "link_list", "settings": { "heading": "Help", "menu": "footer_support" } }
+    ]
+  }
+}
+{% endschema %}

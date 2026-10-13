@@ -1,0 +1,47 @@
+{
+  "type": "header",
+  "name": "Header group",
+  "sections": {
+    "announcement-bar": {
+      "type": "announcement-bar",
+      "settings": {
+        "color_scheme": "accent"
+      },
+      "blocks": {
+        "a1": {
+          "type": "announcement",
+          "settings": {
+            "text": "2-year warranty on every device",
+            "link": ""
+          }
+        },
+        "a2": {
+          "type": "announcement",
+          "settings": {
+            "text": "No-cost EMI on orders over ₹3,000",
+            "link": "/collections/all"
+          }
+        }
+      },
+      "block_order": [
+        "a1",
+        "a2"
+      ]
+    },
+    "header": {
+      "type": "header",
+      "settings": {
+        "logo_position": "left",
+        "menu": "main-menu",
+        "menu_type": "mega",
+        "sticky_header": "always",
+        "color_scheme": "background",
+        "show_line_separator": true
+      }
+    }
+  },
+  "order": [
+    "announcement-bar",
+    "header"
+  ]
+}

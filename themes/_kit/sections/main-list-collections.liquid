@@ -1,0 +1,62 @@
+{%- style -%}
+  .section-{{ section.id }}-padding { padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px; padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px; }
+  @media screen and (min-width: 750px) { .section-{{ section.id }}-padding { padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px; } }
+{%- endstyle -%}
+<div class="list-collections section-{{ section.id }}-padding">
+  <div class="page-width">
+    <h1 class="h0 list-collections__title">{{ section.settings.title | escape }}</h1>
+    <ul class="grid collection-grid" role="list" style="--columns: {{ section.settings.columns_desktop }}; --columns-mobile: {{ section.settings.columns_mobile }};">
+      {%- for card in collections -%}
+        <li class="grid__item" data-reveal>{% render 'card-collection', card_collection: card, placeholder_index: forloop.index, style: section.settings.card_style, ratio: section.settings.image_ratio, show_count: true %}</li>
+      {%- else -%}
+        <li class="grid__item"><p>{{ 'sections.collection_template.empty' | t }}</p></li>
+      {%- endfor -%}
+    </ul>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Collections list page",
+  "tag": "section",
+  "class": "section section-list-collections",
+  "enabled_on": { "templates": ["list-collections"] },
+  "settings": [
+    { "type": "text", "id": "title", "label": "Heading", "default": "Collections" },
+    {
+      "type": "select",
+      "id": "card_style",
+      "label": "Card style",
+      "options": [
+        { "value": "below", "label": "Title below image" },
+        { "value": "overlay", "label": "Title over image" }
+      ],
+      "default": "below"
+    },
+    {
+      "type": "select",
+      "id": "image_ratio",
+      "label": "Image ratio",
+      "options": [
+        { "value": "square", "label": "Square" },
+        { "value": "portrait", "label": "Portrait" },
+        { "value": "landscape", "label": "Landscape" }
+      ],
+      "default": "square"
+    },
+    { "type": "range", "id": "columns_desktop", "label": "Number of columns on desktop", "min": 1, "max": 5, "step": 1, "default": 3 },
+    {
+      "type": "select",
+      "id": "columns_mobile",
+      "label": "Number of columns on mobile",
+      "options": [
+        { "value": "1", "label": "1 column" },
+        { "value": "2", "label": "2 columns" }
+      ],
+      "default": "2"
+    },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 36 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 48 }
+  ]
+}
+{% endschema %}

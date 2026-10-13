@@ -1,0 +1,71 @@
+# The self-run edge (EDGE_PROVIDER=on_demand): Caddy in front of the API
+# pool, terminating TLS for the platform's own names and for every store's
+# custom domain.
+#
+# Run it as a fleet behind anycast or GeoDNS (one per region), with shared
+# certificate storage (Caddy's `storage` — Redis, S3 or Consul) so a
+# certificate issued in one region is used in all of them and Let's Encrypt
+# rate limits are respected.
+#
+# Environment:
+#   EDGE_SHARED_SECRET   the same value as the API's
+#   API_UPSTREAMS        e.g. "10.0.1.10:4000 10.0.1.11:4000"
+#   PLATFORM_DOMAIN      e.g. myveylog.com
+#   CF_API_TOKEN         DNS challenge for the platform's wildcard certificate
+#   ACME_EMAIL           where the CA sends expiry notices
+
+{
+	email {$ACME_EMAIL}
+
+	# A certificate is requested only for hostnames the platform says a store
+	# has proven it owns. Without this, anyone could point a name at the edge
+	# and make it request certificates (and burn the CA's rate limits).
+	on_demand_tls {
+		ask http://{$API_ASK_HOST:127.0.0.1:4000}/internal/edge/tls-allowed?key={$EDGE_SHARED_SECRET}
+	}
+
+	servers {
+		# Trust the load balancer in front for the client address.
+		trusted_proxies static private_ranges
+		protocols h1 h2 h3
+	}
+}
+
+(app) {
+	# Never reachable from outside: the edge's questions to the API.
+	@internal path /internal/*
+	respond @internal 404
+
+	encode zstd gzip
+
+	reverse_proxy {$API_UPSTREAMS} {
+		lb_policy least_conn
+		lb_retries 2
+		health_uri /health/live
+		health_interval 10s
+		header_up X-Forwarded-Proto {scheme}
+		header_up X-Forwarded-Host {host}
+	}
+}
+
+# The platform's own names: one wildcard certificate, by DNS challenge.
+*.{$PLATFORM_DOMAIN}, {$PLATFORM_DOMAIN} {
+	tls {
+		dns cloudflare {$CF_API_TOKEN}
+	}
+	import app
+}
+
+# Every custom domain: certificate on the first visit (after the ask check).
+https:// {
+	tls {
+		on_demand
+	}
+	import app
+}
+
+# Plain HTTP answers ACME HTTP-01 challenges (Caddy does that itself) and
+# otherwise redirects to HTTPS.
+http:// {
+	redir https://{host}{uri} 308
+}

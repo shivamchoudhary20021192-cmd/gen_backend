@@ -1,0 +1,80 @@
+<!doctype html>
+<html class="no-js" lang="{{ request.locale.iso_code }}" dir="{% if localization.language.rtl %}rtl{% else %}ltr{% endif %}">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="theme-color" content="{{ settings.color_background }}">
+    <link rel="canonical" href="{{ canonical_url }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    {%- if settings.favicon != blank -%}
+      <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 64, height: 64 }}">
+    {%- elsif shop.brand.square_logo != blank -%}
+      <link rel="icon" type="image/png" href="{{ shop.brand.square_logo | image_url: width: 64, height: 64 }}">
+    {%- endif -%}
+
+    <title>
+      {{ page_title }}
+      {%- if current_tags %} &ndash; {{ 'general.meta.tagged_with' | t: tags: current_tags | join: ', ' }}{% endif -%}
+      {%- if current_page != 1 %} &ndash; {{ 'general.meta.page' | t: page: current_page }}{% endif -%}
+      {%- unless page_title contains shop.name %} &ndash; {{ shop.name }}{% endunless -%}
+    </title>
+
+    {% if page_description %}
+      <meta name="description" content="{{ page_description | strip_html | escape }}">
+    {% endif %}
+
+    {% render 'meta-tags' %}
+    {% render 'css-variables' %}
+
+    {{ 'base.css' | asset_url | stylesheet_tag }}
+    {{ 'theme-style.css' | asset_url | stylesheet_tag }}
+
+    <script src="{{ 'theme.js' | asset_url }}" defer="defer"></script>
+    <script>document.documentElement.className = document.documentElement.className.replace('no-js', 'js');</script>
+
+    {{ content_for_header }}
+  </head>
+
+  <body class="template-{{ template.name | handle }}{% if settings.animations_reveal %} reveal-on-scroll{% endif %}">
+    <a class="skip-to-content visually-hidden" href="#MainContent">{{ 'accessibility.skip_to_text' | t }}</a>
+
+    {% sections 'header-group' %}
+
+    <main id="MainContent" class="content-for-layout" role="main" tabindex="-1">
+      {{ content_for_layout }}
+    </main>
+
+    {% sections 'footer-group' %}
+
+    {%- if settings.cart_type == 'drawer' -%}
+      {% section 'cart-drawer' %}
+    {%- endif -%}
+
+    <div class="toast" id="Toast" role="status" aria-live="polite" hidden></div>
+
+    <script>
+      window.theme = {
+        routes: {
+          root: {{ routes.root_url | json }},
+          cart: {{ routes.cart_url | json }},
+          cart_add: {{ routes.cart_add_url | json }},
+          cart_change: {{ routes.cart_change_url | json }},
+          predictive_search: {{ routes.predictive_search_url | json }}
+        },
+        cartType: {{ settings.cart_type | json }},
+        currency: {{ cart.currency.iso_code | json }},
+        locale: {{ request.locale.iso_code | json }},
+        strings: {
+          addToCart: {{ 'products.product.add_to_cart' | t | json }},
+          soldOut: {{ 'products.product.sold_out' | t | json }},
+          unavailable: {{ 'products.product.unavailable' | t | json }},
+          added: {{ 'products.product.added' | t | json }},
+          cartError: {{ 'sections.cart.cart_error' | t | json }}
+        }
+      };
+    </script>
+  </body>
+</html>

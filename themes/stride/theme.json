@@ -1,0 +1,56 @@
+{
+  "handle": "stride",
+  "name": "Stride",
+  "version": "2.4.0",
+  "author": "Veylog",
+  "description": "Bold and energetic, for sports, fitness and outdoor brands.",
+  "verticals": [
+    "sports"
+  ],
+  "industries": [
+    "Sports",
+    "Fitness",
+    "Outdoor",
+    "Activewear"
+  ],
+  "features": [
+    "Countdown timer",
+    "Stats bar",
+    "Scrolling text",
+    "Full-screen hero",
+    "Size guide",
+    "Quick add",
+    "Cart drawer"
+  ],
+  "sortOrder": 80,
+  "price": 0,
+  "previewImageUrl": null,
+  "defaults": {
+    "font_heading": "Archivo",
+    "font_body": "Inter",
+    "heading_case": "uppercase",
+    "heading_scale": 150,
+    "radius": 2,
+    "button_style": "square",
+    "color_accent": "#FF4D00",
+    "color_espresso": "#0A0A0A",
+    "image_ratio": "square",
+    "card_style": "minimal"
+  },
+  "presets": {
+    "Volt": {},
+    "Night run": {
+      "color_background": "#0A0A0A",
+      "color_ivory": "#111111",
+      "color_cream": "#181818",
+      "color_champagne": "#1F1F1F",
+      "color_espresso": "#000000",
+      "color_text": "#FFFFFF",
+      "color_text_muted": "#9A9A9A",
+      "color_border": "#262626",
+      "color_accent": "#D4FF3A",
+      "color_accent_contrast": "#0A0A0A"
+    }
+  },
+  "defaultPreset": "Volt"
+}

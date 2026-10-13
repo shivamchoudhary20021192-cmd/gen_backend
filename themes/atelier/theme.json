@@ -1,0 +1,64 @@
+{
+  "handle": "atelier",
+  "name": "Atelier",
+  "version": "2.4.0",
+  "author": "Veylog",
+  "description": "Editorial and image-led, for fashion labels that want the clothes to do the talking.",
+  "verticals": [
+    "fashion"
+  ],
+  "industries": [
+    "Clothing",
+    "Fashion accessories",
+    "Shoes"
+  ],
+  "features": [
+    "Lookbook with hotspots",
+    "Mega menu",
+    "Scrolling text",
+    "Size guide",
+    "Stacked gallery",
+    "Quick add",
+    "Cart drawer"
+  ],
+  "sortOrder": 20,
+  "price": 0,
+  "previewImageUrl": null,
+  "defaults": {
+    "font_heading": "Cormorant Garamond",
+    "font_body": "Work Sans",
+    "heading_scale": 140,
+    "heading_case": "uppercase",
+    "radius": 0,
+    "button_style": "square",
+    "image_ratio": "portrait",
+    "card_style": "minimal",
+    "color_accent": "#111111",
+    "color_espresso": "#111111",
+    "animations_hover": "zoom"
+  },
+  "presets": {
+    "Monochrome": {},
+    "Sand": {
+      "color_background": "#F7F3EC",
+      "color_ivory": "#F2ECE2",
+      "color_cream": "#E9E0D1",
+      "color_champagne": "#DCCDB5",
+      "color_accent": "#6B4F3A",
+      "color_espresso": "#2A2019"
+    },
+    "Noir": {
+      "color_background": "#0B0B0B",
+      "color_ivory": "#121212",
+      "color_cream": "#1A1A1A",
+      "color_champagne": "#222222",
+      "color_espresso": "#000000",
+      "color_text": "#F2F2F2",
+      "color_text_muted": "#A0A0A0",
+      "color_border": "#2B2B2B",
+      "color_accent": "#F2F2F2",
+      "color_accent_contrast": "#0B0B0B"
+    }
+  },
+  "defaultPreset": "Monochrome"
+}

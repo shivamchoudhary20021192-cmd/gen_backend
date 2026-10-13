@@ -1,0 +1,215 @@
+{
+  "sections": {
+    "hero": {
+      "type": "image-banner",
+      "settings": {
+        "image_height": "full",
+        "desktop_content_position": "bottom-left",
+        "desktop_content_alignment": "left",
+        "color_scheme": "inverse",
+        "show_text_box": false,
+        "image_overlay_opacity": 30
+      },
+      "blocks": {
+        "eyebrow": {
+          "type": "eyebrow",
+          "settings": {
+            "text": "New arrivals"
+          }
+        },
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "heading": "Made for the way you live",
+            "heading_size": "h0"
+          }
+        },
+        "text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Solid wood, natural fabrics and pieces built to last generations.</p>",
+            "text_style": "subtitle"
+          }
+        },
+        "buttons": {
+          "type": "buttons",
+          "settings": {
+            "button_label_1": "Explore the collection",
+            "button_link_1": "/collections/all"
+          }
+        }
+      },
+      "block_order": [
+        "eyebrow",
+        "heading",
+        "text",
+        "buttons"
+      ]
+    },
+    "rooms-list": {
+      "type": "collection-list",
+      "settings": {
+        "title": "Shop by room",
+        "columns_desktop": 3,
+        "card_style": "overlay",
+        "image_ratio": "portrait"
+      }
+    },
+    "rooms": {
+      "type": "room-gallery",
+      "settings": {},
+      "blocks": {
+        "r1": {
+          "type": "room",
+          "settings": {
+            "title": "Living room"
+          }
+        },
+        "r2": {
+          "type": "room",
+          "settings": {
+            "title": "Bedroom",
+            "text": "Calm, layered and made for rest."
+          }
+        },
+        "r3": {
+          "type": "room",
+          "settings": {
+            "title": "Dining",
+            "text": "Tables and pieces for long dinners."
+          }
+        }
+      },
+      "block_order": [
+        "r1",
+        "r2",
+        "r3"
+      ]
+    },
+    "bestsellers": {
+      "type": "featured-collection",
+      "settings": {
+        "title": "Bestselling pieces",
+        "eyebrow": "",
+        "products_to_show": 4,
+        "columns_desktop": 4,
+        "layout": "grid",
+        "color_scheme": "background",
+        "heading_size": "h1",
+        "show_view_all": true
+      }
+    },
+    "story": {
+      "type": "image-with-text",
+      "settings": {
+        "layout": "image-first",
+        "color_scheme": "background",
+        "height": "medium"
+      },
+      "blocks": {
+        "caption": {
+          "type": "caption",
+          "settings": {
+            "caption": "Craft"
+          }
+        },
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "heading": "Made to last"
+          }
+        },
+        "text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Every piece is made by hand in small workshops, from sustainably sourced wood, and finished to age beautifully.</p>"
+          }
+        },
+        "button": {
+          "type": "button",
+          "settings": {
+            "button_label": "Our materials",
+            "button_link": "/pages/about",
+            "button_style_secondary": true
+          }
+        }
+      },
+      "block_order": [
+        "caption",
+        "heading",
+        "text",
+        "button"
+      ]
+    },
+    "reviews": {
+      "type": "testimonials",
+      "settings": {
+        "title": "In their homes",
+        "color_scheme": "surface"
+      },
+      "blocks": {
+        "t1": {
+          "type": "testimonial",
+          "settings": {
+            "quote": "<p>The sofa is even better in person. Delivery team assembled it in 20 minutes.</p>"
+          }
+        },
+        "t2": {
+          "type": "testimonial",
+          "settings": {
+            "quote": "<p>Solid, beautiful and exactly as pictured.</p>"
+          }
+        },
+        "t3": {
+          "type": "testimonial",
+          "settings": {
+            "quote": "<p>Our dining table is the heart of the house now.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "t1",
+        "t2",
+        "t3"
+      ]
+    },
+    "newsletter": {
+      "type": "newsletter",
+      "settings": {
+        "color_scheme": "surface-alt"
+      },
+      "blocks": {
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "heading": "Room notes"
+          }
+        },
+        "text": {
+          "type": "paragraph",
+          "settings": {
+            "text": "<p>New pieces, styling ideas and first access to sales.</p>"
+          }
+        },
+        "form": {
+          "type": "email_form",
+          "settings": {}
+        }
+      },
+      "block_order": [
+        "heading",
+        "text",
+        "form"
+      ]
+    }
+  },
+  "order": [
+    "hero",
+    "rooms-list",
+    "rooms",
+    "bestsellers",
+    "story",
+    "reviews",
+    "newsletter"
+  ]
+}

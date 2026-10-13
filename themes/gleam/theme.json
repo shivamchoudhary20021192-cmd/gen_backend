@@ -1,0 +1,57 @@
+{
+  "handle": "gleam",
+  "name": "Gleam",
+  "version": "2.4.0",
+  "author": "Veylog",
+  "description": "Quiet luxury for jewellery and watches: generous space, fine type, close-up imagery.",
+  "verticals": [
+    "jewelry"
+  ],
+  "industries": [
+    "Jewellery",
+    "Watches",
+    "Luxury accessories"
+  ],
+  "features": [
+    "Craftsmanship story",
+    "Centered logo",
+    "Stacked gallery",
+    "Gift messaging",
+    "Care guide",
+    "Cart drawer"
+  ],
+  "sortOrder": 70,
+  "price": 0,
+  "previewImageUrl": null,
+  "defaults": {
+    "font_heading": "Playfair Display",
+    "font_body": "Manrope",
+    "heading_case": "uppercase",
+    "heading_scale": 110,
+    "radius": 0,
+    "button_style": "square",
+    "image_ratio": "square",
+    "color_background": "#FFFFFF",
+    "color_ivory": "#FBFAF7",
+    "color_cream": "#F7F4EF",
+    "color_champagne": "#EFE6D6",
+    "color_espresso": "#16130E",
+    "color_accent": "#8C6A2F"
+  },
+  "presets": {
+    "Gold": {},
+    "Onyx": {
+      "color_background": "#0D0D0D",
+      "color_ivory": "#141414",
+      "color_cream": "#1C1C1C",
+      "color_champagne": "#26221B",
+      "color_espresso": "#000000",
+      "color_text": "#F5F1E8",
+      "color_text_muted": "#B3AA99",
+      "color_border": "#2E2A22",
+      "color_accent": "#D4AF6A",
+      "color_accent_contrast": "#0D0D0D"
+    }
+  },
+  "defaultPreset": "Gold"
+}

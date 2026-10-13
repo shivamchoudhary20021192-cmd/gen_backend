@@ -1,0 +1,85 @@
+{%- style -%}
+  .section-{{ section.id }}-padding { padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px; padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px; }
+  @media screen and (min-width: 750px) { .section-{{ section.id }}-padding { padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px; } }
+{%- endstyle -%}
+<div class="aisles scheme-{{ section.settings.color_scheme }} section-{{ section.id }}-padding">
+  <div class="page-width">
+    <div class="section-heading section-heading--left">
+      <h2 class="section-heading__title h2">{{ section.settings.heading | escape }}</h2>
+      <a class="link link--arrow" href="{{ routes.collections_url }}">{{ 'general.view_all' | t }}{% render 'icon', name: 'arrow-right', size: 16 %}</a>
+    </div>
+    <ul class="aisles__grid" role="list">
+      {%- for block in section.blocks -%}
+        {%- assign aisle = block.settings.collection -%}
+        <li {{ block.shopify_attributes }} data-reveal>
+          <a class="aisle" href="{{ aisle.url | default: routes.all_products_collection_url }}" style="--aisle-bg: {{ block.settings.background }};">
+            <span class="aisle__media">
+              {%- if block.settings.image != blank -%}
+                {{ block.settings.image | image_url: width: 400 | image_tag: loading: 'lazy', alt: '' }}
+              {%- elsif aisle.featured_image -%}
+                {{ aisle.featured_image | image_url: width: 400 | image_tag: loading: 'lazy', alt: '' }}
+              {%- else -%}
+                <span class="aisle__emoji" aria-hidden="true">{{ block.settings.emoji }}</span>
+              {%- endif -%}
+            </span>
+            <span class="aisle__title">{{ block.settings.title | default: aisle.title | escape }}</span>
+          </a>
+        </li>
+      {%- endfor -%}
+    </ul>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Shop by aisle",
+  "tag": "section",
+  "class": "section section-aisles",
+  "max_blocks": 16,
+  "disabled_on": { "groups": ["header", "footer"] },
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Shop by aisle" },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "options": [
+        { "value": "background", "label": "Background" },
+        { "value": "surface", "label": "Surface" },
+        { "value": "surface-alt", "label": "Surface alternate" }
+      ],
+      "default": "background"
+    },
+    { "type": "header", "content": "Padding" },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 40 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 40 }
+  ],
+  "blocks": [
+    {
+      "type": "aisle",
+      "name": "Aisle",
+      "settings": [
+        { "type": "collection", "id": "collection", "label": "Collection" },
+        { "type": "text", "id": "title", "label": "Title", "info": "Leave empty to use the collection's title.", "default": "Fresh fruit" },
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "text", "id": "emoji", "label": "Emoji", "info": "Shown when there is no image.", "default": "🍎" },
+        { "type": "color", "id": "background", "label": "Tile color", "default": "#FDECEC" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Shop by aisle",
+      "category": "Collection",
+      "blocks": [
+        { "type": "aisle", "settings": { "title": "Fruits", "emoji": "🍎", "background": "#FDECEC" } },
+        { "type": "aisle", "settings": { "title": "Vegetables", "emoji": "🥦", "background": "#E8F5E3" } },
+        { "type": "aisle", "settings": { "title": "Dairy & eggs", "emoji": "🥛", "background": "#EEF3FB" } },
+        { "type": "aisle", "settings": { "title": "Bakery", "emoji": "🥐", "background": "#FFF3D6" } },
+        { "type": "aisle", "settings": { "title": "Snacks", "emoji": "🍿", "background": "#FFF0E3" } },
+        { "type": "aisle", "settings": { "title": "Beverages", "emoji": "🧃", "background": "#EAF7F6" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

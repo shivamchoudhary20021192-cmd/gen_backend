@@ -1,0 +1,16 @@
+{%- comment -%}
+  Rendered through the Section Rendering API after a cart change, to refresh
+  the header's cart count without reloading the page.
+{%- endcomment -%}
+{%- render 'icon', name: 'cart', size: 22 -%}
+{%- if cart.item_count > 0 -%}
+  <span class="cart-count-bubble" aria-hidden="true">{{ cart.item_count | at_most: 99 }}</span>
+  <span class="visually-hidden">{{ 'sections.header.cart_count' | t: count: cart.item_count }}</span>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Cart icon",
+  "enabled_on": { "templates": [] }
+}
+{% endschema %}

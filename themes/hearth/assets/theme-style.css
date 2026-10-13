@@ -1,0 +1,16 @@
+/* Hearth — spacious and tactile. */
+.section-heading__title, .banner__heading { font-weight: 400; }
+.header--stacked .list-menu__link { font-size: 0.9rem; letter-spacing: 0.04em; }
+.rooms__tabs { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+.rooms__tab { padding: 0.6rem 1.2rem; border-radius: 999px; border: 1px solid var(--line); background: transparent; cursor: pointer; font-weight: 500; }
+.rooms__tab.is-active { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+.rooms__panel { display: grid; gap: 2rem; align-items: start; }
+@media (min-width: 990px) { .rooms__panel { grid-template-columns: 1.6fr 1fr; } }
+.rooms__image { border-radius: var(--radius); overflow: hidden; aspect-ratio: 4 / 3; }
+.rooms__image img, .rooms__image svg { width: 100%; height: 100%; object-fit: cover; }
+.rooms__intro { color: var(--fg-muted); font-size: 1.05rem; }
+.rooms__list { margin-bottom: 1.5rem; }
+.rooms__item { display: flex; gap: 1rem; align-items: center; padding: 0.9rem 0; border-bottom: 1px solid var(--line); }
+.rooms__thumb { width: 72px; height: 72px; flex: none; border-radius: var(--radius); overflow: hidden; background: var(--color-surface-alt); }
+.rooms__thumb img, .rooms__thumb svg { width: 100%; height: 100%; object-fit: cover; }
+.rooms__item strong { display: block; font-weight: 500; }

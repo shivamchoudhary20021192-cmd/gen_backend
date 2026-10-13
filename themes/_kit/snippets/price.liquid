@@ -1,0 +1,43 @@
+{%- comment -%}
+  Renders a product's price. Accepts:
+  - product: {Object} product (required)
+  - use_variant: {Boolean} price of the selected or first available variant
+  - show_badges: {Boolean} sale / sold out badges
+  - class: {String}
+{%- endcomment -%}
+{%- liquid
+  if use_variant
+    assign target = product.selected_or_first_available_variant
+  else
+    assign target = product
+  endif
+  assign compare_at_price = target.compare_at_price
+  assign price = target.price | default: 1999
+  assign available = target.available | default: false
+  assign money_price = price | money
+  if product.price_varies and use_variant != true
+    assign money_price = 'products.product.price.from_price_html' | t: price: money_price
+  endif
+  assign on_sale = false
+  if compare_at_price > price
+    assign on_sale = true
+  endif
+-%}
+<div class="price{% if on_sale %} price--on-sale{% endif %}{% if available == false %} price--sold-out{% endif %}{% if class %} {{ class }}{% endif %}" data-price>
+  {%- if on_sale -%}
+    <span class="visually-hidden">{{ 'products.product.price.sale_price' | t }}</span>
+    <span class="price__current">{{ money_price }}</span>
+    <span class="visually-hidden">{{ 'products.product.price.regular_price' | t }}</span>
+    <s class="price__compare">{{ compare_at_price | money }}</s>
+  {%- else -%}
+    <span class="price__current">{{ money_price }}</span>
+  {%- endif -%}
+  {%- if show_badges -%}
+    {%- if available == false -%}
+      <span class="badge badge--muted">{{ 'products.product.sold_out' | t }}</span>
+    {%- elsif on_sale and settings.show_sale_badge -%}
+      {%- assign saving = compare_at_price | minus: price | times: 100.0 | divided_by: compare_at_price | round -%}
+      <span class="badge badge--sale">-{{ saving }}%</span>
+    {%- endif -%}
+  {%- endif -%}
+</div>

@@ -1,0 +1,67 @@
+{%- style -%}
+  .section-{{ section.id }}-padding { padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px; padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px; }
+  @media screen and (min-width: 750px) { .section-{{ section.id }}-padding { padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px; } }
+{%- endstyle -%}
+<div class="customer customer--register scheme-{{ section.settings.color_scheme }} section-{{ section.id }}-padding">
+  <div class="customer__card">
+    <h1 class="customer__title">{{ 'customer.register.title' | t }}</h1>
+    <p class="customer__subtitle">{{ 'customer.register.subtitle' | t }}</p>
+    {%- form 'create_customer', id: 'CustomerRegisterForm', class: 'customer__form', novalidate: 'novalidate' -%}
+      {%- if form.errors -%}
+        <div class="form__message form__message--error" role="alert">{{ form.errors | default_errors }}</div>
+      {%- endif -%}
+      <div class="customer__row">
+        <div class="field">
+          <label class="field__label" for="RegisterFirstName">{{ 'customer.register.first_name' | t }}</label>
+          <input class="field__input" type="text" id="RegisterFirstName" name="customer[first_name]" value="{{ form.values.first_name | escape }}" autocomplete="given-name" required>
+        </div>
+        <div class="field">
+          <label class="field__label" for="RegisterLastName">{{ 'customer.register.last_name' | t }}</label>
+          <input class="field__input" type="text" id="RegisterLastName" name="customer[last_name]" value="{{ form.values.last_name | escape }}" autocomplete="family-name">
+        </div>
+      </div>
+      <div class="field">
+        <label class="field__label" for="RegisterPhone">{{ 'customer.register.phone' | t }}</label>
+        <input class="field__input" type="tel" id="RegisterPhone" name="customer[phone]" value="{{ form.values.phone | escape }}" autocomplete="tel" inputmode="tel" required>
+      </div>
+      <div class="field">
+        <label class="field__label" for="RegisterEmail">{{ 'customer.register.email' | t }}</label>
+        <input class="field__input" type="email" id="RegisterEmail" name="customer[email]" value="{{ form.values.email | escape }}" autocomplete="email" spellcheck="false" autocapitalize="off">
+      </div>
+      {%- if section.settings.show_marketing -%}
+        <label class="customer__choice customer__choice--block">
+          <input type="checkbox" name="customer[accepts_marketing]" value="true"{% if form.values.accepts_marketing %} checked{% endif %}>
+          {{ 'customer.register.accepts_marketing' | t }}
+        </label>
+      {%- endif -%}
+      <button type="submit" class="button button--full">{{ 'customer.register.submit' | t }}</button>
+    {%- endform -%}
+    <p class="customer__aside customer__muted">
+      {{ 'customer.register.have_account' | t }} <a class="customer__link" href="{{ routes.account_login_url }}">{{ 'customer.register.sign_in' | t }}</a>
+    </p>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Create account",
+  "tag": "section",
+  "class": "section section-customer-register",
+  "settings": [
+    { "type": "checkbox", "id": "show_marketing", "label": "Ask for email marketing consent", "default": true },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "options": [
+        { "value": "background", "label": "Background" },
+        { "value": "surface", "label": "Surface" },
+        { "value": "surface-alt", "label": "Surface alternate" }
+      ],
+      "default": "background"
+    },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 60 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 80 }
+  ]
+}
+{% endschema %}

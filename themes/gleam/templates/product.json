@@ -1,0 +1,97 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-product",
+      "settings": {
+        "gallery_layout": "stacked"
+      },
+      "blocks": {
+        "title": {
+          "type": "title",
+          "settings": {}
+        },
+        "price": {
+          "type": "price",
+          "settings": {
+            "show_tax_note": true
+          }
+        },
+        "variant_picker": {
+          "type": "variant_picker",
+          "settings": {
+            "picker_type": "button"
+          }
+        },
+        "buy_buttons": {
+          "type": "buy_buttons",
+          "settings": {
+            "show_dynamic_checkout": true
+          }
+        },
+        "trust": {
+          "type": "icon_with_text",
+          "settings": {}
+        },
+        "description": {
+          "type": "description",
+          "settings": {}
+        },
+        "specs": {
+          "type": "specifications",
+          "settings": {
+            "heading": "Details"
+          }
+        },
+        "custom_fields": {
+          "type": "custom_fields",
+          "settings": {
+            "heading": "Product details",
+            "open": true
+          }
+        },
+        "care": {
+          "type": "collapsible_tab",
+          "settings": {
+            "heading": "Care",
+            "icon": "leaf",
+            "content": "<p>Care instructions for this piece.</p>"
+          }
+        },
+        "shipping": {
+          "type": "collapsible_tab",
+          "settings": {
+            "heading": "Shipping & returns",
+            "icon": "truck"
+          }
+        },
+        "share": {
+          "type": "share",
+          "settings": {}
+        }
+      },
+      "block_order": [
+        "title",
+        "price",
+        "variant_picker",
+        "buy_buttons",
+        "trust",
+        "description",
+        "specs",
+        "custom_fields",
+        "care",
+        "shipping",
+        "share"
+      ]
+    },
+    "related": {
+      "type": "related-products",
+      "settings": {
+        "heading": "You may also love"
+      }
+    }
+  },
+  "order": [
+    "main",
+    "related"
+  ]
+}

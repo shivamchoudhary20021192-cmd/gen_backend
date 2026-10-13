@@ -1,0 +1,63 @@
+{%- style -%}
+  .section-{{ section.id }}-padding { padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px; padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px; }
+  @media screen and (min-width: 750px) { .section-{{ section.id }}-padding { padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px; } }
+{%- endstyle -%}
+<div class="contact scheme-{{ section.settings.color_scheme }} section-{{ section.id }}-padding" id="contact_form">
+  <div class="page-width page-width--narrow">
+    {%- if section.settings.heading != blank -%}<h2 class="contact__heading h1">{{ section.settings.heading | escape }}</h2>{%- endif -%}
+    {%- form 'contact', id: 'ContactForm', class: 'contact__form' -%}
+      <input type="hidden" name="return_to" value="{{ request.path }}">
+      {%- if form.posted_successfully -%}
+        <p class="form__message form__message--success" role="status">{% render 'icon', name: 'check', size: 18 %} {{ 'sections.contact.form.post_success' | t }}</p>
+      {%- elsif form.errors -%}
+        <div class="form__message form__message--error" role="alert"><p>{{ 'sections.contact.form.error_heading' | t }}</p>{{ form.errors | default_errors }}</div>
+      {%- endif -%}
+      <div class="contact__fields">
+        <div class="field">
+          <label class="field__label" for="ContactForm-name">{{ 'sections.contact.form.name' | t }}</label>
+          <input class="field__input" autocomplete="name" type="text" id="ContactForm-name" name="contact[name]">
+        </div>
+        <div class="field">
+          <label class="field__label" for="ContactForm-email">{{ 'sections.contact.form.email' | t }} <span aria-hidden="true">*</span></label>
+          <input class="field__input" autocomplete="email" type="email" id="ContactForm-email" name="contact[email]" required>
+        </div>
+      </div>
+      <div class="field">
+        <label class="field__label" for="ContactForm-phone">{{ 'sections.contact.form.phone' | t }}</label>
+        <input class="field__input" type="tel" id="ContactForm-phone" autocomplete="tel" name="contact[phone]">
+      </div>
+      <div class="field">
+        <label class="field__label" for="ContactForm-body">{{ 'sections.contact.form.comment' | t }} <span aria-hidden="true">*</span></label>
+        <textarea rows="6" class="field__input" id="ContactForm-body" name="contact[body]" required></textarea>
+      </div>
+      <button type="submit" class="button">{{ 'sections.contact.form.send' | t }}</button>
+    {%- endform -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Contact form",
+  "tag": "section",
+  "class": "section section-contact-form",
+  "disabled_on": { "groups": ["header", "footer"] },
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Contact form" },
+    { "type": "paragraph", "content": "Messages appear in Customers → Messages." },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "options": [
+        { "value": "background", "label": "Background" },
+        { "value": "surface", "label": "Surface" },
+        { "value": "surface-alt", "label": "Surface alternate" }
+      ],
+      "default": "background"
+    },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 36 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 48 }
+  ],
+  "presets": [{ "name": "Contact form", "category": "Forms" }]
+}
+{% endschema %}

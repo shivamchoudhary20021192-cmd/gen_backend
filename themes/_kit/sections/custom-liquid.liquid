@@ -1,0 +1,34 @@
+{%- style -%}
+  .section-{{ section.id }}-padding { padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px; padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px; }
+  @media screen and (min-width: 750px) { .section-{{ section.id }}-padding { padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px; } }
+{%- endstyle -%}
+<div class="custom-liquid scheme-{{ section.settings.color_scheme }} section-{{ section.id }}-padding">
+  <div class="page-width">{{ section.settings.custom_liquid }}</div>
+</div>
+
+{% schema %}
+{
+  "name": "Custom Liquid",
+  "tag": "section",
+  "class": "section section-custom-liquid",
+  "settings": [
+    { "type": "liquid", "id": "custom_liquid", "label": "Liquid code", "info": "Add app snippets or other Liquid code to create advanced customizations.", "default": "<p class=\"text-center\">Add your own Liquid or HTML here.</p>" },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "options": [
+        { "value": "background", "label": "Background" },
+        { "value": "surface", "label": "Surface" },
+        { "value": "surface-alt", "label": "Surface alternate" },
+        { "value": "inverse", "label": "Inverse" }
+      ],
+      "default": "background"
+    },
+    { "type": "header", "content": "Padding" },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 40 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 40 }
+  ],
+  "presets": [{ "name": "Custom Liquid", "category": "Advanced" }]
+}
+{% endschema %}

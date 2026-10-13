@@ -1,0 +1,218 @@
+{
+  "sections": {
+    "hero": {
+      "type": "image-banner",
+      "settings": {
+        "image_height": "full",
+        "desktop_content_position": "bottom-center",
+        "desktop_content_alignment": "center",
+        "color_scheme": "inverse",
+        "show_text_box": false,
+        "image_overlay_opacity": 30
+      },
+      "blocks": {
+        "eyebrow": {
+          "type": "eyebrow",
+          "settings": {
+            "text": "Autumn / Winter"
+          }
+        },
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "heading": "The new collection",
+            "heading_size": "h0"
+          }
+        },
+        "text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Considered pieces, made to be worn for years.</p>",
+            "text_style": "subtitle"
+          }
+        },
+        "buttons": {
+          "type": "buttons",
+          "settings": {
+            "button_label_1": "Discover",
+            "button_link_1": "/collections/all"
+          }
+        }
+      },
+      "block_order": [
+        "eyebrow",
+        "heading",
+        "text",
+        "buttons"
+      ]
+    },
+    "marquee": {
+      "type": "marquee",
+      "settings": {
+        "text_size": "h3",
+        "color_scheme": "background",
+        "separator": "—",
+        "speed": 40
+      },
+      "blocks": {
+        "m1": {
+          "type": "text",
+          "settings": {
+            "text": "New season"
+          }
+        },
+        "m2": {
+          "type": "text",
+          "settings": {
+            "text": "Made in small batches"
+          }
+        },
+        "m3": {
+          "type": "text",
+          "settings": {
+            "text": "Complimentary shipping"
+          }
+        },
+        "m4": {
+          "type": "text",
+          "settings": {
+            "text": "Free alterations"
+          }
+        }
+      },
+      "block_order": [
+        "m1",
+        "m2",
+        "m3",
+        "m4"
+      ]
+    },
+    "new-in": {
+      "type": "featured-collection",
+      "settings": {
+        "title": "New in",
+        "eyebrow": "Just landed",
+        "products_to_show": 6,
+        "columns_desktop": 3,
+        "layout": "slider",
+        "color_scheme": "background",
+        "heading_size": "h1",
+        "show_view_all": true
+      }
+    },
+    "lookbook": {
+      "type": "lookbook",
+      "settings": {},
+      "blocks": {
+        "h1": {
+          "type": "hotspot",
+          "settings": {
+            "position_x": 42,
+            "position_y": 32
+          }
+        },
+        "h2": {
+          "type": "hotspot",
+          "settings": {
+            "position_x": 60,
+            "position_y": 64
+          }
+        }
+      },
+      "block_order": [
+        "h1",
+        "h2"
+      ]
+    },
+    "collections": {
+      "type": "collection-list",
+      "settings": {
+        "title": "Shop the categories",
+        "columns_desktop": 2,
+        "columns_mobile": "1",
+        "card_style": "overlay",
+        "image_ratio": "portrait"
+      }
+    },
+    "story": {
+      "type": "image-with-text",
+      "settings": {
+        "layout": "text-first",
+        "color_scheme": "background",
+        "height": "medium"
+      },
+      "blocks": {
+        "caption": {
+          "type": "caption",
+          "settings": {
+            "caption": "Our approach"
+          }
+        },
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "heading": "Made to last"
+          }
+        },
+        "text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>We work with a handful of family-run ateliers, in natural fabrics, in small runs. Fewer, better things.</p>"
+          }
+        },
+        "button": {
+          "type": "button",
+          "settings": {
+            "button_label": "About the atelier",
+            "button_link": "/pages/about",
+            "button_style_secondary": true
+          }
+        }
+      },
+      "block_order": [
+        "caption",
+        "heading",
+        "text",
+        "button"
+      ]
+    },
+    "newsletter": {
+      "type": "newsletter",
+      "settings": {
+        "color_scheme": "surface"
+      },
+      "blocks": {
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "heading": "Join the list"
+          }
+        },
+        "text": {
+          "type": "paragraph",
+          "settings": {
+            "text": "<p>Early access to new collections and private sales.</p>"
+          }
+        },
+        "form": {
+          "type": "email_form",
+          "settings": {}
+        }
+      },
+      "block_order": [
+        "heading",
+        "text",
+        "form"
+      ]
+    }
+  },
+  "order": [
+    "hero",
+    "marquee",
+    "new-in",
+    "lookbook",
+    "collections",
+    "story",
+    "newsletter"
+  ]
+}

@@ -1,0 +1,18 @@
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
+
+# Uploaded media lives outside version control. In production this directory
+# is a mounted volume (or S3 once STORAGE_DRIVER flips).
+/storage/
+
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+coverage/
+*.tsbuildinfo

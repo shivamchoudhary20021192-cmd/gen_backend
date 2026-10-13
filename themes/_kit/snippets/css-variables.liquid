@@ -1,0 +1,54 @@
+{%- liquid
+  assign heading_font = settings.font_heading
+  assign body_font = settings.font_body
+  case settings.image_ratio
+    when 'square'
+      assign ratio = '1 / 1'
+    when 'landscape'
+      assign ratio = '4 / 3'
+    when 'natural'
+      assign ratio = 'auto'
+    else
+      assign ratio = '4 / 5'
+  endcase
+  case settings.button_style
+    when 'pill'
+      assign button_radius = '999px'
+    when 'square'
+      assign button_radius = '0px'
+    else
+      assign button_radius = settings.radius | append: 'px'
+  endcase
+-%}
+<style data-theme-variables>
+  {{ heading_font | font_face }}
+  {% unless heading_font.family == body_font.family %}{{ body_font | font_face }}{% endunless %}
+
+  :root {
+    --font-heading-family: "{{ heading_font.family }}", {{ heading_font.fallback_families }};
+    --font-body-family: "{{ body_font.family }}", {{ body_font.fallback_families }};
+    --font-body-size: {{ settings.font_base_size }}px;
+    --font-heading-scale: {{ settings.heading_scale | divided_by: 100.0 }};
+    --font-heading-case: {{ settings.heading_case }};
+
+    --page-width: {{ settings.page_width }}px;
+    --spacing-sections: {{ settings.spacing_sections }}px;
+    --radius: {{ settings.radius }}px;
+    --button-radius: {{ button_radius }};
+    --logo-width: {{ settings.logo_width }}px;
+    --product-image-ratio: {{ ratio }};
+
+    --color-background: {{ settings.color_background }};
+    --color-surface: {{ settings.color_ivory }};
+    --color-surface-alt: {{ settings.color_cream }};
+    --color-accent-surface: {{ settings.color_champagne }};
+    --color-inverse: {{ settings.color_espresso }};
+    --color-text: {{ settings.color_text }};
+    --color-text-muted: {{ settings.color_text_muted }};
+    --color-accent: {{ settings.color_accent }};
+    --color-accent-contrast: {{ settings.color_accent_contrast }};
+    --color-border: {{ settings.color_border }};
+    --color-sale: {{ settings.color_sale }};
+    --color-overlay: {{ settings.color_espresso | color_modify: 'alpha', 0.45 }};
+  }
+</style>

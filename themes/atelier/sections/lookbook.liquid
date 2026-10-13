@@ -1,0 +1,106 @@
+{%- style -%}
+  .section-{{ section.id }}-padding { padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px; padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px; }
+  @media screen and (min-width: 750px) { .section-{{ section.id }}-padding { padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px; } }
+{%- endstyle -%}
+<div class="lookbook scheme-{{ section.settings.color_scheme }} section-{{ section.id }}-padding">
+  <div class="page-width">
+    <div class="lookbook__layout lookbook__layout--{{ section.settings.layout }}">
+      <div class="lookbook__text" data-reveal>
+        {%- if section.settings.caption != blank -%}<p class="eyebrow">{{ section.settings.caption | escape }}</p>{%- endif -%}
+        <h2 class="h0">{{ section.settings.heading | escape }}</h2>
+        {%- if section.settings.text != blank -%}<div class="rte lookbook__copy">{{ section.settings.text }}</div>{%- endif -%}
+        <ul class="lookbook__products" role="list">
+          {%- for block in section.blocks -%}
+            {%- assign spot_product = block.settings.product -%}
+            <li {{ block.shopify_attributes }}>
+              <a class="lookbook__product" href="{{ spot_product.url | default: '#' }}" data-hotspot-link="{{ forloop.index }}">
+                <span class="lookbook__index">{{ forloop.index }}</span>
+                <span class="lookbook__product-title">{{ spot_product.title | default: 'Product name' | escape }}</span>
+                <span class="lookbook__product-price">{%- if spot_product != blank -%}{{ spot_product.price | money }}{%- endif -%}</span>
+              </a>
+            </li>
+          {%- endfor -%}
+        </ul>
+      </div>
+      <div class="lookbook__media" data-reveal>
+        {%- if section.settings.image != blank -%}
+          {{ section.settings.image | image_url: width: 1800 | image_tag: loading: 'lazy', sizes: '(min-width: 990px) 60vw, 100vw', widths: '550, 750, 1100, 1500, 1800', alt: section.settings.heading }}
+        {%- else -%}
+          {{ 'hero-apparel-2' | placeholder_svg_tag: 'placeholder-svg' }}
+        {%- endif -%}
+        {%- for block in section.blocks -%}
+          {%- assign spot_product = block.settings.product -%}
+          <a class="hotspot" href="{{ spot_product.url | default: '#' }}" style="--x: {{ block.settings.position_x }}%; --y: {{ block.settings.position_y }}%;" aria-label="{{ spot_product.title | default: 'Product' | escape }}" data-hotspot="{{ forloop.index }}">
+            <span class="hotspot__dot">{{ forloop.index }}</span>
+            <span class="hotspot__card">
+              <strong>{{ spot_product.title | default: 'Product name' | escape }}</strong>
+              {%- if spot_product != blank -%}<span>{{ spot_product.price | money }}</span>{%- endif -%}
+            </span>
+          </a>
+        {%- endfor -%}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Lookbook",
+  "tag": "section",
+  "class": "section section-lookbook",
+  "max_blocks": 6,
+  "disabled_on": { "groups": ["header", "footer"] },
+  "settings": [
+    { "type": "image_picker", "id": "image", "label": "Look image" },
+    { "type": "text", "id": "caption", "label": "Caption", "default": "The edit" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Shop the look" },
+    { "type": "richtext", "id": "text", "label": "Text", "default": "<p>Pieces made to be worn together, season after season.</p>" },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Desktop layout",
+      "options": [
+        { "value": "image-right", "label": "Image on the right" },
+        { "value": "image-left", "label": "Image on the left" }
+      ],
+      "default": "image-right"
+    },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "options": [
+        { "value": "background", "label": "Background" },
+        { "value": "surface", "label": "Surface" },
+        { "value": "surface-alt", "label": "Surface alternate" },
+        { "value": "inverse", "label": "Inverse" }
+      ],
+      "default": "background"
+    },
+    { "type": "header", "content": "Padding" },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 64 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 64 }
+  ],
+  "blocks": [
+    {
+      "type": "hotspot",
+      "name": "Product hotspot",
+      "settings": [
+        { "type": "product", "id": "product", "label": "Product" },
+        { "type": "range", "id": "position_x", "label": "Horizontal position", "min": 0, "max": 100, "step": 1, "unit": "%", "default": 40 },
+        { "type": "range", "id": "position_y", "label": "Vertical position", "min": 0, "max": 100, "step": 1, "unit": "%", "default": 40 }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Lookbook",
+      "category": "Fashion",
+      "blocks": [
+        { "type": "hotspot", "settings": { "position_x": 42, "position_y": 30 } },
+        { "type": "hotspot", "settings": { "position_x": 58, "position_y": 62 } }
+      ]
+    }
+  ]
+}
+{% endschema %}

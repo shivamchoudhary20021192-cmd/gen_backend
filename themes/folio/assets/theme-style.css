@@ -1,0 +1,17 @@
+/* Folio — literary and calm. */
+body { line-height: 1.7; }
+h1, h2, .h0, .h1 { font-weight: 400; }
+.card__media { box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08), 0 12px 24px -16px rgba(0, 0, 0, 0.35); }
+.card__vendor { font-style: italic; text-transform: none; letter-spacing: 0; font-size: 0.85rem; }
+.book-quote__inner { max-width: 900px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 1rem; }
+.book-quote__mark { font-family: var(--font-heading-family); font-size: 6rem; line-height: 0.5; color: var(--color-accent); height: 3rem; }
+.book-quote__text { margin: 0; font-family: var(--font-heading-family); font-size: clamp(1.5rem, 3vw, 2.3rem); line-height: 1.4; font-style: italic; }
+.book-quote__source { color: var(--fg-muted); }
+.staff-picks__grid { display: grid; gap: 2rem; }
+@media (min-width: 750px) { .staff-picks__grid { grid-template-columns: repeat(3, 1fr); } }
+.staff-pick { display: grid; grid-template-columns: 110px 1fr; gap: 1.25rem; align-items: start; }
+.staff-pick__cover { aspect-ratio: 2 / 3; overflow: hidden; box-shadow: 0 12px 24px -14px rgba(0, 0, 0, 0.45); }
+.staff-pick__cover img, .staff-pick__cover svg { width: 100%; height: 100%; object-fit: cover; }
+.staff-pick__note { font-style: italic; margin-bottom: 0.4rem; }
+.staff-pick__who { color: var(--fg-muted); font-size: 0.88rem; margin-bottom: 0.8rem; }
+.staff-pick__title { font-size: 1.05rem; margin: 0 0 0.3rem; }

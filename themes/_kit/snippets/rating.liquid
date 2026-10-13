@@ -1,0 +1,10 @@
+{%- comment -%}
+  Star rating. Accepts: rating (0–5), count
+{%- endcomment -%}
+{%- if rating > 0 -%}
+  {%- assign rounded = rating | times: 2 | round | divided_by: 2.0 -%}
+  <div class="rating" role="img" aria-label="{{ 'accessibility.star_reviews_info' | t: rating_value: rating, rating_max: 5 }}">
+    <span class="rating__stars" style="--rating: {{ rounded }};" aria-hidden="true">★★★★★</span>
+    {%- if count > 0 -%}<span class="rating__count">({{ count }})</span>{%- endif -%}
+  </div>
+{%- endif -%}

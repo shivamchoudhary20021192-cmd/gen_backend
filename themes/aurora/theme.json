@@ -1,0 +1,65 @@
+{
+  "handle": "aurora",
+  "name": "Aurora",
+  "version": "2.4.0",
+  "author": "Veylog",
+  "description": "Clean and versatile. Works for any catalogue, from ten products to ten thousand.",
+  "verticals": [
+    "general",
+    "pets",
+    "toys"
+  ],
+  "industries": [
+    "General",
+    "Pets",
+    "Toys & games",
+    "Gifts"
+  ],
+  "features": [
+    "Slideshow",
+    "Collage",
+    "Mega menu",
+    "Quick add",
+    "Cart drawer",
+    "Predictive search",
+    "Sticky header",
+    "Color swatches"
+  ],
+  "sortOrder": 10,
+  "price": 0,
+  "previewImageUrl": null,
+  "defaults": {
+    "font_heading": "Manrope",
+    "font_body": "Inter",
+    "radius": 10,
+    "button_style": "rounded",
+    "card_style": "minimal",
+    "color_accent": "#2F5BEA",
+    "image_ratio": "square"
+  },
+  "presets": {
+    "Daylight": {},
+    "Midnight": {
+      "color_background": "#0F1115",
+      "color_ivory": "#151821",
+      "color_cream": "#1B1F2A",
+      "color_champagne": "#20283A",
+      "color_espresso": "#06070A",
+      "color_text": "#F5F6F8",
+      "color_text_muted": "#A3A9B6",
+      "color_border": "#2A2F3B",
+      "color_accent": "#7AA2FF",
+      "color_accent_contrast": "#0F1115"
+    },
+    "Playful": {
+      "color_accent": "#FF5A5F",
+      "color_cream": "#FFF4E6",
+      "color_champagne": "#FFE2C2",
+      "font_heading": "Poppins",
+      "radius": 16,
+      "button_style": "pill",
+      "card_style": "elevated"
+    }
+  },
+  "defaultPreset": "Daylight"
+}

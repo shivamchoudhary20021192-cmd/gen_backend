@@ -1,0 +1,22 @@
+{
+  "sections": {
+    "banner": {
+      "type": "main-collection-banner",
+      "settings": {
+        "color_scheme": "surface"
+      }
+    },
+    "product-grid": {
+      "type": "main-collection-product-grid",
+      "settings": {
+        "products_per_page": 36,
+        "columns_desktop": 5,
+        "filter_type": "horizontal"
+      }
+    }
+  },
+  "order": [
+    "banner",
+    "product-grid"
+  ]
+}

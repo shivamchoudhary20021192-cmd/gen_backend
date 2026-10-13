@@ -1,0 +1,42 @@
+{%- assign image = collection.image -%}
+<div class="collection-hero scheme-{{ section.settings.color_scheme }}{% if section.settings.show_collection_image and image %} collection-hero--with-image{% endif %}">
+  <div class="page-width collection-hero__inner">
+    <div class="collection-hero__text">
+      <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="{{ routes.root_url }}">{{ 'general.home' | t }}</a><span>/</span><span aria-current="page">{{ collection.title | escape }}</span></nav>
+      <h1 class="collection-hero__title h0">{{ collection.title | escape }}</h1>
+      {%- if section.settings.show_collection_description and collection.description != blank -%}
+        <div class="collection-hero__description rte">{{ collection.description }}</div>
+      {%- endif -%}
+    </div>
+    {%- if section.settings.show_collection_image and image -%}
+      <div class="collection-hero__image">{{ image | image_url: width: 1500 | image_tag: loading: 'eager', sizes: '(min-width: 750px) 50vw, 100vw', widths: '375, 550, 750, 1100, 1500', alt: collection.title }}</div>
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Collection banner",
+  "tag": "section",
+  "class": "section section-collection-banner",
+  "enabled_on": { "templates": ["collection"] },
+  "settings": [
+    { "type": "paragraph", "content": "The collection's title, description and image are edited in Products → Collections." },
+    { "type": "checkbox", "id": "show_collection_description", "label": "Show collection description", "default": true },
+    { "type": "checkbox", "id": "show_collection_image", "label": "Show collection image", "default": false },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "options": [
+        { "value": "background", "label": "Background" },
+        { "value": "surface", "label": "Surface" },
+        { "value": "surface-alt", "label": "Surface alternate" },
+        { "value": "accent-surface", "label": "Accent surface" },
+        { "value": "inverse", "label": "Inverse" }
+      ],
+      "default": "surface"
+    }
+  ]
+}
+{% endschema %}

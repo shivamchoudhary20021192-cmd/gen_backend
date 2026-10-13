@@ -1,0 +1,229 @@
+{
+  "sections": {
+    "hero": {
+      "type": "image-banner",
+      "settings": {
+        "image_height": "small",
+        "desktop_content_position": "middle-left",
+        "desktop_content_alignment": "left",
+        "color_scheme": "surface-alt",
+        "show_text_box": true,
+        "image_overlay_opacity": 30
+      },
+      "blocks": {
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "heading": "Fresh groceries, delivered fast",
+            "heading_size": "h0"
+          }
+        },
+        "text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Farm-fresh produce and pantry staples at everyday prices.</p>",
+            "text_style": "subtitle"
+          }
+        },
+        "buttons": {
+          "type": "buttons",
+          "settings": {
+            "button_label_1": "Start shopping",
+            "button_link_1": "/collections/all"
+          }
+        }
+      },
+      "block_order": [
+        "heading",
+        "text",
+        "buttons"
+      ]
+    },
+    "aisles": {
+      "type": "shop-by-aisle",
+      "settings": {},
+      "blocks": {
+        "a0": {
+          "type": "aisle",
+          "settings": {
+            "title": "Fruits",
+            "emoji": "🍎",
+            "background": "#FDECEC"
+          }
+        },
+        "a1": {
+          "type": "aisle",
+          "settings": {
+            "title": "Vegetables",
+            "emoji": "🥦",
+            "background": "#E8F5E3"
+          }
+        },
+        "a2": {
+          "type": "aisle",
+          "settings": {
+            "title": "Dairy & eggs",
+            "emoji": "🥛",
+            "background": "#EEF3FB"
+          }
+        },
+        "a3": {
+          "type": "aisle",
+          "settings": {
+            "title": "Bakery",
+            "emoji": "🥐",
+            "background": "#FFF3D6"
+          }
+        },
+        "a4": {
+          "type": "aisle",
+          "settings": {
+            "title": "Snacks",
+            "emoji": "🍿",
+            "background": "#FFF0E3"
+          }
+        },
+        "a5": {
+          "type": "aisle",
+          "settings": {
+            "title": "Beverages",
+            "emoji": "🧃",
+            "background": "#EAF7F6"
+          }
+        },
+        "a6": {
+          "type": "aisle",
+          "settings": {
+            "title": "Staples",
+            "emoji": "🌾",
+            "background": "#F6F0E4"
+          }
+        },
+        "a7": {
+          "type": "aisle",
+          "settings": {
+            "title": "Household",
+            "emoji": "🧴",
+            "background": "#F1ECF8"
+          }
+        }
+      },
+      "block_order": [
+        "a0",
+        "a1",
+        "a2",
+        "a3",
+        "a4",
+        "a5",
+        "a6",
+        "a7"
+      ]
+    },
+    "fresh": {
+      "type": "featured-collection",
+      "settings": {
+        "title": "Fresh today",
+        "eyebrow": "",
+        "products_to_show": 10,
+        "columns_desktop": 5,
+        "layout": "grid",
+        "color_scheme": "background",
+        "heading_size": "h2",
+        "show_view_all": true
+      }
+    },
+    "promises": {
+      "type": "multicolumn",
+      "settings": {
+        "title": "",
+        "columns_desktop": 3,
+        "column_style": "plain",
+        "color_scheme": "surface-alt",
+        "padding_top": 40,
+        "padding_bottom": 40,
+        "columns_mobile": "2"
+      },
+      "blocks": {
+        "c1": {
+          "type": "column",
+          "settings": {
+            "icon": "clock",
+            "title": "Delivered fast",
+            "text": "<p>Most orders arrive the same day.</p>"
+          }
+        },
+        "c2": {
+          "type": "column",
+          "settings": {
+            "icon": "leaf",
+            "title": "Farm fresh",
+            "text": "<p>Sourced from growers we know.</p>"
+          }
+        },
+        "c3": {
+          "type": "column",
+          "settings": {
+            "icon": "return",
+            "title": "No-fuss refunds",
+            "text": "<p>Not fresh? We refund, instantly.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "c1",
+        "c2",
+        "c3"
+      ]
+    },
+    "staples": {
+      "type": "featured-collection",
+      "settings": {
+        "title": "Pantry staples",
+        "eyebrow": "",
+        "products_to_show": 10,
+        "columns_desktop": 5,
+        "layout": "grid",
+        "color_scheme": "background",
+        "heading_size": "h2",
+        "show_view_all": true
+      }
+    },
+    "newsletter": {
+      "type": "newsletter",
+      "settings": {
+        "color_scheme": "accent-surface"
+      },
+      "blocks": {
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "heading": "Weekly deals"
+          }
+        },
+        "text": {
+          "type": "paragraph",
+          "settings": {
+            "text": "<p>The best of the week’s harvest, every Friday.</p>"
+          }
+        },
+        "form": {
+          "type": "email_form",
+          "settings": {}
+        }
+      },
+      "block_order": [
+        "heading",
+        "text",
+        "form"
+      ]
+    }
+  },
+  "order": [
+    "hero",
+    "aisles",
+    "fresh",
+    "promises",
+    "staples",
+    "newsletter"
+  ]
+}

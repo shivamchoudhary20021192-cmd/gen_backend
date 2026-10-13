@@ -1,0 +1,88 @@
+{%- style -%}
+  .section-{{ section.id }}-padding { padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px; padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px; }
+  @media screen and (min-width: 750px) { .section-{{ section.id }}-padding { padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px; } }
+{%- endstyle -%}
+<div class="testimonials scheme-{{ section.settings.color_scheme }} section-{{ section.id }}-padding">
+  <div class="page-width">
+    {%- if section.settings.title != blank -%}
+      <div class="section-heading section-heading--center" data-reveal>
+        <h2 class="section-heading__title h1">{{ section.settings.title | escape }}</h2>
+      </div>
+    {%- endif -%}
+    <slider-component class="slider" data-slider>
+      <ul class="slider__track grid grid--slider" role="list" style="--columns: {{ section.settings.columns_desktop }}; --columns-mobile: 1;" data-slider-track>
+        {%- for block in section.blocks -%}
+          <li class="grid__item" {{ block.shopify_attributes }}>
+            <figure class="testimonial">
+              {%- if block.settings.rating > 0 -%}
+                <div class="testimonial__stars" aria-label="{{ block.settings.rating }} / 5">
+                  {%- for i in (1..block.settings.rating) -%}{% render 'icon', name: 'star', size: 16 %}{%- endfor -%}
+                </div>
+              {%- endif -%}
+              <blockquote class="testimonial__quote">{{ block.settings.quote }}</blockquote>
+              <figcaption class="testimonial__author">
+                {%- if block.settings.image != blank -%}
+                  <span class="testimonial__avatar">{{ block.settings.image | image_url: width: 120 | image_tag: loading: 'lazy', alt: block.settings.author }}</span>
+                {%- endif -%}
+                <span><strong>{{ block.settings.author | escape }}</strong>{% if block.settings.detail != blank %}<br><small>{{ block.settings.detail | escape }}</small>{% endif %}</span>
+              </figcaption>
+            </figure>
+          </li>
+        {%- endfor -%}
+      </ul>
+      {%- if section.blocks.size > section.settings.columns_desktop -%}
+        <div class="slider__buttons">
+          <button type="button" class="slider-button" data-slider-prev aria-label="{{ 'accessibility.previous_slide' | t }}">{% render 'icon', name: 'chevron-left', size: 18 %}</button>
+          <button type="button" class="slider-button" data-slider-next aria-label="{{ 'accessibility.next_slide' | t }}">{% render 'icon', name: 'chevron-right', size: 18 %}</button>
+        </div>
+      {%- endif -%}
+    </slider-component>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Testimonials",
+  "tag": "section",
+  "class": "section section-testimonials",
+  "max_blocks": 12,
+  "disabled_on": { "groups": ["header", "footer"] },
+  "settings": [
+    { "type": "text", "id": "title", "label": "Heading", "default": "What customers are saying" },
+    { "type": "range", "id": "columns_desktop", "label": "Number of columns on desktop", "min": 1, "max": 4, "step": 1, "default": 3 },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "options": [
+        { "value": "background", "label": "Background" },
+        { "value": "surface", "label": "Surface" },
+        { "value": "surface-alt", "label": "Surface alternate" },
+        { "value": "accent-surface", "label": "Accent surface" },
+        { "value": "inverse", "label": "Inverse" },
+        { "value": "accent", "label": "Accent" }
+      ],
+      "default": "surface"
+    },
+    { "type": "header", "content": "Padding" },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 56 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 56 }
+  ],
+  "blocks": [
+    {
+      "type": "testimonial",
+      "name": "Testimonial",
+      "settings": [
+        { "type": "range", "id": "rating", "label": "Stars", "min": 0, "max": 5, "step": 1, "default": 5 },
+        { "type": "richtext", "id": "quote", "label": "Quote", "default": "<p>Beautifully made and arrived faster than expected. I've already ordered again.</p>" },
+        { "type": "text", "id": "author", "label": "Author", "default": "Customer name" },
+        { "type": "text", "id": "detail", "label": "Detail", "default": "Verified buyer" },
+        { "type": "image_picker", "id": "image", "label": "Photo" }
+      ]
+    }
+  ],
+  "presets": [
+    { "name": "Testimonials", "category": "Social proof", "blocks": [{ "type": "testimonial" }, { "type": "testimonial" }, { "type": "testimonial" }] }
+  ]
+}
+{% endschema %}

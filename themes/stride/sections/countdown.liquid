@@ -1,0 +1,55 @@
+{%- style -%}
+  .section-{{ section.id }}-padding { padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px; padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px; }
+  @media screen and (min-width: 750px) { .section-{{ section.id }}-padding { padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px; } }
+{%- endstyle -%}
+<count-down class="countdown scheme-{{ section.settings.color_scheme }} section-{{ section.id }}-padding" data-end="{{ section.settings.end_date | escape }}T{{ section.settings.end_time | default: '23:59' | escape }}:00" data-hide-when-done="{{ section.settings.hide_when_done }}">
+  <div class="page-width countdown__inner">
+    <div class="countdown__text">
+      {%- if section.settings.caption != blank -%}<p class="eyebrow">{{ section.settings.caption | escape }}</p>{%- endif -%}
+      <h2 class="h0 countdown__heading">{{ section.settings.heading | escape }}</h2>
+      {%- if section.settings.text != blank -%}<p class="countdown__copy">{{ section.settings.text | escape }}</p>{%- endif -%}
+    </div>
+    <div class="countdown__timer" role="timer" aria-live="off">
+      {%- for unit in 'days,hours,minutes,seconds' | split: ',' -%}
+        <div class="countdown__unit"><span class="countdown__number" data-unit="{{ unit }}">00</span><span class="countdown__label">{{ unit | capitalize }}</span></div>
+      {%- endfor -%}
+    </div>
+    {%- if section.settings.button_label != blank -%}
+      <a class="button" href="{{ section.settings.button_link | default: routes.all_products_collection_url }}">{{ section.settings.button_label | escape }}</a>
+    {%- endif -%}
+  </div>
+</count-down>
+
+{% schema %}
+{
+  "name": "Countdown",
+  "tag": "section",
+  "class": "section section-countdown",
+  "disabled_on": { "groups": ["footer"] },
+  "settings": [
+    { "type": "text", "id": "caption", "label": "Caption", "default": "Limited time" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "The season sale ends soon" },
+    { "type": "text", "id": "text", "label": "Text", "default": "Up to 40% off training gear." },
+    { "type": "text", "id": "end_date", "label": "Ends on", "info": "YYYY-MM-DD", "default": "2026-12-31" },
+    { "type": "text", "id": "end_time", "label": "Ends at", "info": "24-hour HH:MM, shopper's local time", "default": "23:59" },
+    { "type": "checkbox", "id": "hide_when_done", "label": "Hide when the countdown ends", "default": true },
+    { "type": "text", "id": "button_label", "label": "Button label", "default": "Shop the sale" },
+    { "type": "url", "id": "button_link", "label": "Button link" },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "options": [
+        { "value": "background", "label": "Background" },
+        { "value": "inverse", "label": "Inverse" },
+        { "value": "accent", "label": "Accent" }
+      ],
+      "default": "accent"
+    },
+    { "type": "header", "content": "Padding" },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 48 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 48 }
+  ],
+  "presets": [{ "name": "Countdown", "category": "Promotional" }]
+}
+{% endschema %}

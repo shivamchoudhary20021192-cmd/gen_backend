@@ -1,0 +1,150 @@
+{%- style -%}
+  .section-{{ section.id }}-padding { padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px; padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px; }
+  @media screen and (min-width: 750px) { .section-{{ section.id }}-padding { padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px; } }
+  .customer__privacy { margin-top: 28px; padding-top: 20px; border-top: 1px solid rgba(var(--color-foreground), 0.12); }
+  .customer__privacy-form { display: inline-block; margin: 8px 8px 0 0; }
+  .customer__privacy-links { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-top: 14px; }
+  .customer__privacy-links a[hidden] { display: none; }
+{%- endstyle -%}
+<div class="customer customer--account scheme-{{ section.settings.color_scheme }} section-{{ section.id }}-padding">
+  <div class="page-width">
+    <div class="customer__header">
+      <div>
+        <h1 class="customer__title">{{ 'customer.account.title' | t }}</h1>
+        {%- if customer.first_name != blank -%}<p class="customer__subtitle">{{ 'customer.account.greeting' | t: name: customer.first_name }}</p>{%- endif -%}
+      </div>
+      <a class="button button--secondary button--small" href="{{ routes.account_logout_url }}">{% render 'icon', name: 'account', size: 18 %} {{ 'customer.account.log_out' | t }}</a>
+    </div>
+
+    <div class="customer__grid">
+      <div class="customer__panel customer__orders">
+        <h2 class="customer__heading">{{ 'customer.orders.title' | t }}</h2>
+        {%- paginate customer.orders by section.settings.orders_per_page -%}
+          {%- if customer.orders.size > 0 -%}
+            <ul class="order-list" role="list">
+              {%- for order in customer.orders -%}
+                <li class="order-card">
+                  <a class="order-card__link" href="{{ order.customer_url }}" aria-label="{{ 'customer.orders.order_number_link' | t: number: order.name }}">
+                    <div class="order-card__thumbs">
+                      {%- for item in order.line_items limit: 3 -%}
+                        <span class="order-card__thumb">
+                          {%- if item.image -%}<img src="{{ item.image | image_url: width: 120 }}" alt="" width="60" height="60" loading="lazy">{%- else -%}{% render 'icon', name: 'cart', size: 20 %}{%- endif -%}
+                        </span>
+                      {%- endfor -%}
+                    </div>
+                    <div class="order-card__body">
+                      <p class="order-card__name">{{ order.name }}</p>
+                      <p class="customer__muted">{{ order.created_at | date: '%b %d, %Y' }} · {{ 'customer.orders.items' | t: count: order.item_count }}</p>
+                    </div>
+                    <div class="order-card__meta">
+                      <span class="badge badge--{{ order.status | handle }}">{{ order.status_label }}</span>
+                      <strong>{{ order.total_price | money }}</strong>
+                    </div>
+                  </a>
+                </li>
+              {%- endfor -%}
+            </ul>
+            {%- if paginate.pages > 1 -%}{% render 'pagination', paginate: paginate %}{%- endif -%}
+          {%- else -%}
+            <div class="customer__empty">
+              <p>{{ 'customer.account.no_orders' | t }}</p>
+              <a class="button button--small" href="{{ routes.all_products_collection_url }}">{{ 'customer.account.start_shopping' | t }}</a>
+            </div>
+          {%- endif -%}
+        {%- endpaginate -%}
+      </div>
+
+      <aside class="customer__panel customer__details">
+        <h2 class="customer__heading">{{ 'customer.account.details' | t }}</h2>
+        <p class="customer__name">{{ customer.name }}</p>
+        {%- if customer.email != blank -%}<p class="customer__muted">{{ customer.email }}</p>{%- endif -%}
+        <p class="customer__muted">{{ customer.phone }}</p>
+        {%- if customer.default_address -%}
+          <address class="customer__address">
+            {{- customer.default_address.address1 }}{% if customer.default_address.address2 != blank %}, {{ customer.default_address.address2 }}{% endif %}<br>
+            {{ customer.default_address.city }}, {{ customer.default_address.province }} {{ customer.default_address.zip }}<br>
+            {{ customer.default_address.country -}}
+          </address>
+        {%- else -%}
+          <p class="customer__muted">{{ 'customer.account.no_address' | t }}</p>
+        {%- endif -%}
+        <a class="customer__link" href="{{ routes.account_addresses_url }}">{{ 'customer.account.view_addresses' | t }} ({{ customer.addresses_count }})</a>
+
+        <details class="customer__edit"{% if form.errors %} open{% endif %}>
+          <summary class="customer__link">{{ 'customer.account.edit_profile' | t }}</summary>
+          {%- form 'customer_profile', class: 'customer__form' -%}
+            {%- if form.errors -%}<div class="form__message form__message--error" role="alert">{{ form.errors | default_errors }}</div>{%- endif -%}
+            <div class="field">
+              <label class="field__label" for="ProfileFirstName">{{ 'customer.account.first_name' | t }}</label>
+              <input class="field__input" id="ProfileFirstName" name="customer[first_name]" value="{{ customer.first_name | escape }}" autocomplete="given-name" required>
+            </div>
+            <div class="field">
+              <label class="field__label" for="ProfileLastName">{{ 'customer.account.last_name' | t }}</label>
+              <input class="field__input" id="ProfileLastName" name="customer[last_name]" value="{{ customer.last_name | escape }}" autocomplete="family-name">
+            </div>
+            <div class="field">
+              <label class="field__label" for="ProfileEmail">{{ 'customer.account.email' | t }}</label>
+              <input class="field__input" type="email" id="ProfileEmail" name="customer[email]" value="{{ customer.email | escape }}" autocomplete="email">
+            </div>
+            <label class="customer__choice customer__choice--block"><input type="checkbox" name="customer[accepts_marketing]" value="true"{% if customer.accepts_marketing %} checked{% endif %}> {{ 'customer.account.accepts_marketing' | t }}</label>
+            <button type="submit" class="button button--small">{{ 'customer.account.save' | t }}</button>
+          {%- endform -%}
+        </details>
+        {%- form 'customer_profile' -%}
+          {%- if form.posted_successfully -%}
+            <p class="form__message form__message--success" role="status">{% render 'icon', name: 'check', size: 18 %} {{ 'customer.account.profile_updated' | t }}</p>
+          {%- endif -%}
+        {%- endform -%}
+
+        <div class="customer__privacy" id="privacy">
+          <h2 class="customer__heading">{{ 'customer.privacy.title' | t }}</h2>
+          <p class="customer__muted">{{ 'customer.privacy.intro' | t }}</p>
+          {%- if privacy_request != blank -%}
+            <p class="form__message form__message--success" role="status">{% render 'icon', name: 'check', size: 18 %} {{ 'customer.privacy.request_sent' | t: reference: privacy_request }}</p>
+          {%- endif -%}
+          <form method="post" action="/account/privacy" class="customer__privacy-form">
+            <input type="hidden" name="request_type" value="access">
+            <button type="submit" class="button button--secondary button--small">{{ 'customer.privacy.download' | t }}</button>
+          </form>
+          <form method="post" action="/account/privacy" class="customer__privacy-form">
+            <input type="hidden" name="request_type" value="withdraw_consent">
+            <button type="submit" class="button button--secondary button--small">{{ 'customer.privacy.withdraw' | t }}</button>
+          </form>
+          <form method="post" action="/account/privacy" class="customer__privacy-form" onsubmit="return window.confirm({{ 'customer.privacy.erase_confirm' | t | json | escape }});">
+            <input type="hidden" name="request_type" value="erasure">
+            <button type="submit" class="button button--secondary button--small">{{ 'customer.privacy.erase' | t }}</button>
+          </form>
+          <p class="customer__muted customer__privacy-links">
+            <a class="customer__link" href="#" data-privacy-preferences hidden>{{ 'general.privacy.cookie_preferences' | t }}</a>
+            <a class="customer__link" href="/pages/data-sharing-opt-out" data-privacy-choices hidden>{{ 'general.privacy.choices' | t }}</a>
+            <a class="customer__link" href="/privacy/request">{{ 'customer.privacy.more' | t }}</a>
+          </p>
+        </div>
+      </aside>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Account",
+  "tag": "section",
+  "class": "section section-customer-account",
+  "settings": [
+    { "type": "range", "id": "orders_per_page", "label": "Orders per page", "min": 5, "max": 25, "step": 5, "default": 10 },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "options": [
+        { "value": "background", "label": "Background" },
+        { "value": "surface", "label": "Surface" },
+        { "value": "surface-alt", "label": "Surface alternate" }
+      ],
+      "default": "background"
+    },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 40 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 60 }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,23 @@
+{%- comment -%}
+  Social profile links: the theme's settings first, then Settings → Brand.
+{%- endcomment -%}
+{%- liquid
+  assign profiles = ''
+  for platform in shop.brand.social_links
+    assign profiles = profiles | append: platform.platform | append: '|' | append: platform.url | append: '^'
+  endfor
+-%}
+<ul class="social-icons" role="list">
+  {%- for network in 'instagram,facebook,x,youtube,tiktok,pinterest' | split: ',' -%}
+    {%- assign key = 'social_' | append: network -%}
+    {%- assign url = settings[key] -%}
+    {%- if url == blank -%}
+      {%- for entry in shop.brand.social_links -%}
+        {%- if entry.platform == network -%}{%- assign url = entry.url -%}{%- endif -%}
+      {%- endfor -%}
+    {%- endif -%}
+    {%- if url != blank -%}
+      <li><a href="{{ url }}" class="social-icons__link" target="_blank" rel="noopener" aria-label="{{ network | capitalize }}">{% render 'icon', name: network, size: 20 %}</a></li>
+    {%- endif -%}
+  {%- endfor -%}
+</ul>

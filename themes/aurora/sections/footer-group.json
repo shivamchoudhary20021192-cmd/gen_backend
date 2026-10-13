@@ -1,0 +1,44 @@
+{
+  "type": "footer",
+  "name": "Footer group",
+  "sections": {
+    "footer": {
+      "type": "footer",
+      "settings": {
+        "color_scheme": "inverse",
+        "newsletter_heading": "Subscribe to our emails",
+        "newsletter_text": "Be the first to know about new collections and exclusive offers."
+      },
+      "blocks": {
+        "brand": {
+          "type": "brand_information",
+          "settings": {
+            "show_social": true
+          }
+        },
+        "shop": {
+          "type": "link_list",
+          "settings": {
+            "heading": "Shop",
+            "menu": "footer"
+          }
+        },
+        "help": {
+          "type": "link_list",
+          "settings": {
+            "heading": "Help",
+            "menu": "footer_support"
+          }
+        }
+      },
+      "block_order": [
+        "brand",
+        "shop",
+        "help"
+      ]
+    }
+  },
+  "order": [
+    "footer"
+  ]
+}

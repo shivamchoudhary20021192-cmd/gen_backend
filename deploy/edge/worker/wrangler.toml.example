@@ -1,0 +1,26 @@
+# The Online Store edge worker (storefront.ts) on Cloudflare Workers.
+#
+#   cp wrangler.toml.example wrangler.toml     # then fill in the zone and origin
+#   npx wrangler secret put EDGE_SHARED_SECRET # the platform's EDGE_SHARED_SECRET
+#   npx wrangler deploy
+#
+# The route `*/*` on the SaaS zone runs the worker for every custom hostname
+# (Cloudflare for SaaS) as well as for the zone's own names.
+
+name = "veylog-storefront-edge"
+main = "storefront.ts"
+compatibility_date = "2026-09-01"
+
+routes = [
+  { pattern = "*/*", zone_name = "myveylog.com" },
+]
+
+[vars]
+# Where storefront requests go (the fallback origin's hostname).
+ORIGIN = "https://origin.myveylog.com"
+# Seconds a hostname's route — and so the content version pages are keyed by —
+# is reused in a location. Lower is fresher after a change; higher is fewer
+# calls to /internal/edge/route.
+ROUTE_TTL = "10"
+# Shops live on pods; send each to its pod's region.
+# POD_ORIGINS = '{"1":"https://ap-south-1.origin.myveylog.com","2":"https://eu-west-1.origin.myveylog.com"}'

@@ -1,0 +1,154 @@
+{
+  "sections": {
+    "hero": {
+      "type": "image-banner",
+      "blocks": {
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "heading": "Made for everyday",
+            "heading_size": "h0"
+          }
+        },
+        "text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Thoughtfully made products, delivered to your door.</p>"
+          }
+        },
+        "buttons": {
+          "type": "buttons",
+          "settings": {
+            "button_label_1": "Shop now",
+            "button_link_1": "/collections/all"
+          }
+        }
+      },
+      "block_order": [
+        "heading",
+        "text",
+        "buttons"
+      ],
+      "settings": {
+        "image_height": "large"
+      }
+    },
+    "featured": {
+      "type": "featured-collection",
+      "settings": {
+        "title": "Bestsellers",
+        "products_to_show": 8
+      }
+    },
+    "promises": {
+      "type": "multicolumn",
+      "blocks": {
+        "c1": {
+          "type": "column",
+          "settings": {
+            "icon": "truck",
+            "title": "Fast delivery",
+            "text": "<p>Dispatched within 24 hours.</p>"
+          }
+        },
+        "c2": {
+          "type": "column",
+          "settings": {
+            "icon": "return",
+            "title": "Easy returns",
+            "text": "<p>Changed your mind? Return within 7 days.</p>"
+          }
+        },
+        "c3": {
+          "type": "column",
+          "settings": {
+            "icon": "lock",
+            "title": "Secure checkout",
+            "text": "<p>UPI, cards and cash on delivery.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "c1",
+        "c2",
+        "c3"
+      ],
+      "settings": {
+        "title": "",
+        "color_scheme": "surface-alt",
+        "padding_top": 36,
+        "padding_bottom": 36
+      }
+    },
+    "collections": {
+      "type": "collection-list",
+      "settings": {
+        "title": "Shop by collection"
+      }
+    },
+    "story": {
+      "type": "image-with-text",
+      "blocks": {
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "heading": "Our story"
+          }
+        },
+        "text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Tell customers who you are and why you started. A few honest sentences go a long way.</p>"
+          }
+        },
+        "button": {
+          "type": "button",
+          "settings": {
+            "button_label": "Learn more",
+            "button_link": "/pages/about"
+          }
+        }
+      },
+      "block_order": [
+        "heading",
+        "text",
+        "button"
+      ],
+      "settings": {}
+    },
+    "newsletter": {
+      "type": "newsletter",
+      "blocks": {
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "heading": "Be the first to know"
+          }
+        },
+        "text": {
+          "type": "paragraph",
+          "settings": {
+            "text": "<p>New arrivals, offers and stories, now and then.</p>"
+          }
+        },
+        "form": {
+          "type": "email_form"
+        }
+      },
+      "block_order": [
+        "heading",
+        "text",
+        "form"
+      ],
+      "settings": {}
+    }
+  },
+  "order": [
+    "hero",
+    "featured",
+    "promises",
+    "collections",
+    "story",
+    "newsletter"
+  ]
+}

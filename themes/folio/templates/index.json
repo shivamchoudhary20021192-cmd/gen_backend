@@ -1,0 +1,145 @@
+{
+  "sections": {
+    "hero": {
+      "type": "image-with-text",
+      "settings": {
+        "layout": "text-first",
+        "color_scheme": "surface-alt",
+        "height": "medium"
+      },
+      "blocks": {
+        "caption": {
+          "type": "caption",
+          "settings": {
+            "caption": "Staff favourites"
+          }
+        },
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "heading": "This month’s reads"
+          }
+        },
+        "text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Twelve books our booksellers can’t stop talking about — and why you should read them too.</p>"
+          }
+        },
+        "button": {
+          "type": "button",
+          "settings": {
+            "button_label": "See the list",
+            "button_link": "/collections/all",
+            "button_style_secondary": true
+          }
+        }
+      },
+      "block_order": [
+        "caption",
+        "heading",
+        "text",
+        "button"
+      ]
+    },
+    "new": {
+      "type": "featured-collection",
+      "settings": {
+        "title": "New releases",
+        "eyebrow": "",
+        "products_to_show": 10,
+        "columns_desktop": 5,
+        "layout": "grid",
+        "color_scheme": "background",
+        "heading_size": "h1",
+        "show_view_all": true
+      }
+    },
+    "quote": {
+      "type": "book-quote",
+      "settings": {}
+    },
+    "picks": {
+      "type": "staff-picks",
+      "settings": {},
+      "blocks": {
+        "p1": {
+          "type": "pick",
+          "settings": {}
+        },
+        "p2": {
+          "type": "pick",
+          "settings": {
+            "staff_name": "Arjun, manager",
+            "note": "The funniest, saddest book I read this year."
+          }
+        },
+        "p3": {
+          "type": "pick",
+          "settings": {
+            "staff_name": "Meera, children’s books",
+            "note": "Read it aloud — the whole family will be hooked."
+          }
+        }
+      },
+      "block_order": [
+        "p1",
+        "p2",
+        "p3"
+      ]
+    },
+    "genres": {
+      "type": "collection-list",
+      "settings": {
+        "title": "Browse by genre",
+        "columns_desktop": 4,
+        "image_ratio": "portrait",
+        "card_style": "below"
+      }
+    },
+    "journal": {
+      "type": "blog-posts",
+      "settings": {
+        "heading": "From the reading room"
+      }
+    },
+    "newsletter": {
+      "type": "newsletter",
+      "settings": {
+        "color_scheme": "surface-alt"
+      },
+      "blocks": {
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "heading": "The reading list"
+          }
+        },
+        "text": {
+          "type": "paragraph",
+          "settings": {
+            "text": "<p>A handful of books we loved, once a month.</p>"
+          }
+        },
+        "form": {
+          "type": "email_form",
+          "settings": {}
+        }
+      },
+      "block_order": [
+        "heading",
+        "text",
+        "form"
+      ]
+    }
+  },
+  "order": [
+    "hero",
+    "new",
+    "quote",
+    "picks",
+    "genres",
+    "journal",
+    "newsletter"
+  ]
+}

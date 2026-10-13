@@ -1,0 +1,39 @@
+{
+  "type": "header",
+  "name": "Header group",
+  "sections": {
+    "announcement-bar": {
+      "type": "announcement-bar",
+      "settings": {
+        "color_scheme": "surface-alt"
+      },
+      "blocks": {
+        "a1": {
+          "type": "announcement",
+          "settings": {
+            "text": "Free delivery and assembly on orders over ₹25,000",
+            "link": ""
+          }
+        }
+      },
+      "block_order": [
+        "a1"
+      ]
+    },
+    "header": {
+      "type": "header",
+      "settings": {
+        "logo_position": "stacked",
+        "menu": "main-menu",
+        "menu_type": "dropdown",
+        "sticky_header": "on-scroll-up",
+        "color_scheme": "background",
+        "show_line_separator": true
+      }
+    }
+  },
+  "order": [
+    "announcement-bar",
+    "header"
+  ]
+}

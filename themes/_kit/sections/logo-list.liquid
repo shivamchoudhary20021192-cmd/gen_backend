@@ -1,0 +1,65 @@
+{%- style -%}
+  .section-{{ section.id }}-padding { padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px; padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px; }
+  @media screen and (min-width: 750px) { .section-{{ section.id }}-padding { padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px; } }
+{%- endstyle -%}
+<div class="logo-list scheme-{{ section.settings.color_scheme }} section-{{ section.id }}-padding">
+  <div class="page-width">
+    {%- if section.settings.title != blank -%}<p class="logo-list__title eyebrow text-center">{{ section.settings.title | escape }}</p>{%- endif -%}
+    <ul class="logo-list__items" role="list">
+      {%- for block in section.blocks -%}
+        <li class="logo-list__item" {{ block.shopify_attributes }}>
+          {%- capture logo -%}
+            {%- if block.settings.image != blank -%}
+              {{ block.settings.image | image_url: width: 400 | image_tag: loading: 'lazy', alt: block.settings.name }}
+            {%- else -%}
+              <span class="logo-list__name">{{ block.settings.name | escape }}</span>
+            {%- endif -%}
+          {%- endcapture -%}
+          {%- if block.settings.link != blank -%}<a href="{{ block.settings.link }}">{{ logo }}</a>{%- else -%}{{ logo }}{%- endif -%}
+        </li>
+      {%- endfor -%}
+    </ul>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Logo list",
+  "tag": "section",
+  "class": "section section-logo-list",
+  "max_blocks": 12,
+  "disabled_on": { "groups": ["header", "footer"] },
+  "settings": [
+    { "type": "text", "id": "title", "label": "Heading", "default": "As featured in" },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "options": [
+        { "value": "background", "label": "Background" },
+        { "value": "surface", "label": "Surface" },
+        { "value": "surface-alt", "label": "Surface alternate" },
+        { "value": "inverse", "label": "Inverse" }
+      ],
+      "default": "background"
+    },
+    { "type": "header", "content": "Padding" },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 36 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 36 }
+  ],
+  "blocks": [
+    {
+      "type": "logo",
+      "name": "Logo",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Logo" },
+        { "type": "text", "id": "name", "label": "Name", "default": "Publication" },
+        { "type": "url", "id": "link", "label": "Link" }
+      ]
+    }
+  ],
+  "presets": [
+    { "name": "Logo list", "category": "Social proof", "blocks": [{ "type": "logo" }, { "type": "logo" }, { "type": "logo" }, { "type": "logo" }] }
+  ]
+}
+{% endschema %}

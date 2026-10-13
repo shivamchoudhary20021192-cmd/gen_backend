@@ -1,0 +1,29 @@
+{%- comment -%}
+  A collection card. Accepts: card_collection, placeholder_index, style ('overlay' | 'below'), ratio ('square' | 'portrait' | 'landscape')
+{%- endcomment -%}
+{%- assign card_style = style | default: 'below' -%}
+{%- assign card_ratio = ratio | default: 'square' -%}
+{%- if card_collection != blank -%}
+  <a class="collection-card collection-card--{{ card_style }} collection-card--{{ card_ratio }}" href="{{ card_collection.url }}">
+    <div class="collection-card__media">
+      {%- assign image = card_collection.featured_image | default: card_collection.products.first.featured_image -%}
+      {%- if image -%}
+        {{ image | image_url: width: 900 | image_tag: loading: 'lazy', sizes: '(min-width: 990px) 33vw, 50vw', widths: '360, 540, 720, 900', alt: card_collection.title }}
+      {%- else -%}
+        {{ 'collection-1' | placeholder_svg_tag: 'collection-card__placeholder' }}
+      {%- endif -%}
+    </div>
+    <div class="collection-card__info">
+      <h3 class="collection-card__title">{{ card_collection.title | escape }}{% render 'icon', name: 'arrow-right', size: 16 %}</h3>
+      {%- if show_count and card_collection.products_count > 0 -%}
+        <p class="collection-card__count">{{ 'products.facets.product_count' | t: count: card_collection.products_count }}</p>
+      {%- endif -%}
+    </div>
+  </a>
+{%- else -%}
+  {%- assign placeholder = placeholder_index | default: 1 | modulo: 6 | plus: 1 -%}
+  <div class="collection-card collection-card--{{ card_style }} collection-card--{{ card_ratio }}">
+    <div class="collection-card__media">{{ 'collection-' | append: placeholder | placeholder_svg_tag: 'collection-card__placeholder' }}</div>
+    <div class="collection-card__info"><h3 class="collection-card__title">Collection title</h3></div>
+  </div>
+{%- endif -%}
