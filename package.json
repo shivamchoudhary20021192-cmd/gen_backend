@@ -24,6 +24,7 @@
     "sandbox:payments": "tsx scripts/payments-sandbox.ts",
     "smoke:accounts": "tsx scripts/smoke-accounts.ts",
     "smoke:messaging": "tsx scripts/smoke-messaging.ts",
+    "smoke:mfa": "tsx scripts/smoke-mfa.ts",
     "start:worker": "node dist/src/worker.js",
     "worker": "tsx watch src/worker.ts",
     "db:migrate:prod": "node dist/scripts/migrate.js",

@@ -87,6 +87,21 @@ export interface LoginResult {
   shops: ShopMembership[];
   /** The shop requests go to when they do not name one. */
   active_shop: ShopMembership | null;
+  /** Present only when this sign-in used a recovery code: how many are left. */
+  recovery_codes_remaining?: number;
+}
+
+/**
+ * What `POST /auth/login` answers when the password is right and the person
+ * has two-step sign-in on. No tokens yet: the client sends `mfa_token` with a
+ * code to `POST /auth/login/mfa` to finish.
+ */
+export interface MfaChallenge {
+  mfa_required: true;
+  mfa_token: string;
+  mfa_methods: ('totp' | 'recovery_code')[];
+  /** Seconds until `mfa_token` stops working and the password is needed again. */
+  expires_in: number;
 }
 
 export interface PublicAdmin {

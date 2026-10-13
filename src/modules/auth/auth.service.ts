@@ -14,10 +14,12 @@ import type {
   AccessTokenPayload,
   AuthenticatedAdmin,
   LoginResult,
+  MfaChallenge,
   PlatformRole,
   PublicAdmin,
   ShopMembership,
 } from './auth.types';
+import { adminForChallenge, consumeSecondFactor, MFA_CHALLENGE_SECONDS, mfaActive, signChallenge, type SecondFactor } from './mfa';
 
 interface RequestMeta {
   ip: string | null;
@@ -93,7 +95,7 @@ export function toPublicAdmin(row: AdminRow, fullAccessInShop = false): PublicAd
     status: row.status,
     is_super_admin: fullAccessInShop,
     platform_role: row.platform_role ?? 'none',
-    mfa_enabled: row.mfa_enabled === 1,
+    mfa_enabled: mfaActive(row),
     avatar_media_id: row.avatar_media_id,
     timezone: row.timezone,
     last_login_at: row.last_login_at ? row.last_login_at.toISOString() : null,
@@ -219,8 +221,61 @@ async function loginPayload(admin: AdminRow, sessionId: number, refreshToken: st
   };
 }
 
+/**
+ * Opens a session for someone who has proved who they are: a password, and a
+ * second factor when they have one switched on. `factor` is what the second
+ * step used, or null when there was none.
+ */
+async function openSession(admin: AdminRow, meta: RequestMeta, factor: SecondFactor | null): Promise<LoginResult> {
+  // The shop they last worked in, so signing in lands where they left off.
+  const memberships = openable(await authRepository.listMemberships(admin.id));
+  const activeShopId = memberships[0]?.shop_id ?? null;
+
+  const sessionToken = randomToken(32);
+  const refreshToken = randomToken(48);
+  const expiresAt = new Date(Date.now() + env.auth.refreshTtlDays * 86_400_000);
+
+  const sessionId = await withTransaction(async (tx) => {
+    const id = await authRepository.createSession(
+      {
+        adminUserId: admin.id,
+        activeShopId,
+        sessionTokenHash: hashToken(sessionToken),
+        refreshTokenHash: hashToken(refreshToken),
+        ip: meta.ip,
+        userAgent: meta.userAgent,
+        expiresAt,
+        mfaSatisfied: factor !== null,
+      },
+      tx,
+    );
+    await authRepository.recordSuccessfulLogin(admin.id, meta.ip, tx);
+    return id;
+  }, controlPlane);
+
+  await auditService.log({
+    actorId: admin.id,
+    actorLabel: admin.email,
+    action: 'admin.logged_in',
+    entityType: 'admin_user',
+    entityId: admin.id,
+    summary: `${admin.email} signed in`,
+    context: { request_id: meta.requestId, session_id: sessionId, active_shop_id: activeShopId, second_factor: factor },
+    ip: meta.ip,
+    userAgent: meta.userAgent,
+  });
+
+  const result = await loginPayload(admin, sessionId, refreshToken, activeShopId);
+  if (factor === 'recovery_code') {
+    // So the admin can warn that the person is running out.
+    const fresh = await authRepository.findById(admin.id);
+    result.recovery_codes_remaining = fresh?.mfa_recovery_codes?.length ?? 0;
+  }
+  return result;
+}
+
 export const authService = {
-  async login(email: string, password: string, meta: RequestMeta): Promise<LoginResult> {
+  async login(email: string, password: string, meta: RequestMeta): Promise<LoginResult | MfaChallenge> {
     const admin = await authRepository.findByEmail(email.toLowerCase().trim());
 
     // Same error and roughly the same work whether the account exists or not,
@@ -262,50 +317,60 @@ export const authService = {
       throw new ApiError(401, 'INVALID_CREDENTIALS', 'Email or password is incorrect.');
     }
 
-    // MFA is modelled but the TOTP step ships in phase 2. Failing closed here
-    // would lock out every seeded admin, so we record that it was satisfied.
-    if (admin.mfa_enabled === 1 && !admin.mfa_secret) {
-      logger.warn('auth.mfa_enabled_without_secret', { admin_id: admin.id });
+    if (mfaActive(admin)) {
+      // The password is right but nothing is open yet. Failed attempts are
+      // deliberately NOT reset here: a stolen password must not buy unlimited
+      // guesses at the code, four at a time.
+      return {
+        mfa_required: true,
+        mfa_token: signChallenge(admin),
+        mfa_methods: ['totp', 'recovery_code'],
+        expires_in: MFA_CHALLENGE_SECONDS,
+      };
     }
 
-    // The shop they last worked in, so signing in lands where they left off.
-    const memberships = openable(await authRepository.listMemberships(admin.id));
-    const activeShopId = memberships[0]?.shop_id ?? null;
+    return openSession(admin, meta, null);
+  },
 
-    const sessionToken = randomToken(32);
-    const refreshToken = randomToken(48);
-    const expiresAt = new Date(Date.now() + env.auth.refreshTtlDays * 86_400_000);
+  /**
+   * The second step: the challenge from `login` plus a code from the
+   * authenticator app or a recovery code. A wrong code counts towards the
+   * same lockout as a wrong password, so the six digits cannot be walked.
+   */
+  async completeMfaLogin(mfaToken: string, code: string, meta: RequestMeta): Promise<LoginResult> {
+    const admin = await adminForChallenge(mfaToken);
+    if (admin.status !== 'active') {
+      throw new ApiError(403, 'ACCOUNT_INACTIVE', `This account is ${admin.status}.`);
+    }
 
-    const sessionId = await withTransaction(async (tx) => {
-      const id = await authRepository.createSession(
-        {
-          adminUserId: admin.id,
-          activeShopId,
-          sessionTokenHash: hashToken(sessionToken),
-          refreshTokenHash: hashToken(refreshToken),
-          ip: meta.ip,
-          userAgent: meta.userAgent,
-          expiresAt,
-        },
-        tx,
-      );
-      await authRepository.recordSuccessfulLogin(admin.id, meta.ip, tx);
-      return id;
-    }, controlPlane);
+    // The attempt is counted before the code is looked at, so requests fired
+    // in parallel cannot each slip past the lockout check (see the repository).
+    const lockUntil = new Date(Date.now() + env.auth.lockoutMinutes * 60_000);
+    if (!(await authRepository.reserveSignInAttempt(admin.id, env.auth.maxLoginAttempts, lockUntil))) {
+      const current = await authRepository.findById(admin.id);
+      const until = current?.locked_until?.getTime() ?? lockUntil.getTime();
+      const minutes = Math.max(1, Math.ceil((until - Date.now()) / 60000));
+      throw new ApiError(403, 'ACCOUNT_LOCKED', `Account is locked. Try again in ${minutes} minute(s).`);
+    }
 
-    await auditService.log({
-      actorId: admin.id,
-      actorLabel: admin.email,
-      action: 'admin.logged_in',
-      entityType: 'admin_user',
-      entityId: admin.id,
-      summary: `${admin.email} signed in`,
-      context: { request_id: meta.requestId, session_id: sessionId, active_shop_id: activeShopId },
-      ip: meta.ip,
-      userAgent: meta.userAgent,
-    });
+    const factor = await consumeSecondFactor(admin, code);
+    if (!factor) {
+      const attempts = admin.failed_login_attempts + 1;
+      await auditService.log({
+        actorType: 'system',
+        action: 'admin.mfa_failed',
+        entityType: 'admin_user',
+        entityId: admin.id,
+        summary: `Wrong or reused sign-in code for ${admin.email}`,
+        context: { request_id: meta.requestId, attempts },
+        ip: meta.ip,
+        userAgent: meta.userAgent,
+      });
+      logger.warn('auth.mfa_failed', { admin_id: admin.id, attempts, locked: attempts >= env.auth.maxLoginAttempts });
+      throw new ApiError(401, 'INVALID_MFA_CODE', 'That code is not right, or has already been used.');
+    }
 
-    return loginPayload(admin, sessionId, refreshToken, activeShopId);
+    return openSession(admin, meta, factor);
   },
 
   /**

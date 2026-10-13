@@ -18,6 +18,14 @@ export const loginSchema = z.object({
   password: z.string().min(1, 'Password is required.').max(128),
 });
 
+/** A six-digit app code ("123 456" is fine) or a 5-5 recovery code. */
+export const mfaCodeSchema = z.string().trim().min(6, 'Enter the code from your authenticator app.').max(20);
+
+export const mfaLoginSchema = z.object({
+  mfa_token: z.string().min(20, 'The sign-in attempt is missing.').max(2048),
+  code: mfaCodeSchema,
+});
+
 export const refreshSchema = z.object({
   refresh_token: z.string().min(32, 'Refresh token is required.').max(256),
 });

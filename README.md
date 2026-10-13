@@ -146,6 +146,41 @@ POST /auth/login  →  { access_token (15 min JWT), refresh_token (30 d opaque),
 - **Lockout** after 5 failed attempts for 15 minutes; login is rate-limited per
   email *and* per IP, because limiting only one of those leaves the other open.
 
+### Two-step sign-in (TOTP)
+
+Opt-in per person, from any authenticator app. With it on, the password alone
+opens nothing:
+
+```
+POST /auth/login       { email, password }      → { mfa_required: true, mfa_token, mfa_methods, expires_in: 300 }
+POST /auth/login/mfa   { mfa_token, code }      → the usual login response
+```
+
+`code` is the app's six digits or a one-time recovery code (`abcde-fghjk`).
+
+- **A code works once.** The 30-second step of the last accepted code is stored
+  and only a later step is accepted, in one `UPDATE`, so a code read over
+  someone's shoulder cannot be replayed inside its window.
+- **Wrong codes lock the account** exactly like wrong passwords, and the
+  attempt is counted *before* the code is checked, so a burst of parallel
+  guesses still gets 5 between them. A correct password does not reset the
+  counter while a code is still owed.
+- The challenge is a 5-minute JWT with its own audience: it is never accepted
+  as an access token, and it dies if the password changes.
+- The secret is sealed by the vault, bound to the person; recovery codes are
+  stored only as peppered hashes and shown once.
+
+```
+GET  /auth/mfa                    status, recovery codes left
+POST /auth/mfa/setup              { password }        → secret + otpauth:// URI (not on yet)
+POST /auth/mfa/enable             { code }            → on; 10 recovery codes; other sessions signed out
+POST /auth/mfa/disable            { password, code }
+POST /auth/mfa/recovery-codes     { code }            → a new set; the old one stops working
+POST /platform/api/v1/people/:id/mfa/reset  { reason }   platform admins, never for themselves
+```
+
+`npm run smoke:mfa` walks all of it against a running server (43 checks).
+
 ## Authorisation — deny wins
 
 ```
@@ -275,8 +310,10 @@ test fires `name); DROP TABLE products; --` at it and gets a 422.
 
 ```
 AUTH        POST   /auth/login | /auth/refresh | /auth/logout
-            GET    /auth/me | /auth/sessions
+            POST   /auth/login/mfa
+            GET    /auth/me | /auth/sessions | /auth/mfa
             POST   /auth/change-password
+            POST   /auth/mfa/setup | /enable | /disable | /recovery-codes
             DELETE /auth/sessions/:id
 
 ADMINS      GET    /admin-users              list, filter, search
@@ -526,8 +563,8 @@ call.
 5. Schedule the housekeeping jobs: `purgeExpiredRateLimits`, expired-session
    sweep, orphan-media sweep (`usage_count = 0` for 30+ days), automatic
    collection recalculation.
-6. Wire TOTP verification — the schema, the login response shape and the
-   `mfa_satisfied_at` column are already in place.
+6. Decide who must use two-step sign-in. It is opt-in per person today; the
+   `auth.admin_mfa_required` setting is not yet enforced.
 
 ## Not in this phase
 

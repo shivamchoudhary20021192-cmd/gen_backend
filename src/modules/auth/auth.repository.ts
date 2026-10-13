@@ -17,7 +17,12 @@ export interface AdminRow extends RowDataPacket {
   platform_role: PlatformRole;
   account_type: 'human' | 'app' | 'system';
   mfa_enabled: number;
+  /** Vault-sealed base32 TOTP secret. Set with mfa_enabled = 0 while enrolment is pending. */
   mfa_secret: string | null;
+  /** Peppered hashes of the unused recovery codes. */
+  mfa_recovery_codes: string[] | null;
+  mfa_last_used_step: number | null;
+  mfa_enabled_at: Date | null;
   failed_login_attempts: number;
   locked_until: Date | null;
   last_login_at: Date | null;
@@ -114,13 +119,15 @@ export const authRepository = {
       ip: string | null;
       userAgent: string | null;
       expiresAt: Date;
+      /** True when the sign-in that opened this session passed a second factor. */
+      mfaSatisfied: boolean;
     },
     exec: Executor = controlPlane,
   ): Promise<number> {
     return insert(
       `INSERT INTO admin_sessions
          (admin_user_id, active_shop_id, session_token_hash, refresh_token_hash, ip, user_agent, expires_at, mfa_satisfied_at)
-       VALUES (?, ?, ?, ?, ${data.ip ? 'INET6_ATON(?)' : 'NULL'}, ?, ?, NOW())`,
+       VALUES (?, ?, ?, ?, ${data.ip ? 'INET6_ATON(?)' : 'NULL'}, ?, ?, ${data.mfaSatisfied ? 'NOW()' : 'NULL'})`,
       data.ip
         ? [data.adminUserId, data.activeShopId, data.sessionTokenHash, data.refreshTokenHash, data.ip, data.userAgent, data.expiresAt]
         : [data.adminUserId, data.activeShopId, data.sessionTokenHash, data.refreshTokenHash, data.userAgent, data.expiresAt],
@@ -302,5 +309,105 @@ export const authRepository = {
       [passwordHash, adminId],
       exec,
     );
+  },
+
+  // ── two-step sign-in ───────────────────────────────────────────────────────
+
+  /** Starts (or restarts) enrolment. Refuses while MFA is already on. */
+  async setPendingMfaSecret(adminId: number, sealedSecret: string, exec: Executor = controlPlane): Promise<boolean> {
+    const result = await execute(
+      `UPDATE admin_users
+          SET mfa_secret = ?, mfa_recovery_codes = NULL, mfa_last_used_step = NULL
+        WHERE id = ? AND mfa_enabled = 0`,
+      [sealedSecret, adminId],
+      exec,
+    );
+    return result.affectedRows === 1;
+  },
+
+  /** Completes enrolment; matches only while it is still pending. */
+  async enableMfa(adminId: number, recoveryHashes: string[], step: number, exec: Executor = controlPlane): Promise<boolean> {
+    const result = await execute(
+      `UPDATE admin_users
+          SET mfa_enabled = 1, mfa_enabled_at = NOW(), mfa_recovery_codes = CAST(? AS JSON), mfa_last_used_step = ?
+        WHERE id = ? AND mfa_enabled = 0 AND mfa_secret IS NOT NULL`,
+      [JSON.stringify(recoveryHashes), step, adminId],
+      exec,
+    );
+    return result.affectedRows === 1;
+  },
+
+  async disableMfa(adminId: number, exec: Executor = controlPlane): Promise<void> {
+    await execute(
+      `UPDATE admin_users
+          SET mfa_enabled = 0, mfa_secret = NULL, mfa_recovery_codes = NULL,
+              mfa_last_used_step = NULL, mfa_enabled_at = NULL
+        WHERE id = ?`,
+      [adminId],
+      exec,
+    );
+  },
+
+  /**
+   * Records a TOTP step as used, only if it is later than the last one. The
+   * comparison and the write are one statement, so a replayed code — or two
+   * requests racing with the same code — match zero rows.
+   */
+  async consumeTotpStep(adminId: number, step: number, exec: Executor = controlPlane): Promise<boolean> {
+    const result = await execute(
+      `UPDATE admin_users
+          SET mfa_last_used_step = ?
+        WHERE id = ? AND (mfa_last_used_step IS NULL OR mfa_last_used_step < ?)`,
+      [step, adminId, step],
+      exec,
+    );
+    return result.affectedRows === 1;
+  },
+
+  /** Removes one recovery code by its hash; false when it is not (or no longer) there. */
+  async consumeRecoveryCode(adminId: number, codeHash: string, exec: Executor = controlPlane): Promise<boolean> {
+    const result = await execute(
+      `UPDATE admin_users
+          SET mfa_recovery_codes = JSON_REMOVE(mfa_recovery_codes, JSON_UNQUOTE(JSON_SEARCH(mfa_recovery_codes, 'one', ?)))
+        WHERE id = ? AND mfa_enabled = 1 AND JSON_SEARCH(mfa_recovery_codes, 'one', ?) IS NOT NULL`,
+      [codeHash, adminId, codeHash],
+      exec,
+    );
+    return result.affectedRows === 1;
+  },
+
+  async replaceRecoveryCodes(adminId: number, recoveryHashes: string[], exec: Executor = controlPlane): Promise<void> {
+    await execute(
+      `UPDATE admin_users SET mfa_recovery_codes = CAST(? AS JSON) WHERE id = ? AND mfa_enabled = 1`,
+      [JSON.stringify(recoveryHashes), adminId],
+      exec,
+    );
+  },
+
+  /**
+   * Counts a sign-in code attempt BEFORE the code is checked, and locks the
+   * account on the attempt that reaches `max`. Because the check and the
+   * increment are one statement, fifty requests fired at once still get
+   * `max` guesses between them, not fifty: once one of them sets the lock the
+   * rest match zero rows. False means the account is locked right now.
+   *
+   * MySQL evaluates single-table SET assignments left to right, so the IF
+   * sees the incremented count. A correct code resets both through
+   * recordSuccessfulLogin.
+   */
+  async reserveSignInAttempt(adminId: number, max: number, lockUntil: Date, exec: Executor = controlPlane): Promise<boolean> {
+    const result = await execute(
+      `UPDATE admin_users
+          SET failed_login_attempts = failed_login_attempts + 1,
+              locked_until = IF(failed_login_attempts >= ?, ?, locked_until)
+        WHERE id = ? AND (locked_until IS NULL OR locked_until <= NOW())`,
+      [max, lockUntil, adminId],
+      exec,
+    );
+    return result.affectedRows === 1;
+  },
+
+  async markSessionMfaSatisfied(sessionId: number, exec: Executor = controlPlane): Promise<void> {
+    await execute(`UPDATE admin_sessions SET mfa_satisfied_at = NOW() WHERE id = ?`, [sessionId], exec);
   },
 };

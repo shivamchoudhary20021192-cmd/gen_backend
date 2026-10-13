@@ -7,6 +7,8 @@ import { podRouter } from '../../db/pods';
 import { authenticateIdentity } from '../../middleware/authenticate';
 import { requirePlatformAdmin, requirePlatformRole } from '../../middleware/requirePermission';
 import { validate } from '../../middleware/validate';
+import { clientIp } from '../../middleware/requestContext';
+import { mfaService } from '../../modules/auth/mfa.service';
 import { auditService } from '../../shared/audit.service';
 import { platformAppsRoutes } from '../apps/apps.routes';
 import { jobQueue } from '../jobs/queue';
@@ -224,6 +226,28 @@ platformRoutes.post(
     entitlements.invalidate(id);
     await auditService.log({ actorId: actor(req).id, actorLabel: actor(req).label, action: 'platform.shop_plan_changed', entityType: 'shop', entityId: id, summary: `${shop.handle} moved to ${plan.handle}` });
     res.json({ id, plan: plan.handle });
+  }),
+);
+
+// ── people ───────────────────────────────────────────────────────────────────
+
+/**
+ * Turns off someone's two-step sign-in when they have lost both the phone and
+ * the recovery codes. Admins only, never for yourself, always with a reason
+ * that goes into the audit trail; signs out every session they have.
+ */
+platformRoutes.post(
+  '/people/:id/mfa/reset',
+  requirePlatformAdmin,
+  validate({ params: shopRef, body: z.object({ reason: z.string().trim().min(3).max(255) }) }),
+  asyncHandler(async (req: Request, res: Response) => {
+    const result = await mfaService.operatorReset(
+      { id: req.identity!.id, email: req.identity!.email },
+      Number(req.params.id),
+      req.body.reason,
+      { ip: clientIp(req), userAgent: req.header('User-Agent')?.slice(0, 255) ?? null, requestId: req.requestId },
+    );
+    res.json(result);
   }),
 );
 
