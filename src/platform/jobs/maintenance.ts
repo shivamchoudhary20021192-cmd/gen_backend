@@ -94,7 +94,12 @@ defineJob({
     const buckets = (
       await execute('DELETE FROM api_rate_buckets WHERE updated_ms < ? LIMIT 5000', [Date.now() - 3_600_000], controlPlane)
     ).affectedRows;
-    if (jobs + codes + events + deliveries + requeued + buckets > 0) {
+    // Expired Idempotency-Key claims are dead weight; the middleware takes an
+    // expired row over anyway, so this only bounds the table.
+    const idempotencyKeys = (
+      await execute('DELETE FROM idempotency_keys WHERE expires_at < NOW(3) LIMIT 5000', [], controlPlane)
+    ).affectedRows;
+    if (jobs + codes + events + deliveries + requeued + buckets + idempotencyKeys > 0) {
       logger.info('platform.maintenance', {
         jobs,
         oauth_codes: codes,
@@ -102,6 +107,7 @@ defineJob({
         webhook_deliveries: deliveries,
         inbound_requeued: requeued,
         api_buckets: buckets,
+        idempotency_keys: idempotencyKeys,
       });
     }
   },

@@ -97,7 +97,7 @@ Adding a module (orders, customers, coupons) is one folder plus one line in
 | Plural envelope + meta on read | `{ "products": [ … ], "pagination": { … } }` |
 | Nested sub-resources | `/products/:id/variants/:variantId` |
 | Actions as POST, not PATCH | `POST /products/:id/publish` |
-| `Idempotency-Key` on POST | honoured; replays the first response |
+| `Idempotency-Key` on POST | honoured; replays the first response for 10 minutes, on any node |
 | 422 with per-field errors | `{ error: { code, message, request_id, details } }` |
 
 **Deliberate divergence:** Shopify's `variants[].option1/option2/option3`
@@ -558,8 +558,9 @@ call.
 2. Change `SUPERADMIN_PASSWORD`; the seed script refuses the default in prod.
 3. Put the media root on a mounted volume, or implement `S3Driver` and flip
    `STORAGE_DRIVER`.
-4. Move the idempotency cache out of process if you run more than one node
-   (Redis, or a small `idempotency_keys` table) — the interface doesn't change.
+4. ~~Move the idempotency cache out of process~~ — done: keys live in the
+   `idempotency_keys` table, so a replay holds across every node and a
+   restart (`npm run smoke:idempotency` runs it against two nodes).
 5. Schedule the housekeeping jobs: `purgeExpiredRateLimits`, expired-session
    sweep, orphan-media sweep (`usage_count = 0` for 30+ days), automatic
    collection recalculation.
