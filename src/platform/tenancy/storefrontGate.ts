@@ -26,7 +26,15 @@ import { brandService } from '../shops/brand';
 
 export const TOKEN_TTL_MS = 7 * 24 * 3_600_000;
 // The newsletter too: an "opening soon" page is where a store collects its first emails.
-const OPEN_PATHS = [/^\/storefront\/(unlock|shop)$/, /^\/theme$/, /^\/payments\/razorpay\/webhook$/, /^\/newsletter\/(subscribe|unsubscribe)$/];
+// A page preview link is its own secret, like a theme preview link: it is how
+// a draft gets reviewed while the store is still behind its password.
+const OPEN_PATHS = [
+  /^\/storefront\/(unlock|shop)$/,
+  /^\/theme$/,
+  /^\/payments\/razorpay\/webhook$/,
+  /^\/newsletter\/(subscribe|unsubscribe)$/,
+  /^\/content\/pages\/preview\/[0-9a-f-]{36}$/,
+];
 
 function sign(shopId: number, expiresAt: number, hashFragment: string): string {
   return crypto

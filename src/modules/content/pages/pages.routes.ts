@@ -160,13 +160,38 @@ pagesRouter.post(
 )
 
 /**
+ * Issue (or replace) a shareable preview link for a draft
+ * POST /admin/api/v1/content/pages/:id/preview-link
+ * Permission: cms.edit
+ */
+pagesRouter.post(
+  '/:id/preview-link',
+  requirePermission('cms.edit'),
+  validate({ params: pageIdParamSchema }),
+  asyncHandler(pagesController.issuePreviewLink)
+)
+
+/**
+ * Revoke the preview link
+ * DELETE /admin/api/v1/content/pages/:id/preview-link
+ * Permission: cms.edit
+ */
+pagesRouter.delete(
+  '/:id/preview-link',
+  requirePermission('cms.edit'),
+  validate({ params: pageIdParamSchema }),
+  asyncHandler(pagesController.revokePreviewLink)
+)
+
+/**
  * Mark page as reviewed
  * POST /admin/api/v1/content/pages/:id/review
- * Permission: content.pages.review (or content.pages.edit)
+ * Permission: cms.review — separate from cms.edit, so the person who wrote a
+ * regulated page need not be the one who signs it off
  */
 pagesRouter.post(
   '/:id/review',
-  requirePermission('cms.edit'), // TODO: add specific review permission
+  requirePermission('cms.review'),
   validate({ params: pageIdParamSchema }),
   asyncHandler(pagesController.markReviewed)
 )

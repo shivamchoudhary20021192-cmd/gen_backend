@@ -193,6 +193,30 @@ export const pagesController = {
   },
 
   /**
+   * POST /admin/api/v1/content/pages/:id/preview-link
+   * Issue (or replace) the page's shareable preview link
+   */
+  async issuePreviewLink(req: Request, res: Response): Promise<void> {
+    const { id } = req.params
+
+    const link = await pagesService.issuePreviewToken(Number(id))
+
+    res.status(200).json(link)
+  },
+
+  /**
+   * DELETE /admin/api/v1/content/pages/:id/preview-link
+   * Revoke the preview link
+   */
+  async revokePreviewLink(req: Request, res: Response): Promise<void> {
+    const { id } = req.params
+
+    await pagesService.revokePreviewToken(Number(id))
+
+    res.status(204).send()
+  },
+
+  /**
    * POST /admin/api/v1/content/pages/:id/review
    * Mark page as reviewed
    */

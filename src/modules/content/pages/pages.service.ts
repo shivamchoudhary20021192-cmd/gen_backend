@@ -5,6 +5,7 @@
  * Handles validation, workflow management, slug generation, and orchestration.
  */
 
+import { randomUUID } from 'node:crypto'
 import { pagesRepository } from './pages.repository'
 import { ApiError } from '../../../core/ApiError'
 import { slugify } from '../../../core/slug'
@@ -447,20 +448,28 @@ export const pagesService = {
   },
 
   /**
-   * Get page for preview (by preview token)
+   * Issue a preview link for a page in any state but archived, so a draft can
+   * be read by someone without admin access (legal, a client) before it is
+   * published. Issuing again replaces the token, which is also how a link that
+   * was shared too widely is killed without losing the ability to preview.
    */
-  async getByPreviewToken(token: string): Promise<PageWithRelations> {
-    // This would require a separate query method in repository
-    // For now, throw not implemented
-    throw new ApiError(501, 'NOT_FOUND', 'Preview token lookup not yet implemented')
+  async issuePreviewToken(id: number): Promise<{ preview_token: string; preview_path: string }> {
+    const page = await this.getById(id)
+
+    if (page.status === 'archived') {
+      throw new ApiError(409, 'INVALID_TRANSITION', 'An archived page cannot be previewed. Restore it first.')
+    }
+
+    const token = randomUUID()
+    await pagesRepository.setPreviewToken(id, token)
+
+    return { preview_token: token, preview_path: `/api/v1/content/pages/preview/${token}` }
   },
 
-  /**
-   * Generate preview token
-   */
-  generatePreviewToken(): string {
-    // Generate a secure random token
-    return require('crypto').randomBytes(16).toString('hex')
+  /** Revoke the page's preview link; anyone holding it gets a 404 from now on. */
+  async revokePreviewToken(id: number): Promise<void> {
+    await this.getById(id)
+    await pagesRepository.setPreviewToken(id, null)
   },
 
   /**
