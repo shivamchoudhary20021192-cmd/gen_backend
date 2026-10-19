@@ -215,7 +215,7 @@ export async function quoteCart(cartId: number, options: QuoteOptions = {}, exec
             needsAddress: false,
             reason: null,
             zone: null,
-            options: [{ method: 'standard' as ShippingMethod, name: 'Delivered by email', price: 0, basePrice: 0, freeAbove: null, etaMinDays: 0, etaMaxDays: 0 }],
+            options: [{ method: 'standard' as ShippingMethod, name: 'Delivered by email', price: 0, basePrice: 0, freeAbove: null, etaMinDays: 0, etaMaxDays: 0, rateSource: 'table' as const, carrierService: null }],
             codAvailable: false,
           }
       : await shippingQuote.quote({

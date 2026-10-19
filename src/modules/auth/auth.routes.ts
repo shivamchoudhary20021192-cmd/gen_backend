@@ -7,7 +7,15 @@ import { validate } from '../../middleware/validate';
 import { clientIp } from '../../middleware/requestContext';
 import { accountsService } from './accounts.service';
 import { authController } from './auth.controller';
-import { changePasswordSchema, idParamSchema, loginSchema, passwordSchema, refreshSchema } from './auth.schemas';
+import {
+  changePasswordSchema,
+  idParamSchema,
+  loginSchema,
+  mfaCodeSchema,
+  mfaLoginSchema,
+  passwordSchema,
+  refreshSchema,
+} from './auth.schemas';
 
 export const authRoutes = Router();
 
@@ -35,6 +43,18 @@ authRoutes.post(
   asyncHandler(authController.login),
 );
 
+/**
+ * The second step of sign-in for people with two-step sign-in on. The real
+ * brute-force guard is the account lockout (a wrong code counts as a failed
+ * login); this limit stops one IP walking many accounts' challenges at once.
+ */
+authRoutes.post(
+  '/login/mfa',
+  rateLimit({ bucket: 'admin.login_mfa.ip', max: 30, windowSeconds: 900 }),
+  validate({ body: mfaLoginSchema }),
+  asyncHandler(authController.completeMfaLogin),
+);
+
 authRoutes.post(
   '/refresh',
   rateLimit({ bucket: 'admin.refresh', max: 60, windowSeconds: 900 }),
@@ -60,6 +80,47 @@ authRoutes.post(
   rateLimit({ bucket: 'admin.change_password', max: 5, windowSeconds: 900, identify: (req) => String(req.identity?.id ?? 'anon') }),
   validate({ body: changePasswordSchema }),
   asyncHandler(authController.changePassword),
+);
+
+// ── two-step sign-in, from the person's security settings ────────────────────
+// Each change asks for a code (and turning on or off, the password), so these
+// are limited per person rather than per IP.
+
+const mfaLimit = rateLimit({
+  bucket: 'admin.mfa_settings',
+  max: 10,
+  windowSeconds: 900,
+  identify: (req) => String(req.identity?.id ?? 'anon'),
+});
+
+authRoutes.get('/mfa', authenticateIdentity, asyncHandler(authController.mfaStatus));
+authRoutes.post(
+  '/mfa/setup',
+  authenticateIdentity,
+  mfaLimit,
+  validate({ body: z.object({ password: z.string().min(1, 'Password is required.').max(128) }) }),
+  asyncHandler(authController.mfaSetup),
+);
+authRoutes.post(
+  '/mfa/enable',
+  authenticateIdentity,
+  mfaLimit,
+  validate({ body: z.object({ code: mfaCodeSchema }) }),
+  asyncHandler(authController.mfaEnable),
+);
+authRoutes.post(
+  '/mfa/disable',
+  authenticateIdentity,
+  mfaLimit,
+  validate({ body: z.object({ password: z.string().min(1, 'Password is required.').max(128), code: mfaCodeSchema }) }),
+  asyncHandler(authController.mfaDisable),
+);
+authRoutes.post(
+  '/mfa/recovery-codes',
+  authenticateIdentity,
+  mfaLimit,
+  validate({ body: z.object({ code: mfaCodeSchema }) }),
+  asyncHandler(authController.mfaRecoveryCodes),
 );
 
 authRoutes.get('/sessions', authenticateIdentity, asyncHandler(authController.listSessions));

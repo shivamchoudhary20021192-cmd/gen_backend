@@ -25,6 +25,7 @@ export interface PublicPageRow extends RowDataPacket {
   is_indexable: number;
   published_at: Date | null;
   updated_at: Date;
+  status: string;
   meta_title: string | null;
   meta_description: string | null;
 }
@@ -107,19 +108,38 @@ const PAGE_LIVE = `
   AND (p.published_at IS NULL OR p.published_at <= NOW())
   AND (p.unpublish_at IS NULL OR p.unpublish_at > NOW())`;
 
+/** What a visitor may see of a page. Listed by name, never `p.*`. */
+const PAGE_COLUMNS = `
+  p.id, p.slug, p.full_path, p.title, p.subtitle, p.page_type, p.template,
+  p.body_html, p.is_indexable, p.published_at, p.updated_at, p.status,
+  hero.storage_key AS hero_key, hero.alt_text AS hero_alt,
+  seo.meta_title, seo.meta_description
+    FROM cms_pages p
+    LEFT JOIN media hero ON hero.id = p.hero_media_id AND hero.shop_id = p.shop_id
+    LEFT JOIN seo_meta seo ON seo.shop_id = p.shop_id AND seo.entity_type = 'page' AND seo.entity_id = p.id`;
+
 export const contentPublicRepository = {
   async pageBySlug(slug: string, exec: Executor = pool): Promise<PublicPageRow | null> {
     return queryOne<PublicPageRow>(
-      `SELECT p.id, p.slug, p.full_path, p.title, p.subtitle, p.page_type, p.template,
-              p.body_html, p.is_indexable, p.published_at, p.updated_at,
-              hero.storage_key AS hero_key, hero.alt_text AS hero_alt,
-              seo.meta_title, seo.meta_description
-         FROM cms_pages p
-         LEFT JOIN media hero ON hero.id = p.hero_media_id AND hero.shop_id = p.shop_id
-         LEFT JOIN seo_meta seo ON seo.shop_id = p.shop_id AND seo.entity_type = 'page' AND seo.entity_id = p.id
+      `SELECT ${PAGE_COLUMNS}
         WHERE (p.slug = ? OR p.full_path = ?) AND ${PAGE_LIVE}
         LIMIT 1`,
       [slug, slug, shopId()],
+      exec,
+    );
+  },
+
+  /**
+   * A page by its preview link, whatever its state short of archived or
+   * deleted. The published gate deliberately does not apply: showing what is
+   * not live yet is the point. Nothing but the preview route reads this.
+   */
+  async pageByPreviewToken(token: string, exec: Executor = pool): Promise<PublicPageRow | null> {
+    return queryOne<PublicPageRow>(
+      `SELECT ${PAGE_COLUMNS}
+        WHERE p.shop_id = ? AND p.preview_token = ? AND p.deleted_at IS NULL AND p.status <> 'archived'
+        LIMIT 1`,
+      [shopId(), token],
       exec,
     );
   },

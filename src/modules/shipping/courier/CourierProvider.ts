@@ -7,9 +7,11 @@
  * this file works in these terms, so adding a real vendor is one new class and a
  * row in `shipping_carriers`, not a change to the orders service.
  *
- * Deliberately narrow. Rate shopping, manifest generation and label PDFs are
- * vendor features we do not use yet, and an interface that promises them would
- * have to lie for every provider that cannot.
+ * Deliberately narrow. Manifest generation and label PDFs are vendor features
+ * we do not use yet, and an interface that promises them would have to lie for
+ * every provider that cannot. Rate quotes are the one optional capability: a
+ * provider that can price a parcel before it is booked implements
+ * `quoteRates`, and one that cannot simply leaves it out.
  */
 
 export interface ShipmentAddress {
@@ -96,6 +98,29 @@ export interface ReversePickupInput {
   parcel: ShipmentParcel;
 }
 
+export interface RateQuoteInput {
+  /** The shop's pickup location. */
+  origin: { postalCode: string; country: string };
+  destination: { postalCode: string; country: string; region: string | null };
+  weightGrams: number;
+  /** In the shop's currency; some carriers price insurance on it. */
+  declaredValue: number;
+  /** Quotes are for prepaid parcels; a COD surcharge is the shop's own fee. */
+  cod: boolean;
+}
+
+/** One service the carrier offers for this parcel. */
+export interface RateQuote {
+  mode: 'surface' | 'air' | 'express';
+  /** The carrier's name for it, e.g. "Delhivery Surface". */
+  service: string;
+  amount: number;
+  /** ISO 4217. A quote in another currency than the shop's is not used. */
+  currency: string;
+  etaMinDays: number | null;
+  etaMaxDays: number | null;
+}
+
 export interface CourierProvider {
   /** Matches `shipping_carriers.api_provider`. */
   readonly code: string;
@@ -111,6 +136,12 @@ export interface CourierProvider {
    */
   track(awbNumber: string, bookedAt?: Date): Promise<TrackingResult>;
   createReversePickup(input: ReversePickupInput): Promise<CreateShipmentResult>;
+  /**
+   * What the carrier would charge for this parcel, by service. Empty when it
+   * does not serve the destination. Optional: absent, a carrier-calculated
+   * rate falls back to its flat price.
+   */
+  quoteRates?(input: RateQuoteInput): Promise<RateQuote[]>;
 }
 
 /**

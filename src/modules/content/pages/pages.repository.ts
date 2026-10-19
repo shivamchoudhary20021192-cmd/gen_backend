@@ -492,6 +492,21 @@ export const pagesRepository = {
   /**
    * Soft delete page
    */
+  /** Sets the page's preview token, or clears it with null. */
+  async setPreviewToken(id: number, token: string | null): Promise<boolean> {
+    const conn = await pool.getConnection()
+    try {
+      const [result] = await conn.query<any>(
+        'UPDATE cms_pages SET preview_token = ? WHERE shop_id = ? AND id = ? AND deleted_at IS NULL',
+        [token, shopId(), id]
+      )
+
+      return result.affectedRows > 0
+    } finally {
+      conn.release()
+    }
+  },
+
   async delete(id: number): Promise<boolean> {
     const conn = await pool.getConnection()
     try {

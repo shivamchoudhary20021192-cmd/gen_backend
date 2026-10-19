@@ -9,12 +9,16 @@ export interface ShippingRateRow extends RowDataPacket {
   zone: 'local' | 'regional' | 'metro' | 'rest_of_india' | 'special' | 'all';
   zone_id: number | null;
   method: 'standard' | 'express' | 'pickup';
+  rate_type: 'flat' | 'carrier';
+  carrier_id: number | null;
   min_order_amount: string;
   max_order_amount: string | null;
   min_weight_grams: number;
   max_weight_grams: number | null;
   rate: string;
   free_above_amount: string | null;
+  carrier_markup_percent: string;
+  carrier_markup_amount: string;
   eta_min_days: number;
   eta_max_days: number;
   is_active: number;
@@ -105,12 +109,16 @@ export const shippingRepository = {
       zone?: string;
       zone_id?: number | null;
       method?: string;
+      rate_type?: 'flat' | 'carrier';
+      carrier_id?: number | null;
       min_order_amount?: number;
       max_order_amount?: number | null;
       min_weight_grams?: number;
       max_weight_grams?: number | null;
       rate: number;
       free_above_amount?: number | null;
+      carrier_markup_percent?: number;
+      carrier_markup_amount?: number;
       eta_min_days?: number;
       eta_max_days?: number;
       is_active?: boolean;
@@ -120,22 +128,26 @@ export const shippingRepository = {
   ): Promise<number> {
     return insert(
       `INSERT INTO shipping_rates
-         (shop_id, name, zone, zone_id, method, min_order_amount, max_order_amount, min_weight_grams,
-          max_weight_grams, rate, free_above_amount, eta_min_days, eta_max_days,
+         (shop_id, name, zone, zone_id, method, rate_type, carrier_id, min_order_amount, max_order_amount, min_weight_grams,
+          max_weight_grams, rate, free_above_amount, carrier_markup_percent, carrier_markup_amount, eta_min_days, eta_max_days,
           is_active, priority)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         shopId(),
         data.name,
         data.zone ?? 'all',
         data.zone_id ?? null,
         data.method ?? 'standard',
+        data.rate_type ?? 'flat',
+        data.carrier_id ?? null,
         data.min_order_amount ?? 0,
         data.max_order_amount ?? null,
         data.min_weight_grams ?? 0,
         data.max_weight_grams ?? null,
         data.rate,
         data.free_above_amount ?? null,
+        data.carrier_markup_percent ?? 0,
+        data.carrier_markup_amount ?? 0,
         data.eta_min_days ?? 3,
         data.eta_max_days ?? 7,
         data.is_active !== false ? 1 : 0,
@@ -151,8 +163,9 @@ export const shippingRepository = {
     exec: Executor = pool,
   ): Promise<void> {
     const allowed = [
-      'name', 'zone', 'zone_id', 'method', 'min_order_amount', 'max_order_amount',
+      'name', 'zone', 'zone_id', 'method', 'rate_type', 'carrier_id', 'min_order_amount', 'max_order_amount',
       'min_weight_grams', 'max_weight_grams', 'rate', 'free_above_amount',
+      'carrier_markup_percent', 'carrier_markup_amount',
       'eta_min_days', 'eta_max_days', 'is_active', 'priority',
     ];
     const sets: string[] = [];

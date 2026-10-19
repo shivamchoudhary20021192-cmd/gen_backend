@@ -150,33 +150,50 @@ function presentPage(row: PublicPageRow) {
   };
 }
 
+/** A page row with its sections and blocks, ready for the storefront. */
+async function assemblePage(row: PublicPageRow) {
+  const sections = await contentPublicRepository.sectionsFor(row.id);
+  const blocks = await contentPublicRepository.blocksFor(sections.map((section) => section.id));
+
+  const resolved = await contentPublicRepository.resolveLinkTargets(
+    blocks
+      .filter((block) => block.link_ref_id)
+      .map((block) => ({ type: block.link_type, id: Number(block.link_ref_id) })),
+  );
+
+  return {
+    page: presentPage(row),
+    sections: sections.map((section) => ({
+      key: section.section_key,
+      name: section.name,
+      background: section.background,
+      padding: { top: section.padding_top, bottom: section.padding_bottom },
+      settings: parseJson(section.settings),
+      blocks: blocks
+        .filter((block) => block.section_id === section.id)
+        .map((block) => presentBlock(block, resolved)),
+    })),
+  };
+}
+
 export const contentPublicService = {
   async page(slug: string) {
     const row = await contentPublicRepository.pageBySlug(slug);
     if (!row) throw ApiError.notFound('That page does not exist.');
+    return assemblePage(row);
+  },
 
-    const sections = await contentPublicRepository.sectionsFor(row.id);
-    const blocks = await contentPublicRepository.blocksFor(sections.map((section) => section.id));
-
-    const resolved = await contentPublicRepository.resolveLinkTargets(
-      blocks
-        .filter((block) => block.link_ref_id)
-        .map((block) => ({ type: block.link_type, id: Number(block.link_ref_id) })),
-    );
-
-    return {
-      page: presentPage(row),
-      sections: sections.map((section) => ({
-        key: section.section_key,
-        name: section.name,
-        background: section.background,
-        padding: { top: section.padding_top, bottom: section.padding_bottom },
-        settings: parseJson(section.settings),
-        blocks: blocks
-          .filter((block) => block.section_id === section.id)
-          .map((block) => presentBlock(block, resolved)),
-      })),
-    };
+  /**
+   * A page through its preview link: the same shape as `page`, so the
+   * storefront renders a draft exactly as it would render it live, plus what
+   * state it is in. Never indexable, whatever the page says.
+   */
+  async previewPage(token: string) {
+    const row = await contentPublicRepository.pageByPreviewToken(token);
+    if (!row) throw ApiError.notFound('This preview link is not valid any more.');
+    const assembled = await assemblePage(row);
+    assembled.page.seo.is_indexable = false;
+    return { ...assembled, preview: { status: row.status } };
   },
 
   async pageIndex() {

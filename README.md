@@ -97,7 +97,7 @@ Adding a module (orders, customers, coupons) is one folder plus one line in
 | Plural envelope + meta on read | `{ "products": [ … ], "pagination": { … } }` |
 | Nested sub-resources | `/products/:id/variants/:variantId` |
 | Actions as POST, not PATCH | `POST /products/:id/publish` |
-| `Idempotency-Key` on POST | honoured; replays the first response |
+| `Idempotency-Key` on POST | honoured; replays the first response for 10 minutes, on any node |
 | 422 with per-field errors | `{ error: { code, message, request_id, details } }` |
 
 **Deliberate divergence:** Shopify's `variants[].option1/option2/option3`
@@ -145,6 +145,41 @@ POST /auth/login  →  { access_token (15 min JWT), refresh_token (30 d opaque),
   suspended admin loses access within 30 seconds rather than at token expiry.
 - **Lockout** after 5 failed attempts for 15 minutes; login is rate-limited per
   email *and* per IP, because limiting only one of those leaves the other open.
+
+### Two-step sign-in (TOTP)
+
+Opt-in per person, from any authenticator app. With it on, the password alone
+opens nothing:
+
+```
+POST /auth/login       { email, password }      → { mfa_required: true, mfa_token, mfa_methods, expires_in: 300 }
+POST /auth/login/mfa   { mfa_token, code }      → the usual login response
+```
+
+`code` is the app's six digits or a one-time recovery code (`abcde-fghjk`).
+
+- **A code works once.** The 30-second step of the last accepted code is stored
+  and only a later step is accepted, in one `UPDATE`, so a code read over
+  someone's shoulder cannot be replayed inside its window.
+- **Wrong codes lock the account** exactly like wrong passwords, and the
+  attempt is counted *before* the code is checked, so a burst of parallel
+  guesses still gets 5 between them. A correct password does not reset the
+  counter while a code is still owed.
+- The challenge is a 5-minute JWT with its own audience: it is never accepted
+  as an access token, and it dies if the password changes.
+- The secret is sealed by the vault, bound to the person; recovery codes are
+  stored only as peppered hashes and shown once.
+
+```
+GET  /auth/mfa                    status, recovery codes left
+POST /auth/mfa/setup              { password }        → secret + otpauth:// URI (not on yet)
+POST /auth/mfa/enable             { code }            → on; 10 recovery codes; other sessions signed out
+POST /auth/mfa/disable            { password, code }
+POST /auth/mfa/recovery-codes     { code }            → a new set; the old one stops working
+POST /platform/api/v1/people/:id/mfa/reset  { reason }   platform admins, never for themselves
+```
+
+`npm run smoke:mfa` walks all of it against a running server (43 checks).
 
 ## Authorisation — deny wins
 
@@ -275,8 +310,10 @@ test fires `name); DROP TABLE products; --` at it and gets a 422.
 
 ```
 AUTH        POST   /auth/login | /auth/refresh | /auth/logout
-            GET    /auth/me | /auth/sessions
+            POST   /auth/login/mfa
+            GET    /auth/me | /auth/sessions | /auth/mfa
             POST   /auth/change-password
+            POST   /auth/mfa/setup | /enable | /disable | /recovery-codes
             DELETE /auth/sessions/:id
 
 ADMINS      GET    /admin-users              list, filter, search
@@ -521,13 +558,14 @@ call.
 2. Change `SUPERADMIN_PASSWORD`; the seed script refuses the default in prod.
 3. Put the media root on a mounted volume, or implement `S3Driver` and flip
    `STORAGE_DRIVER`.
-4. Move the idempotency cache out of process if you run more than one node
-   (Redis, or a small `idempotency_keys` table) — the interface doesn't change.
+4. ~~Move the idempotency cache out of process~~ — done: keys live in the
+   `idempotency_keys` table, so a replay holds across every node and a
+   restart (`npm run smoke:idempotency` runs it against two nodes).
 5. Schedule the housekeeping jobs: `purgeExpiredRateLimits`, expired-session
    sweep, orphan-media sweep (`usage_count = 0` for 30+ days), automatic
    collection recalculation.
-6. Wire TOTP verification — the schema, the login response shape and the
-   `mfa_satisfied_at` column are already in place.
+6. Decide who must use two-step sign-in. It is opt-in per person today; the
+   `auth.admin_mfa_required` setting is not yet enforced.
 
 ## Not in this phase
 

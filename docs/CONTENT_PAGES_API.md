@@ -195,9 +195,38 @@ PageWithRelations {
 ### 12. Mark as Reviewed
 **POST** `/admin/api/v1/content/pages/:id/review`
 
-**Permission**: `content.pages.edit`
+**Permission**: `cms.review` — separate from `cms.edit`, so the person who wrote a
+regulated page need not be the one who signs it off. Every role that had
+`cms.edit` was given `cms.review` by migration 139; take it off a role to
+separate the duties.
 
-**Response**: 200 OK
+**Response**: 200 OK. 400 when the page does not require legal review.
+
+---
+
+### 12a. Preview Link
+**POST** `/admin/api/v1/content/pages/:id/preview-link` — issue, or replace, a
+shareable link to a page in any state but archived (409 for archived).
+
+**DELETE** `/admin/api/v1/content/pages/:id/preview-link` — revoke it (204).
+
+**Permission**: `cms.edit`
+
+**Response**:
+```json
+{ "preview_token": "6f1c…-…", "preview_path": "/api/v1/content/pages/preview/6f1c…-…" }
+```
+
+Issuing again replaces the token, so the old link stops working at once.
+
+The link is read through the storefront API, like the live page:
+
+**GET** `/api/v1/content/pages/preview/:token` — the same body as
+`GET /api/v1/content/pages/:slug`, plus `"preview": { "status": "draft" }`, with
+`seo.is_indexable` always false, `Cache-Control: private, no-store` and
+`X-Robots-Tag: noindex, nofollow`. It works while the store is behind its
+password (the token is the secret), and 404s for an unknown, replaced or
+revoked token, or on another shop.
 
 ---
 

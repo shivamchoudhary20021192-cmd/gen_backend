@@ -50,7 +50,7 @@ export const BASE_ROLES: RoleSeed[] = [
     description: 'Pages, blog, media, SEO and the theme. No payment or refund access.',
     level: 40,
     permissions: [
-      'analytics.view', 'apps.view', 'claims.manage', 'cms.edit', 'cms.menus', 'cms.publish', 'cms.redirects', 'cms.view',
+      'analytics.view', 'apps.view', 'claims.manage', 'cms.edit', 'cms.menus', 'cms.publish', 'cms.redirects', 'cms.review', 'cms.view',
       'integrations.view', 'media.delete', 'media.upload', 'media.view', 'products.view', 'reviews.moderate',
       'reviews.view', 'seo.manage', 'shop.view', 'themes.manage', 'themes.view',
     ],
@@ -61,7 +61,7 @@ export const BASE_ROLES: RoleSeed[] = [
     description: 'Discounts, campaigns, landing pages and reports.',
     level: 45,
     permissions: [
-      'analytics.view', 'cms.edit', 'cms.publish', 'cms.view', 'coupons.manage', 'coupons.view', 'gift_cards.manage', 'gift_cards.view',
+      'analytics.view', 'cms.edit', 'cms.publish', 'cms.review', 'cms.view', 'coupons.manage', 'coupons.view', 'gift_cards.manage', 'gift_cards.view',
       'media.upload', 'media.view', 'notifications.manage', 'notifications.view', 'products.view', 'seo.manage',
     ],
   },

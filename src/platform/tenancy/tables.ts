@@ -57,6 +57,8 @@ export const CONTROL_PLANE_TABLES: ReadonlySet<string> = new Set([
   'exchange_rates',
   'rate_limits',
   'api_rate_buckets',
+  // Idempotency-Key claims: the shop is part of the hashed key, not a column
+  'idempotency_keys',
   'job_runs',
   'media_migrations',
   'feature_flags',

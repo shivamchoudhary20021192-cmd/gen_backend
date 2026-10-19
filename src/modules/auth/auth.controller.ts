@@ -3,6 +3,7 @@ import { ApiError } from '../../core/ApiError';
 import { clientIp } from '../../middleware/requestContext';
 import { authService, toPublicAdmin, type SessionActor } from './auth.service';
 import { authRepository } from './auth.repository';
+import { mfaService } from './mfa.service';
 
 function meta(req: Request) {
   return {
@@ -28,6 +29,35 @@ export const authController = {
     const { email, password } = req.body as { email: string; password: string };
     const result = await authService.login(email, password, meta(req));
     res.status(200).json(result);
+  },
+
+  async completeMfaLogin(req: Request, res: Response): Promise<void> {
+    const { mfa_token, code } = req.body as { mfa_token: string; code: string };
+    res.status(200).json(await authService.completeMfaLogin(mfa_token, code, meta(req)));
+  },
+
+  async mfaStatus(req: Request, res: Response): Promise<void> {
+    res.status(200).json({ mfa: await mfaService.status(req.identity!.id) });
+  },
+
+  async mfaSetup(req: Request, res: Response): Promise<void> {
+    const { password } = req.body as { password: string };
+    res.status(200).json(await mfaService.beginSetup(sessionActor(req), password));
+  },
+
+  async mfaEnable(req: Request, res: Response): Promise<void> {
+    const { code } = req.body as { code: string };
+    res.status(200).json(await mfaService.enable(sessionActor(req), code, meta(req)));
+  },
+
+  async mfaDisable(req: Request, res: Response): Promise<void> {
+    const { password, code } = req.body as { password: string; code: string };
+    res.status(200).json({ mfa: await mfaService.disable(sessionActor(req), password, code, meta(req)) });
+  },
+
+  async mfaRecoveryCodes(req: Request, res: Response): Promise<void> {
+    const { code } = req.body as { code: string };
+    res.status(200).json(await mfaService.regenerateRecoveryCodes(sessionActor(req), code, meta(req)));
   },
 
   async refresh(req: Request, res: Response): Promise<void> {

@@ -116,6 +116,21 @@ contentPublicRoutes.get(
   }),
 );
 
+/**
+ * A draft through its preview link (issued from the admin). Never cached and
+ * never indexed: the link is a secret, and what it shows is not public yet.
+ */
+contentPublicRoutes.get(
+  '/pages/preview/:token',
+  browseLimit,
+  validate({ params: z.object({ token: z.string().uuid() }) }),
+  asyncHandler(async (req: Request, res: Response) => {
+    res.setHeader('Cache-Control', 'private, no-store');
+    res.setHeader('X-Robots-Tag', 'noindex, nofollow');
+    res.status(200).json(await contentPublicService.previewPage(String(req.params.token)));
+  }),
+);
+
 contentPublicRoutes.get(
   '/pages/:slug',
   browseLimit,

@@ -5,6 +5,8 @@ import {
   type CourierStatus,
   type CreateShipmentInput,
   type CreateShipmentResult,
+  type RateQuote,
+  type RateQuoteInput,
   type ReversePickupInput,
   type ShipmentAddress,
   type TrackingEvent,
@@ -108,7 +110,7 @@ class ShiprocketCourier implements CourierProvider {
     return data.token;
   }
 
-  private async call<T = Record<string, unknown>>(path: string, init: { method?: 'GET' | 'POST'; json?: unknown } = {}): Promise<T> {
+  private async call<T = Record<string, unknown>>(path: string, init: { method?: 'GET' | 'POST'; json?: unknown; timeoutMs?: number } = {}): Promise<T> {
     try {
       const { data } = await providerFetch<T>({
         provider: 'shiprocket',
@@ -116,7 +118,7 @@ class ShiprocketCourier implements CourierProvider {
         url: `${API}${path}`,
         headers: { Authorization: `Bearer ${await this.token()}` },
         json: init.json,
-        timeoutMs: 25_000,
+        timeoutMs: init.timeoutMs ?? 25_000,
         errorMessage: commonErrorMessage,
       });
       return data;
@@ -229,6 +231,44 @@ class ShiprocketCourier implements CourierProvider {
       estimatedDeliveryAt: edd && !Number.isNaN(edd.getTime()) ? edd : null,
       deliveredAt: current === 'delivered' && delivered && !Number.isNaN(delivered.getTime()) ? delivered : null,
     };
+  }
+
+  /**
+   * Courier serviceability: every courier on the account that serves this
+   * route, with its price and delivery estimate. Weight goes in kilograms.
+   * With a preferred courier configured, only that courier's price counts —
+   * it is the one the parcel will be booked with.
+   */
+  async quoteRates(input: RateQuoteInput): Promise<RateQuote[]> {
+    if (input.origin.country !== 'IN' || input.destination.country !== 'IN') return [];
+    const params = new URLSearchParams({
+      pickup_postcode: input.origin.postalCode,
+      delivery_postcode: input.destination.postalCode,
+      weight: String(Math.max(0.1, input.weightGrams / 1000)),
+      cod: input.cod ? '1' : '0',
+      declared_value: String(Math.round(input.declaredValue)),
+    });
+    const data = await this.call<{ data?: { available_courier_companies?: Record<string, unknown>[] } }>(
+      `/courier/serviceability/?${params.toString()}`,
+      { method: 'GET', timeoutMs: 5_000 },
+    );
+    const preferred = Number(this.context.config.courier_company_id ?? 0) || null;
+    const quotes: RateQuote[] = [];
+    for (const company of data.data?.available_courier_companies ?? []) {
+      if (preferred !== null && Number(company.courier_company_id) !== preferred) continue;
+      const amount = Number(company.rate ?? company.freight_charge);
+      if (!Number.isFinite(amount) || amount <= 0) continue;
+      const days = Number(company.estimated_delivery_days);
+      quotes.push({
+        mode: company.is_surface === true || company.is_surface === 1 ? 'surface' : 'air',
+        service: String(company.courier_name ?? 'Shiprocket'),
+        amount,
+        currency: 'INR',
+        etaMinDays: Number.isFinite(days) && days > 0 ? days : null,
+        etaMaxDays: Number.isFinite(days) && days > 0 ? days : null,
+      });
+    }
+    return quotes;
   }
 
   async createReversePickup(input: ReversePickupInput): Promise<CreateShipmentResult> {

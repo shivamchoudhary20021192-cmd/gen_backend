@@ -3,6 +3,7 @@ import { ShopScopedCache } from '../../platform/cache/shopCache';
 import { shopPricing } from '../../platform/commerce/shopPricing';
 import { roundMoney } from '../../platform/money/currency';
 import { shopId, tenancy } from '../../platform/tenancy/context';
+import { carrierQuotes, carrierRates, pickQuote, withMarkup } from './carrierRates';
 
 /**
  * What delivery costs for this basket, to this address, by each method the
@@ -23,6 +24,11 @@ import { shopId, tenancy } from '../../platform/tenancy/context';
  *
  * A shop with no rate rows at all falls back to its flat standard cost setting,
  * which is what the single-shop checkout charged.
+ *
+ * A row can be carrier-calculated (`rate_type = 'carrier'`): it matches like
+ * any other, but its price is the connected courier's live quote for this
+ * parcel and address, plus the row's markup — and the row's own `rate` when
+ * the courier cannot answer (see carrierRates.ts). Free-above still applies.
  */
 
 export type ShippingMethod = 'standard' | 'express' | 'pickup';
@@ -36,6 +42,13 @@ export interface ShippingOption {
   freeAbove: number | null;
   etaMinDays: number;
   etaMaxDays: number;
+  /**
+   * Where the price came from: the rate table, a courier's live quote, or a
+   * carrier-calculated row's fallback because the courier could not answer.
+   */
+  rateSource: 'table' | 'carrier' | 'carrier_fallback';
+  /** The courier service a live quote priced, e.g. "Delhivery Surface". */
+  carrierService: string | null;
 }
 
 export interface ShippingQuote {
@@ -57,6 +70,10 @@ interface RateRow extends RowDataPacket {
   zone: string;
   zone_id: number | null;
   method: ShippingMethod;
+  rate_type: 'flat' | 'carrier';
+  carrier_id: number | null;
+  carrier_markup_percent: string;
+  carrier_markup_amount: string;
   min_order_amount: string;
   max_order_amount: string | null;
   min_weight_grams: number;
@@ -194,6 +211,8 @@ export const shippingQuote = {
         freeAbove: pricing.shipping.freeAbove,
         etaMinDays: area?.standard_eta_min_days ?? 3,
         etaMaxDays: area?.standard_eta_max_days ?? 7,
+        rateSource: 'table',
+        carrierService: null,
       });
     } else {
       // In a zone, the zone's rates are the whole offer. Outside every zone,
@@ -215,17 +234,44 @@ export const shippingQuote = {
         const rate = matching[0];
         if (!rate) continue;
         const freeAbove = rate.free_above_amount === null ? null : num(rate.free_above_amount);
-        const base = round(num(rate.rate));
+        let base = round(num(rate.rate));
+        let etaMinDays =
+          method === 'standard' && area ? area.standard_eta_min_days : method === 'express' && area?.express_eta_days ? area.express_eta_days : rate.eta_min_days;
+        let etaMaxDays =
+          method === 'standard' && area ? area.standard_eta_max_days : method === 'express' && area?.express_eta_days ? area.express_eta_days : rate.eta_max_days;
+        let rateSource: ShippingOption['rateSource'] = 'table';
+        let carrierService: string | null = null;
+
+        // Store pickup is never a parcel, whatever the row says.
+        if (rate.rate_type === 'carrier' && method !== 'pickup') {
+          rateSource = 'carrier_fallback';
+          const offered = rate.carrier_id && input.postalCode
+            ? await carrierQuotes(Number(rate.carrier_id), {
+                destination: { postalCode: input.postalCode.trim().toUpperCase(), country, region: input.region ?? null },
+                weightGrams: input.weightGrams,
+                declaredValue: input.subtotal,
+              })
+            : null;
+          const live = offered ? pickQuote(offered, method) : null;
+          if (live) {
+            base = round(withMarkup(live.amount, rate));
+            etaMinDays = live.etaMinDays ?? etaMinDays;
+            etaMaxDays = live.etaMaxDays ?? Math.max(etaMaxDays, etaMinDays);
+            rateSource = 'carrier';
+            carrierService = live.service;
+          }
+        }
+
         options.push({
           method,
           name: rate.name,
           price: freeAbove !== null && input.subtotal >= freeAbove ? 0 : base,
           basePrice: base,
           freeAbove,
-          etaMinDays:
-            method === 'standard' && area ? area.standard_eta_min_days : method === 'express' && area?.express_eta_days ? area.express_eta_days : rate.eta_min_days,
-          etaMaxDays:
-            method === 'standard' && area ? area.standard_eta_max_days : method === 'express' && area?.express_eta_days ? area.express_eta_days : rate.eta_max_days,
+          etaMinDays,
+          etaMaxDays,
+          rateSource,
+          carrierService,
         });
       }
     }
@@ -253,5 +299,6 @@ export const shippingQuote = {
   invalidate(): void {
     ratesCache.clear();
     zonesCache.clear();
+    carrierRates.invalidate();
   },
 };

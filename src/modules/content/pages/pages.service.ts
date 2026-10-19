@@ -5,6 +5,7 @@
  * Handles validation, workflow management, slug generation, and orchestration.
  */
 
+import { randomUUID } from 'node:crypto'
 import { pagesRepository } from './pages.repository'
 import { ApiError } from '../../../core/ApiError'
 import { slugify } from '../../../core/slug'
@@ -23,6 +24,26 @@ import type {
   UpdateSectionDto,
 } from './pages.types'
 import { PAGE_STATUS_TRANSITIONS } from './pages.types'
+
+const toCamel = (key: string) => key.replace(/_([a-z])/g, (_match, letter: string) => letter.toUpperCase())
+
+/**
+ * A field of a page or section row, whichever casing it arrived in.
+ *
+ * pagesRepository aliases columns to camelCase (`requiresLegalReview`,
+ * `bodyHtml`, `sectionKey`) — the shape the admin screens read — while the
+ * types declare snake_case. Rules that read the declared name saw
+ * `undefined`: the legal-review gate never fired, and duplicating a page
+ * failed on a NULL page_type. Business rules read through this instead.
+ */
+function read<T extends object, K extends keyof T>(row: T, key: K): T[K] {
+  const record = row as unknown as Record<string, unknown>
+  const name = String(key)
+  return (record[name] !== undefined ? record[name] : record[toCamel(name)]) as T[K]
+}
+
+/** MySQL hands booleans back as 0/1. */
+const flag = (value: unknown): boolean => value === true || Number(value) === 1
 import { nowForDb } from '../../../core/now'
 
 export const pagesService = {
@@ -99,6 +120,12 @@ export const pagesService = {
       data.status = 'scheduled'
     }
 
+    // A page that needs legal review cannot be reviewed before it exists, so
+    // it cannot be created live either.
+    if (data.requires_legal_review && (data.status === 'published' || data.status === 'scheduled')) {
+      throw new ApiError(400, 'INVALID_TRANSITION', 'Page requires legal review before publishing')
+    }
+
     // Create page
     const pageId = await pagesRepository.create(data, adminId)
 
@@ -130,8 +157,8 @@ export const pagesService = {
     }
 
     // Check legal review requirement
-    if (existingPage.requires_legal_review && data.status === 'published') {
-      if (!existingPage.reviewed_at) {
+    if (flag(read(existingPage, 'requires_legal_review')) && data.status === 'published') {
+      if (!read(existingPage, 'reviewed_at')) {
         throw new ApiError(400, 'INVALID_TRANSITION', 'Page requires legal review before publishing')
       }
     }
@@ -154,7 +181,7 @@ export const pagesService = {
     const page = await this.getById(id)
 
     // Check legal review if required
-    if (page.requires_legal_review && !page.reviewed_at) {
+    if (flag(read(page, 'requires_legal_review')) && !read(page, 'reviewed_at')) {
       throw new ApiError(400, 'INVALID_TRANSITION', 'Page requires legal review before publishing')
     }
 
@@ -258,17 +285,17 @@ export const pagesService = {
       slug: `${original.slug}-copy`,
       title: `${original.title} (Copy)`,
       subtitle: original.subtitle || undefined,
-      page_type: original.page_type,
+      page_type: read(original, 'page_type'),
       template: original.template,
       locale: original.locale,
-      body_html: original.body_html || undefined,
-      body_json: original.body_json || undefined,
-      hero_media_id: original.hero_media_id || undefined,
+      body_html: read(original, 'body_html') || undefined,
+      body_json: read(original, 'body_json') || undefined,
+      hero_media_id: read(original, 'hero_media_id') || undefined,
       status: 'draft',
-      requires_legal_review: original.requires_legal_review,
-      is_indexable: original.is_indexable,
-      show_in_sitemap: original.show_in_sitemap,
-      parent_id: original.parent_id || undefined,
+      requires_legal_review: flag(read(original, 'requires_legal_review')),
+      is_indexable: flag(read(original, 'is_indexable')),
+      show_in_sitemap: flag(read(original, 'show_in_sitemap')),
+      parent_id: read(original, 'parent_id') || undefined,
     }
 
     const newPageId = await pagesRepository.create(duplicateData, adminId)
@@ -277,16 +304,16 @@ export const pagesService = {
     if (original.sections && original.sections.length > 0) {
       for (const section of original.sections) {
         const sectionData: CreateSectionDto = {
-          section_key: section.section_key,
+          section_key: read(section, 'section_key'),
           name: section.name || undefined,
-          sort_order: section.sort_order,
-          is_enabled: section.is_enabled,
+          sort_order: read(section, 'sort_order'),
+          is_enabled: flag(read(section, 'is_enabled')),
           settings: section.settings,
           background: section.background || undefined,
-          padding_top: section.padding_top,
-          padding_bottom: section.padding_bottom,
-          visible_from: section.visible_from || undefined,
-          visible_until: section.visible_until || undefined,
+          padding_top: read(section, 'padding_top'),
+          padding_bottom: read(section, 'padding_bottom'),
+          visible_from: read(section, 'visible_from') || undefined,
+          visible_until: read(section, 'visible_until') || undefined,
         }
         await pagesRepository.createSection(newPageId, sectionData)
       }
@@ -301,7 +328,7 @@ export const pagesService = {
   async markReviewed(id: number, adminId: number): Promise<PageWithRelations> {
     const page = await this.getById(id)
 
-    if (!page.requires_legal_review) {
+    if (!flag(read(page, 'requires_legal_review'))) {
       throw new ApiError(400, 'BAD_REQUEST', 'Page does not require legal review')
     }
 
@@ -427,20 +454,28 @@ export const pagesService = {
   },
 
   /**
-   * Get page for preview (by preview token)
+   * Issue a preview link for a page in any state but archived, so a draft can
+   * be read by someone without admin access (legal, a client) before it is
+   * published. Issuing again replaces the token, which is also how a link that
+   * was shared too widely is killed without losing the ability to preview.
    */
-  async getByPreviewToken(token: string): Promise<PageWithRelations> {
-    // This would require a separate query method in repository
-    // For now, throw not implemented
-    throw new ApiError(501, 'NOT_FOUND', 'Preview token lookup not yet implemented')
+  async issuePreviewToken(id: number): Promise<{ preview_token: string; preview_path: string }> {
+    const page = await this.getById(id)
+
+    if (page.status === 'archived') {
+      throw new ApiError(409, 'INVALID_TRANSITION', 'An archived page cannot be previewed. Restore it first.')
+    }
+
+    const token = randomUUID()
+    await pagesRepository.setPreviewToken(id, token)
+
+    return { preview_token: token, preview_path: `/api/v1/content/pages/preview/${token}` }
   },
 
-  /**
-   * Generate preview token
-   */
-  generatePreviewToken(): string {
-    // Generate a secure random token
-    return require('crypto').randomBytes(16).toString('hex')
+  /** Revoke the page's preview link; anyone holding it gets a 404 from now on. */
+  async revokePreviewToken(id: number): Promise<void> {
+    await this.getById(id)
+    await pagesRepository.setPreviewToken(id, null)
   },
 
   /**
@@ -451,7 +486,9 @@ export const pagesService = {
 
     for (const id of ids) {
       try {
-        await pagesRepository.update(id, { status }, adminId)
+        // Through `update`, so each page gets the same transition and
+        // legal-review checks as a single edit; one that fails is skipped.
+        await this.update(id, { status }, adminId)
         successCount++
       } catch (error) {
         // Continue with other pages even if one fails
